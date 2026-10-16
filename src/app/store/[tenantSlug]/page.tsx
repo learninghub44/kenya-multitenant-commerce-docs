@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import PublicCheckout from "./public-checkout";
 
 type StorefrontRow = {
   store_name: string;
@@ -61,6 +62,15 @@ export default async function StorefrontPage({ params }: { params: Promise<{ ten
         </div>
       </article>)}
     </section>
-    <footer className="storefront-footer"><p>Storefront catalogue · Ordering and checkout are not enabled in this milestone.</p></footer>
+    <PublicCheckout storeSlug={tenantSlug} products={products.map(product => ({
+      product_id: product.product_id,
+      product_title: product.product_title,
+      variants: product.variants.map(variant => ({
+        variant_id: variant.variant_id, variant_title: variant.variant_title,
+        price_minor: variant.price_minor, currency: variant.currency,
+        available_quantity: variant.available_quantity
+      }))
+    }))} />
+    <footer className="storefront-footer"><p>Public catalogue and order requests · Online payment is not enabled.</p></footer>
   </main>;
 }
