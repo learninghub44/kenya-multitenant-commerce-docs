@@ -119,7 +119,7 @@ li p { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; 
 .variant-manager > label { display: block; margin-top: 12px; font-size: 13px; font-weight: 650; }
 .variant-manager > input { display: block; width: 100%; margin-top: 6px; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); font: inherit; }
 
-.storefront-page { width: min(100% - 32px, 1120px); margin: 0 auto; padding: 38px 0 64px; }
+.storefront-page { width: 100%; margin: 0 auto; padding: 0 0 32px; background: #fff; color: #222720; }
 .storefront-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; padding: 20px 0 30px; border-bottom: 1px solid var(--border); }
 .storefront-header h1 { margin: 8px 0; font-size: clamp(30px, 5vw, 48px); }
 .storefront-header p:not(.eyebrow) { color: var(--muted); }
@@ -134,11 +134,11 @@ li p { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; 
 .store-variant span { overflow-wrap: anywhere; }
 .store-variant small { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
 .store-variant strong { white-space: nowrap; }
-.storefront-footer { padding: 28px 0; color: var(--muted); font-size: 12px; }
+.storefront-footer { max-width: 1440px; margin: 0 auto; padding: 28px clamp(18px, 4vw, 56px); color: var(--muted); font-size: 12px; }
 @media (max-width: 860px) { .storefront-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .storefront-grid { grid-template-columns: 1fr; } .store-product-image { height: 240px; } .storefront-header { flex-direction: column; } }
 
-.public-checkout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; margin-top: 36px; padding: 24px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+.public-checkout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; width: min(100% - 32px, 1280px); margin: 44px auto 0; padding: clamp(16px, 3vw, 30px); border: 1px solid var(--border); border-radius: 16px; background: #fafbf8; scroll-margin-top: 18px; }
 .public-checkout > header { grid-column: 1 / -1; }
 .public-checkout > header h2 { margin: 6px 0 8px; font-size: 26px; }
 .public-checkout > header p:not(.eyebrow) { max-width: 680px; color: var(--muted); font-size: 14px; line-height: 1.6; }
