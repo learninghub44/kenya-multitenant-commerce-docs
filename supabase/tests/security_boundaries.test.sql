@@ -1,7 +1,7 @@
 -- Structural security regression tests. Run after migrations with: supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(15);
+select extensions.plan(18);
 
 select extensions.ok(
   (select count(*) = 22 from pg_class c
@@ -91,6 +91,26 @@ select extensions.ok(
 select extensions.ok(
   position('reserved>=order_line.quantity' in pg_get_functiondef('public.release_expired_reservations_for_tenant(uuid)'::regprocedure)) > 0,
   'reservation expiry refuses to clamp inconsistent stock balances'
+);
+
+
+select extensions.ok(
+  not has_function_privilege('anon','public.is_active_tenant_member(uuid)','EXECUTE')
+  and not has_function_privilege('anon','public.has_tenant_role(uuid,public.membership_role[])','EXECUTE'),
+  'anonymous users cannot call tenant authorization helper functions'
+);
+
+select extensions.ok(
+  not has_function_privilege('anon','public.refresh_public_store_reservations(text)','EXECUTE')
+  and not has_function_privilege('authenticated','public.refresh_public_store_reservations(text)','EXECUTE'),
+  'reservation cleanup cannot be triggered directly through the public API'
+);
+
+select extensions.ok(
+  (select count(*)=1 from pg_policies
+   where schemaname='public' and tablename='inventory_locations'
+     and cmd='SELECT' and roles @> array['authenticated']::name[]),
+  'inventory locations have only one permissive SELECT policy'
 );
 
 select * from extensions.finish();
