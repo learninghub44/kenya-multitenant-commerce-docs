@@ -31,10 +31,10 @@ export default async function CategoriesPage({ params }: { params: Promise<{ ten
     <p><Link href="/dashboard">← Your businesses</Link> · <Link href={`/dashboard/${tenant.slug}/products`}>Products</Link></p>
     <header className="dashboard-header"><div><p className="eyebrow">PRODUCT CATALOGUE</p><h1>Categories</h1><p className="auth-description">Organize products for {tenant.name}.</p></div><span className="workspace-status">{categories.length} categories</span></header>
     <section className="workspace-list">
-      {categories.length === 0 ? <div className="empty-state"><h2>No categories yet</h2><p>Create categories for your business catalogue. Product-to-category assignment is a follow-up step.</p></div> : categories.map(category =>
+      {!canManage && (categories.length === 0 ? <div className="empty-state"><h2>No categories yet</h2><p>This business has not created categories.</p></div> : categories.map(category =>
         <article className="workspace-card" key={category.id}><div><h2>{category.name}</h2><p>/{category.slug}</p></div><span className="workspace-status">{category.status}</span></article>
-      )}
+      ))}
     </section>
-    {canManage ? <CategoryManager tenantId={tenant.id} /> : <p className="field-help">Your role can view categories but cannot create them.</p>}
+    {canManage ? <CategoryManager tenantId={tenant.id} categories={categories} /> : <p className="field-help">Your role can view categories but cannot create them.</p>}
   </main>;
 }
