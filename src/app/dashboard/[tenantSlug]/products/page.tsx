@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import NewProductForm from "./new-product-form";
+import ProductEditor from "./product-editor";
 
 type ProductRow = {
   id: string;
@@ -56,7 +57,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
   let variants: VariantRow[] = [];
   if (products.length) {
     const { data, error } = await supabase.from("product_variants")
-      .select("product_id, sku, price_minor, currency")
+      .select("id, product_id, sku, price_minor, currency")
       .eq("tenant_id", tenant.id)
       .in("product_id", products.map(product => product.id));
     if (error) {
@@ -75,7 +76,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
           const variant = variants.find(item => item.product_id === product.id);
           return <article className="workspace-card product-card" key={product.id}>
             <div><h2>{product.title}</h2><p>/{product.slug}{variant?.sku ? ` · SKU ${variant.sku}` : ""}</p>{product.description && <p>{product.description}</p>}<span className="workspace-status">{product.status}</span></div>
-            <strong className="product-price">{variant ? new Intl.NumberFormat("en-KE", { style: "currency", currency: variant.currency }).format(variant.price_minor / 100) : "Price unavailable"}</strong>
+            <div className="product-card-side"><strong className="product-price">{variant ? new Intl.NumberFormat("en-KE", { style: "currency", currency: variant.currency }).format(variant.price_minor / 100) : "Price unavailable"}</strong>{canManage && variant && <ProductEditor tenantId={tenant.id} productId={product.id} variantId={variant.id} initialTitle={product.title} initialSlug={product.slug} initialDescription={product.description} initialPriceMinor={variant.price_minor} initialSku={variant.sku} initialStatus={product.status} />}</div>
           </article>;
         })}
       </section>
