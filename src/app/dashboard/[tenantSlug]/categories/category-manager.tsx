@@ -45,11 +45,16 @@ export default function CategoryManager({ tenantId, categories }: { tenantId: st
       const supabase = createSupabaseBrowserClient();
       const { data, error: authError } = await supabase.auth.getUser();
       if (authError || !data.user) throw new Error("Your session has expired. Sign in again.");
-      const nextName = window.prompt("Category name", category.name);
-      if (nextName === null) return;
-      const nextSlugInput = window.prompt("Category URL slug", category.slug);
-      if (nextSlugInput === null) return;
-      const nextSlug = slugify(nextSlugInput);
+      let nextName = category.name;
+      let nextSlug = category.slug;
+      if (status === "published") {
+        const nextNameInput = window.prompt("Category name", category.name);
+        if (nextNameInput === null) return;
+        const nextSlugInput = window.prompt("Category URL slug", category.slug);
+        if (nextSlugInput === null) return;
+        nextName = nextNameInput.trim();
+        nextSlug = slugify(nextSlugInput);
+      }
       if (!nextName.trim() || nextName.trim().length > 100 || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(nextSlug)) {
         throw new Error("Enter a valid category name and slug.");
       }
