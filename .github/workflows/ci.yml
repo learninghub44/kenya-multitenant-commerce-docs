@@ -53,8 +53,10 @@ jobs:
         uses: supabase/setup-cli@v1
         with:
           version: latest
-      - name: Start local Supabase and apply migrations
+      - name: Start local Supabase
         run: supabase start
+      - name: Reset database and apply every migration
+        run: supabase db reset
       - name: Run database security regression tests
         run: supabase test db
       - name: Stop local Supabase
