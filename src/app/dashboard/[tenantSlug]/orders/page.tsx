@@ -42,7 +42,7 @@ export default async function OrdersPage({ params }: { params: Promise<{ tenantS
     return <main className="dashboard-page"><Link href={`/dashboard/${tenant.slug}/products`}>← Products</Link><p role="alert">Could not load order items.</p></main>;
   }
   const items = (itemData ?? []) as ItemRow[];
-  const canRecordPayment = ["owner","manager","finance_viewer"].includes(membership.role);
+  const canRecordPayment = ["owner","manager"].includes(membership.role);
   const canManageOrders = ["owner","manager","order_operator"].includes(membership.role);
 
   return <main className="dashboard-page">
