@@ -63,7 +63,8 @@ export default function AuthPage() {
 
   return (
     <AuthShell
-      headline="Sell online and run the business behind it."
+      headline="Your online shop, "
+      accent="ready in minutes."
       summary="One account for your storefront, stock and orders."
       points={["Publish products with photos, prices and variants", "Keep stock counts accurate as you sell", "Follow every order from request to fulfilment"]}
     >

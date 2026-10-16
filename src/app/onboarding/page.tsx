@@ -50,7 +50,8 @@ export default function OnboardingPage() {
 
   return (
     <AuthShell
-      headline="Give your business its own workspace."
+      headline="Give your business "
+      accent="its own workspace."
       summary="Each workspace keeps its catalogue, stock and team separate from your other businesses."
     >
       <section className="auth-card" aria-labelledby="onboarding-title">

@@ -3,12 +3,13 @@ import type { ReactNode } from "react";
 
 type AuthShellProps = {
   headline: string;
+  accent: string;
   summary: string;
   points?: string[];
   children: ReactNode;
 };
 
-export default function AuthShell({ headline, summary, points, children }: AuthShellProps) {
+export default function AuthShell({ headline, accent, summary, points, children }: AuthShellProps) {
   return (
     <main className="auth-shell">
       <aside className="auth-aside">
@@ -17,7 +18,7 @@ export default function AuthShell({ headline, summary, points, children }: AuthS
           Commerce Workspace
         </Link>
         <div>
-          <h2>{headline}</h2>
+          <h2>{headline}<span>{accent}</span></h2>
           <p>{summary}</p>
           {points && (
             <ul className="auth-points">
