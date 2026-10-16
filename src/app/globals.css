@@ -173,3 +173,16 @@ li p { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; 
 .order-actions label { font-size: 12px; font-weight: 650; }
 .order-actions input { width: 100%; min-width: 0; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font: inherit; }
 @media (max-width: 560px) { .order-card-header { flex-direction: column; } .order-line-list li { gap: 8px; } .order-actions form { width: 100%; } }
+
+.erp-manager { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; margin-top: 28px; }
+.erp-section { display: grid; align-content: start; gap: 14px; min-width: 0; padding: 20px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+.erp-section-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.erp-section-heading h2 { margin: 5px 0 0; }
+.erp-record-list { display: grid; gap: 8px; }
+.erp-record-list > div { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 11px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; }
+.erp-record-list small { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; }
+.erp-section .product-form { margin-top: 0; padding: 16px; }
+.erp-section .product-form h3 { margin: 0 0 4px; font-size: 15px; }
+.erp-section .product-form label { display: block; margin-top: 10px; font-size: 12px; font-weight: 650; }
+.erp-section .product-form input, .erp-section .product-form select { width: 100%; min-width: 0; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); font: inherit; }
+@media (max-width: 800px) { .erp-manager { grid-template-columns: 1fr; } }
