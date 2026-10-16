@@ -41,6 +41,7 @@ The feature branch includes authentication and tenant onboarding, product/catego
 - [Implementation status](docs/23-implementation-status.md)
 - [Commerce and ERP domain foundation](docs/25-commerce-erp-domain.md)
 - [Review and release checklist](docs/26-review-and-release-checklist.md)
+- [Cloudflare Workers deployment](docs/28-cloudflare-workers-deployment.md)
 - [Agent instructions](AGENTS.md)
 
 ## Stack and architecture
