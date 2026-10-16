@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import NewProductForm from "./new-product-form";
 import ProductEditor from "./product-editor";
+import ProductCategoryAssignment from "./product-category-assignment";
 
 type ProductRow = {
   id: string;
@@ -10,10 +11,14 @@ type ProductRow = {
   slug: string;
   description: string;
   status: string;
+  category_id: string | null;
   created_at: string;
 };
 
+type CategoryRow = { id: string; name: string; status: string };
+
 type VariantRow = {
+  id: string;
   product_id: string;
   sku: string | null;
   price_minor: number;
@@ -46,7 +51,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
 
   const { data: productsData, error: productsError } = await supabase
     .from("products")
-    .select("id, title, slug, description, status, created_at")
+    .select("id, title, slug, description, status, category_id, created_at")
     .eq("tenant_id", tenant.id)
     .order("created_at", { ascending: false });
   if (productsError) {
@@ -54,6 +59,12 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
   }
 
   const products = (productsData ?? []) as ProductRow[];
+  const { data: categoriesData, error: categoriesError } = await supabase.from("categories")
+    .select("id, name, status").eq("tenant_id", tenant.id).eq("status", "published").order("name");
+  if (categoriesError) {
+    return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><p role="alert">Could not load categories. Confirm the category migration is applied.</p></main>;
+  }
+  const categories = (categoriesData ?? []) as CategoryRow[];
   let variants: VariantRow[] = [];
   if (products.length) {
     const { data, error } = await supabase.from("product_variants")
@@ -75,8 +86,8 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
         {products.length === 0 ? <div className="empty-state"><h2>No products yet</h2><p>Add your first product. It will be saved as a draft and will not appear on a public storefront.</p></div> : products.map(product => {
           const variant = variants.find(item => item.product_id === product.id);
           return <article className="workspace-card product-card" key={product.id}>
-            <div><h2>{product.title}</h2><p>/{product.slug}{variant?.sku ? ` · SKU ${variant.sku}` : ""}</p>{product.description && <p>{product.description}</p>}<span className="workspace-status">{product.status}</span></div>
-            <div className="product-card-side"><strong className="product-price">{variant ? new Intl.NumberFormat("en-KE", { style: "currency", currency: variant.currency }).format(variant.price_minor / 100) : "Price unavailable"}</strong>{canManage && variant && <ProductEditor tenantId={tenant.id} productId={product.id} variantId={variant.id} initialTitle={product.title} initialSlug={product.slug} initialDescription={product.description} initialPriceMinor={variant.price_minor} initialSku={variant.sku} initialStatus={product.status} />}</div>
+            <div><h2>{product.title}</h2><p>/{product.slug}{variant?.sku ? ` · SKU ${variant.sku}` : ""}</p>{product.description && <p>{product.description}</p>}<p className="product-category-label">{categories.find(category => category.id === product.category_id)?.name ?? "Uncategorized"}</p><span className="workspace-status">{product.status}</span></div>
+            <div className="product-card-side"><strong className="product-price">{variant ? new Intl.NumberFormat("en-KE", { style: "currency", currency: variant.currency }).format(variant.price_minor / 100) : "Price unavailable"}</strong>{canManage && <ProductCategoryAssignment tenantId={tenant.id} productId={product.id} currentCategoryId={product.category_id} categories={categories} />}{canManage && variant && <ProductEditor tenantId={tenant.id} productId={product.id} variantId={variant.id} initialTitle={product.title} initialSlug={product.slug} initialDescription={product.description} initialPriceMinor={variant.price_minor} initialSku={variant.sku} initialStatus={product.status} />}</div>
           </article>;
         })}
       </section>
