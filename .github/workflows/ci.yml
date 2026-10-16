@@ -23,6 +23,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Cache npm downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
       - name: Install dependencies
         run: npm install --no-audit --no-fund
       - name: Type-check
