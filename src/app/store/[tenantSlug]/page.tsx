@@ -26,6 +26,10 @@ export default async function StorefrontPage({ params }: { params: Promise<{ ten
   if (!/^[a-z0-9](?:[a-z0-9-]{1,48}[a-z0-9])?$/.test(tenantSlug)) notFound();
 
   const supabase = await createSupabaseServerClient();
+  const { error: refreshError } = await supabase.rpc("refresh_public_store_reservations", { p_store_slug: tenantSlug });
+  if (refreshError) {
+    return <main className="storefront-page"><Link href="/">Commerce Workspace</Link><section className="empty-state"><h1>Store temporarily unavailable</h1><p>Stock availability could not be refreshed safely. Please try again shortly.</p></section></main>;
+  }
   const { data, error } = await supabase.rpc("get_public_storefront", { p_store_slug: tenantSlug });
   if (error) {
     return <main className="storefront-page"><Link href="/">Commerce Workspace</Link><section className="empty-state"><h1>Store temporarily unavailable</h1><p>The public catalogue could not be loaded. The store owner may need to finish setup.</p></section></main>;
