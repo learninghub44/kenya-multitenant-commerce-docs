@@ -1,7 +1,7 @@
 -- Structural security regression tests. Run after migrations with: supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(18);
+select extensions.plan(20);
 
 select extensions.ok(
   (select count(*) = 22 from pg_class c
@@ -111,6 +111,21 @@ select extensions.ok(
    where schemaname='public' and tablename='inventory_locations'
      and cmd='SELECT' and roles @> array['authenticated']::name[]),
   'inventory locations have only one permissive SELECT policy'
+);
+
+
+select extensions.ok(
+  not has_function_privilege('authenticated','public.is_active_tenant_member(uuid)','EXECUTE')
+  and not has_function_privilege('authenticated','public.has_tenant_role(uuid,public.membership_role[])','EXECUTE')
+  and has_function_privilege('authenticated','private.is_active_tenant_member(uuid)','EXECUTE')
+  and has_function_privilege('authenticated','private.has_tenant_role(uuid,public.membership_role[])','EXECUTE'),
+  'RLS helper functions are callable only through private schema policies, not public RPCs'
+);
+
+select extensions.ok(
+  not has_schema_privilege('anon','private','USAGE')
+  and has_schema_privilege('authenticated','private','USAGE'),
+  'private schema is unavailable to anonymous clients and available to authenticated RLS evaluation'
 );
 
 select * from extensions.finish();
