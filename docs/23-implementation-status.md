@@ -15,6 +15,7 @@ This repository contains an early application scaffold on `feat/mvp-application-
 - Tenant onboarding through a database RPC that atomically creates a tenant and its owner membership. The browser cannot set its own role or supply another user's ID.
 - Server-side sign-out endpoint.
 - Tenant-scoped product catalogue with create/edit forms and draft/published status controls.
+- Tenant category listing and creation through a role-checked database RPC; direct authenticated category write policy removed.
 - Atomic database RPC creates a draft product and matching draft KES-priced variant; validated edit/status changes use a separate role-authorized RPC.
 - Catalogue write hardening removes direct authenticated-client write policies for products and variants so edits must pass through validated database operations.
 - Inventory overview with a default Main store location, on-hand/reserved display, and stock receipt/adjustment form.
@@ -25,7 +26,7 @@ This repository contains an early application scaffold on `feat/mvp-application-
 
 - Signup confirmation, email templates, redirect URLs, password policies, and rate limits depend on Supabase Auth project configuration and still need end-to-end validation.
 - The new tenant-onboarding migration must be applied in a development Supabase project before onboarding works.
-- Product editing and draft/published status controls exist, but category management, variant management, image uploads, storefront hostname routing, orders, checkout, payment adapters, webhook processing, reconciliation, notifications, audit-event service, and reporting UI are not implemented yet.
+- Product editing and draft/published status controls exist, but product-to-category assignment/edit/archive, variant management, image uploads, storefront hostname routing, orders, checkout, payment adapters, webhook processing, reconciliation, notifications, audit-event service, and reporting UI are not implemented yet.
 - The admin Supabase client bypasses RLS. It must only be used in trusted server operations after explicit authorization; never expose it to browser code.
 - Stock balance and movement mutations are intentionally not exposed to browser clients; receipt/adjustment is available through a transactional, idempotent database RPC but still needs concurrency and RLS tests.
 - Anonymous storefront catalogue access is not enabled yet.
@@ -38,7 +39,7 @@ This repository contains an early application scaffold on `feat/mvp-application-
 1. Apply and test the migrations in a development Supabase project; validate auth, tenant creation, slug conflicts, and cross-tenant RLS.
 2. Add integration tests proving cross-tenant isolation and role boundaries.
 3. Implement transactional stock operations with idempotency keys and concurrent-checkout tests.
-4. Implement category management, variant management, and signed image upload.
+4. Extend categories with product assignment and lifecycle controls, then implement variant management and signed image upload.
 5. Implement hostname-based storefront routing and public published-catalogue reads.
 6. Implement order snapshots, reservations, checkout, and fulfilment state transitions.
 7. Integrate one payment provider in sandbox with signature verification, deduplication, and reconciliation.
