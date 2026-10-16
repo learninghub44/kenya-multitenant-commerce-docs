@@ -45,7 +45,7 @@ export default function ErpManager({ tenantId, role, customers, suppliers, expen
 
   const canCustomers = ["owner","manager","order_operator"].includes(role);
   const canSuppliers = ["owner","manager","stock_clerk"].includes(role);
-  const canFinance = ["owner","manager","finance_viewer"].includes(role);
+  const canRecordExpense = ["owner","manager"].includes(role);
   const canPurchasing = canSuppliers;
   const variantLabel = (id: string) => {
     const variant = variants.find(v => v.id === id);
@@ -158,7 +158,7 @@ export default function ErpManager({ tenantId, role, customers, suppliers, expen
     <section className="erp-section">
       <div className="erp-section-heading"><div><p className="eyebrow">EXPENSE TRACKING</p><h2>Expenses</h2></div><span className="workspace-status">{expenses.length}</span></div>
       {expenses.length>0 && <div className="erp-record-list">{expenses.slice(0,50).map(expense=><div key={expense.id}><strong>{expense.description}</strong><small>{expense.category} · {expense.expense_date}{expense.reference ? ` · ${expense.reference}` : ""}</small><b>{new Intl.NumberFormat("en-KE",{style:"currency",currency:"KES"}).format(expense.amount_minor/100)}</b></div>)}</div>}
-      {canFinance && <form className="product-form" onSubmit={addExpense}>
+      {canRecordExpense && <form className="product-form" onSubmit={addExpense}>
         <h3>Record expense</h3><label>Description</label><input required maxLength={240} value={expenseDescription} onChange={e=>setExpenseDescription(e.target.value)}/>
         <label>Category</label><input required maxLength={80} value={expenseCategory} onChange={e=>setExpenseCategory(e.target.value)}/>
         <label>Amount (KES)</label><input required inputMode="decimal" value={expenseAmount} onChange={e=>setExpenseAmount(e.target.value)}/>
