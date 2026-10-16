@@ -186,3 +186,15 @@ li p { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; 
 .erp-section .product-form label { display: block; margin-top: 10px; font-size: 12px; font-weight: 650; }
 .erp-section .product-form input, .erp-section .product-form select { width: 100%; min-width: 0; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); font: inherit; }
 @media (max-width: 800px) { .erp-manager { grid-template-columns: 1fr; } }
+
+.report-metrics { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; margin-top: 28px; }
+.report-metrics article { display: grid; gap: 8px; min-width: 0; padding: 18px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.report-metrics span { color: var(--muted); font-size: 12px; }
+.report-metrics strong { font-size: clamp(18px,2.6vw,28px); letter-spacing: -.04em; overflow-wrap: anywhere; }
+.report-metrics small { color: var(--muted); font-size: 11px; line-height: 1.5; }
+.report-status-list { display: grid; width: 100%; gap: 0; margin-top: 16px; }
+.report-status-list > div { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 0; border-top: 1px solid var(--border); font-size: 13px; }
+.report-status-list small { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; }
+.report-status-list strong { text-align: right; white-space: nowrap; }
+@media (max-width: 820px) { .report-metrics { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 420px) { .report-metrics { grid-template-columns: 1fr 1fr; gap: 8px; } .report-metrics article { padding: 12px; } }
