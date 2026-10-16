@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 type CheckoutVariant = {
@@ -49,7 +49,7 @@ export default function PublicCheckout({ storeSlug, products }: { storeSlug: str
   const lines = Object.values(cart);
   const estimatedTotal = lines.reduce((sum, line) => sum + line.variant.price_minor * line.quantity, 0);
 
-  async function placeOrder(event: React.FormEvent<HTMLFormElement>) {
+  async function placeOrder(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setBusy(true); setError(""); setOrder(null);
     try {
       if (lines.length === 0) throw new Error("Add at least one product to your order.");
