@@ -1,16 +1,16 @@
 -- Structural security regression tests. Run after migrations with: supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(12);
+select extensions.plan(13);
 
 select extensions.ok(
-  (select count(*) = 18 from pg_class c
+  (select count(*) = 22 from pg_class c
    join pg_namespace n on n.oid=c.relnamespace
    where n.nspname='public' and c.relname = any(array[
      'tenants','tenant_memberships','categories','products','product_variants',
      'inventory_locations','inventory_balances','inventory_movements','product_images',
      'customers','suppliers','orders','order_items','purchase_orders','purchase_order_items',
-     'goods_receipts','expenses','payment_transactions'
+     'goods_receipts','goods_receipt_items','expenses','payment_transactions','payment_events','audit_events','notification_outbox'
    ]) and c.relrowsecurity),
   'core tenant and commerce tables have row-level security enabled'
 );
