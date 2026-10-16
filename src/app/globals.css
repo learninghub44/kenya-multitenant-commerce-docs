@@ -86,3 +86,11 @@ li p { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; 
 .product-form-compact label { margin-top: 4px; }
 .product-form-compact input, .product-form-compact textarea, .product-form-compact select { padding: 10px 11px; font-size: 13px; }
 @media (max-width: 540px) { .product-card-side { justify-items: stretch; min-width: 0; } .product-editor { max-width: none; } }
+
+.category-assignment { display: grid; gap: 7px; width: 100%; max-width: 380px; padding: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+.category-assignment label { font-size: 12px; font-weight: 650; }
+.category-assignment select { width: 100%; min-width: 0; padding: 10px 11px; border: 1px solid #d7d9d2; border-radius: 8px; background: white; color: var(--text); font: inherit; font-size: 13px; }
+.category-assignment .secondary-button { justify-self: start; padding: 9px 11px; font-size: 12px; }
+.category-assignment .form-message { margin: 0; }
+.product-category-label { margin: 8px 0; color: var(--muted); font-size: 12px; }
+@media (max-width: 540px) { .category-assignment { max-width: none; } }
