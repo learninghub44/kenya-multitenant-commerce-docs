@@ -54,7 +54,7 @@ jobs:
         with:
           version: latest
       - name: Start local Supabase
-        run: supabase start
+        run: supabase start --exclude studio,edge-runtime,analytics,vector,logflare,imgproxy
       - name: Reset database and apply every migration
         run: supabase db reset
       - name: Run database security regression tests
