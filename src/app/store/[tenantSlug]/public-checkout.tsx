@@ -23,33 +23,27 @@ export default function PublicCheckout({ storeSlug, products }: { storeSlug: str
 
   function resetKey() { setIdempotencyKey(""); }
   function add(product: CheckoutProduct, variant: CheckoutVariant) {
-    setCart(current => {
-      const previous = current[variant.variant_id];
-      const nextQuantity = (previous?.quantity ?? 0) + 1;
-      if (variant.available_quantity !== null && nextQuantity > variant.available_quantity) {
-        setError("The requested quantity is above the available stock.");
-        return current;
-      }
-      setError(""); setOrder(null); resetKey();
-      return { ...current, [variant.variant_id]: { variant, productTitle: product.product_title, quantity: nextQuantity } };
-    });
+    const previous = cart[variant.variant_id];
+    const nextQuantity = (previous?.quantity ?? 0) + 1;
+    if (variant.available_quantity !== null && nextQuantity > variant.available_quantity) {
+      setError("The requested quantity is above the available stock.");
+      return;
+    }
+    setError(""); setOrder(null); resetKey();
+    setCart({ ...cart, [variant.variant_id]: { variant, productTitle: product.product_title, quantity: nextQuantity } });
   }
   function changeQuantity(variantId: string, quantity: number) {
-    setCart(current => {
-      const next = { ...current };
-      if (quantity < 1) delete next[variantId];
-      else {
-        const line = next[variantId];
-        if (!line) return current;
-        if (line.variant.available_quantity !== null && quantity > line.variant.available_quantity) {
-          setError("The requested quantity is above the available stock.");
-          return current;
-        }
-        next[variantId] = { ...line, quantity };
-      }
-      setError(""); setOrder(null); resetKey();
-      return next;
-    });
+    const next = { ...cart };
+    const line = next[variantId];
+    if (!line) return;
+    if (quantity > 0 && line.variant.available_quantity !== null && quantity > line.variant.available_quantity) {
+      setError("The requested quantity is above the available stock.");
+      return;
+    }
+    if (quantity < 1) delete next[variantId];
+    else next[variantId] = { ...line, quantity };
+    setError(""); setOrder(null); resetKey();
+    setCart(next);
   }
 
   const lines = Object.values(cart);
