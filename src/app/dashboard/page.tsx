@@ -25,7 +25,7 @@ export default async function DashboardPage() {
         {tenants.length === 0 ? <div className="empty-state"><h2>No workspace yet</h2><p>Create a business workspace to start organising its catalogue and operations.</p></div> : tenants.map(item => (
           <article className="workspace-card" key={item.tenant_id}>
             <div><h2>{item.tenants!.name}</h2><p>{item.tenants!.slug} · {item.role.replaceAll("_", " ")}</p><span className="workspace-status">{item.tenants!.currency} · active</span></div>
-            <span className="coming-soon">Product management next</span>
+            <Link className="workspace-action" href={`/dashboard/${item.tenants!.slug}/products`}>Open catalogue <span aria-hidden="true">→</span></Link>
           </article>
         ))}
         <Link className="primary-button inline-button" href="/onboarding">Create business workspace</Link>
