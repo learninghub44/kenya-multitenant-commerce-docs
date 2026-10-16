@@ -10,7 +10,7 @@ Help Kenyan SMEs sell online and manage day-to-day retail operations from one mo
 
 ## Application scaffold
 
-The `feat/mvp-application-foundation` branch introduces a Next.js/TypeScript starter, neutral responsive landing page, environment-variable example, and initial Supabase migration for tenant-scoped catalogue and inventory tables.
+The `feat/mvp-application-foundation` branch includes a Next.js/TypeScript starter, Supabase session refresh, email/password authentication UI, authenticated tenant dashboard, atomic tenant onboarding RPC, and initial tenant-scoped catalogue/inventory schema. It remains an early scaffold: migrations and application flows have not yet been tested against a configured Supabase project.
 
 **Implementation progress and known limitations:** [Implementation status](docs/23-implementation-status.md).
 
