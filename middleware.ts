@@ -49,12 +49,19 @@ export async function middleware(request: NextRequest) {
             !request.nextUrl.pathname.startsWith("/api/")) {
           const rewritten = request.nextUrl.clone();
           rewritten.pathname = "/store/" + subdomain;
-          return NextResponse.rewrite(rewritten, { request: { headers: request.headers } });
+          const rewriteResponse = NextResponse.rewrite(rewritten, { request: { headers: request.headers } });
+          // Wildcard hosts arrive at "/" before the internal rewrite, so apply
+          // the private cache policy here as well as in next.config.ts.
+          rewriteResponse.headers.set("Cache-Control", "private, no-store, max-age=0, must-revalidate");
+          return rewriteResponse;
         }
       }
     } catch {
       // Invalid APP_URL disables wildcard routing instead of guessing a host.
     }
+  }
+  if (/^\/(dashboard|auth|onboarding|store|api)(\/|$)/.test(request.nextUrl.pathname)) {
+    response.headers.set("Cache-Control", "private, no-store, max-age=0, must-revalidate");
   }
   return response;
 }
