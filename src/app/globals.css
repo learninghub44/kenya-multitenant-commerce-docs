@@ -111,3 +111,10 @@ li p { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; 
   .category-actions button { flex: 1 1 auto; }
   .product-card-side { width: 100%; }
 }
+
+.product-image-list { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+.product-image-list figure { width: 132px; margin: 0; padding: 6px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+.product-image-list img { display: block; width: 120px; height: 100px; object-fit: cover; border-radius: 5px; }
+.product-image-list figcaption { padding-top: 5px; color: var(--muted); font-size: 11px; overflow-wrap: anywhere; }
+.variant-manager > label { display: block; margin-top: 12px; font-size: 13px; font-weight: 650; }
+.variant-manager > input { display: block; width: 100%; margin-top: 6px; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); font: inherit; }
