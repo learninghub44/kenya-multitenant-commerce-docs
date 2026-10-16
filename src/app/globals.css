@@ -75,3 +75,5 @@ li p { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; 
 .product-card { align-items: flex-start; }
 .product-price { white-space: nowrap; font-size: 15px; }
 @media (max-width: 540px) { .product-card { align-items: stretch; } .product-price { white-space: normal; } }
+
+.product-form select { width: 100%; min-width: 0; padding: 12px 13px; border: 1px solid #d7d9d2; border-radius: 9px; background: white; color: var(--text); font: inherit; }
