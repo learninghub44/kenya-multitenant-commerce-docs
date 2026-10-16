@@ -118,3 +118,22 @@ li p { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; 
 .product-image-list figcaption { padding-top: 5px; color: var(--muted); font-size: 11px; overflow-wrap: anywhere; }
 .variant-manager > label { display: block; margin-top: 12px; font-size: 13px; font-weight: 650; }
 .variant-manager > input { display: block; width: 100%; margin-top: 6px; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); font: inherit; }
+
+.storefront-page { width: min(100% - 32px, 1120px); margin: 0 auto; padding: 38px 0 64px; }
+.storefront-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; padding: 20px 0 30px; border-bottom: 1px solid var(--border); }
+.storefront-header h1 { margin: 8px 0; font-size: clamp(30px, 5vw, 48px); }
+.storefront-header p:not(.eyebrow) { color: var(--muted); }
+.storefront-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; padding-top: 24px; }
+.store-product-card { min-width: 0; overflow: hidden; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+.store-product-image { display: block; width: 100%; height: 220px; object-fit: cover; background: var(--background); }
+.store-product-content { padding: 18px; }
+.store-product-content h2 { margin: 6px 0 10px; }
+.store-product-content > p:not(.eyebrow) { color: var(--muted); font-size: 14px; line-height: 1.6; }
+.store-variant-list { display: grid; gap: 8px; margin-top: 14px; }
+.store-variant { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 13px; }
+.store-variant span { overflow-wrap: anywhere; }
+.store-variant small { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
+.store-variant strong { white-space: nowrap; }
+.storefront-footer { padding: 28px 0; color: var(--muted); font-size: 12px; }
+@media (max-width: 860px) { .storefront-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .storefront-grid { grid-template-columns: 1fr; } .store-product-image { height: 240px; } .storefront-header { flex-direction: column; } }
