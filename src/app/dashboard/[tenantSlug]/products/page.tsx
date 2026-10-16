@@ -86,7 +86,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
   const canManage = ["owner", "manager", "catalog_editor"].includes(membership.role);
   return (
     <main className="dashboard-page">
-      <p><Link href="/dashboard">← Your businesses</Link> · <Link href={`/dashboard/${tenant.slug}/inventory`}>Inventory and stock →</Link> · <Link href={`/dashboard/${tenant.slug}/categories`}>Manage categories →</Link></p>
+      <p><Link href="/dashboard">← Your businesses</Link> · <Link href={`/dashboard/${tenant.slug}/inventory`}>Inventory and stock →</Link> · <Link href={`/dashboard/${tenant.slug}/categories`}>Manage categories →</Link> · <Link href={`/dashboard/${tenant.slug}/orders`}>Orders →</Link></p>
       <header className="dashboard-header"><div><p className="eyebrow">PRODUCT CATALOGUE</p><h1>{tenant.name}</h1><p className="auth-description">Manage your products and draft prices.</p></div><span className="workspace-status">{membership.role.replaceAll("_", " ")}</span></header>
       <section className="workspace-list">
         {products.length === 0 ? <div className="empty-state"><h2>No products yet</h2><p>Add your first product. It will be saved as a draft and will not appear on a public storefront.</p></div> : products.map(product => {
