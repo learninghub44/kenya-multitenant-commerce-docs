@@ -1,10 +1,11 @@
 # Implementation Status
 
-The application foundation has been expanded on the current feature branch and is available for review in PR #1. This remains an unverified development implementation, not a production-ready release.
+The project owner reports that the app is deployed and Supabase is connected. This status describes the source in this checkout; the live deployment and signed-in Supabase UI were not verified during these frontend changes.
 
 ## Implemented
 
 - Next.js/TypeScript app, Supabase SSR/browser/admin clients, email/password auth, tenant onboarding, and tenant-role checks.
+- Responsive business workspace picker, tenant overview, shared desktop/mobile navigation, role-aware page access, and sign-in redirects that return users to their requested page.
 - Tenant-scoped product catalogue, product editing/status controls, category create/edit/archive and product assignment, variant management, and signed Cloudinary product image uploads.
 - Tenant-safe Postgres schema, RLS, composite tenant foreign keys, integer minor-unit money, and transactional/idempotent stock receipts and adjustments.
 - Public storefront route at /store/{tenantSlug}, wildcard subdomain rewrite based on APP_URL, and a public RPC restricted to active stores and published catalogue data.
@@ -22,8 +23,8 @@ The application foundation has been expanded on the current feature branch and i
 - Full order notification/outbox delivery, automated scheduled reservation cleanup, tenant staff invitations/role administration, platform super-admin, custom-domain verification, branding, bulk imports/exports, and comprehensive reporting/accounting are not implemented.
 - Purchasing UI currently supports one line per purchase order; customer/supplier editing, purchase returns, and supplier invoice reconciliation are not implemented.
 - No complete automated test suite for Postgres RLS, tenant isolation, stock concurrency, checkout idempotency, or payment replay is in place.
-- No successful CI run has been observed, and no dependency install, typecheck, lint, build, SQL migration, or browser E2E test has been run in the authoring environment.
-- Database migrations need to be applied and reviewed in a disposable Supabase project before any production data or live traffic is used.
+- Local dependency install, TypeScript check, lint, Next.js production build, and Cloudflare OpenNext build pass for the UI changes in this checkout. No GitHub Actions run or authenticated browser end-to-end test against the connected Supabase project was verified.
+- The live Supabase schema was not inspected during these frontend changes; review migration status before making any future production schema change.
 
 ## Security boundaries to preserve
 
@@ -39,4 +40,4 @@ The application foundation has been expanded on the current feature branch and i
 - CI now caches npm downloads and the ESLint flat-config composition has been corrected. The latest run must still finish before merge.
 - Migration `202610160021_order_idempotency_and_stock_consistency.sql` blocks repeated terminal order transitions and makes reservation-release operations fail closed when the reserved quantity does not reconcile.
 - Deployment split, environment secrets, cache policy, CI hardening and remaining blockers are documented in `docs/27-caching-idempotency-cicd-deployment.md`.
-- No committed package lockfile exists yet, no production deployment target is configured, and the separate platform-admin app has not been implemented. Do not represent these as completed.
+- The project owner reports an existing deployment and connected Supabase, but the live target and settings were not verified in this checkout. No production data or migrations were changed here; the separate platform-admin app has not been implemented.

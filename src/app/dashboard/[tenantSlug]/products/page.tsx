@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import RoleAccessDenied from "../role-access-denied";
 import NewProductForm from "./new-product-form";
 import ProductEditor from "./product-editor";
 import ProductCategoryAssignment from "./product-category-assignment";
@@ -26,7 +27,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
   const { tenantSlug } = await params;
   const supabase = await createSupabaseServerClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) redirect("/auth?next=/dashboard");
+  if (authError || !user) redirect(`/auth?next=${encodeURIComponent(`/dashboard/${tenantSlug}/products`)}`);
 
   const { data: tenant, error: tenantError } = await supabase
     .from("tenants")
@@ -45,6 +46,9 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
     .eq("active", true)
     .maybeSingle();
   if (!membership) notFound();
+  if (!["owner", "manager", "catalog_editor"].includes(membership.role)) {
+    return <RoleAccessDenied tenantSlug={tenantSlug} role={membership.role} area="the product catalogue" />;
+  }
 
   const { data: productsData, error: productsError } = await supabase
     .from("products")
@@ -86,7 +90,6 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
   const canManage = ["owner", "manager", "catalog_editor"].includes(membership.role);
   return (
     <main className="dashboard-page">
-      <p><Link href="/dashboard">← Your businesses</Link> · <Link href={`/dashboard/${tenant.slug}/inventory`}>Inventory and stock →</Link> · <Link href={`/dashboard/${tenant.slug}/categories`}>Manage categories →</Link> · <Link href={`/dashboard/${tenant.slug}/orders`}>Orders →</Link> · <Link href={`/dashboard/${tenant.slug}/erp`}>ERP workspace →</Link> · <Link href={`/dashboard/${tenant.slug}/reports`}>Reports →</Link></p>
       <header className="dashboard-header"><div><p className="eyebrow">PRODUCT CATALOGUE</p><h1>{tenant.name}</h1><p className="auth-description">Manage your products and draft prices.</p></div><span className="workspace-status">{membership.role.replaceAll("_", " ")}</span></header>
       <section className="workspace-list">
         {products.length === 0 ? <div className="empty-state"><h2>No products yet</h2><p>Add your first product. It will be saved as a draft and will not appear on a public storefront.</p></div> : products.map(product => {

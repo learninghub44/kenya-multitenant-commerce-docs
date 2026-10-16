@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import RoleAccessDenied from "../role-access-denied";
 
 type Order = { id: string; status: string; payment_status: string; total_minor: number; created_at: string };
 type Expense = { id: string; description: string; category: string; amount_minor: number; expense_date: string };
@@ -16,11 +17,14 @@ export default async function ReportsPage({ params }: { params: Promise<{ tenant
   const { tenantSlug } = await params;
   const supabase = await createSupabaseServerClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) redirect("/auth?next=/dashboard");
+  if (authError || !user) redirect(`/auth?next=${encodeURIComponent(`/dashboard/${tenantSlug}/reports`)}`);
   const { data: tenant, error: tenantError } = await supabase.from("tenants").select("id,name,slug,status").eq("slug",tenantSlug).maybeSingle();
   if (tenantError || !tenant || tenant.status!=="active") notFound();
   const { data: membership } = await supabase.from("tenant_memberships").select("role").eq("tenant_id",tenant.id).eq("user_id",user.id).eq("active",true).maybeSingle();
   if (!membership) notFound();
+  if (!["owner", "manager", "finance_viewer"].includes(membership.role)) {
+    return <RoleAccessDenied tenantSlug={tenantSlug} role={membership.role} area="reports" />;
+  }
 
   const [orderResult,expenseResult,variantResult,productResult,balanceResult] = await Promise.all([
     supabase.from("orders").select("id,status,payment_status,total_minor,created_at").eq("tenant_id",tenant.id).order("created_at",{ascending:false}).limit(1000),
@@ -55,7 +59,6 @@ export default async function ReportsPage({ params }: { params: Promise<{ tenant
   }).sort((a,b)=>a.available-b.available);
 
   return <main className="dashboard-page">
-    <p><Link href="/dashboard">← Your businesses</Link> · <Link href={`/dashboard/${tenant.slug}/products`}>Products</Link> · <Link href={`/dashboard/${tenant.slug}/orders`}>Orders</Link> · <Link href={`/dashboard/${tenant.slug}/erp`}>ERP workspace</Link></p>
     <header className="dashboard-header"><div><p className="eyebrow">BUSINESS PERFORMANCE</p><h1>Reports</h1><p className="auth-description">Live records from {tenant.name}. Sales figures include only orders with a recorded successful payment; this is not an accounting statement.</p></div><span className="workspace-status">Last {orders.length} orders</span></header>
     <section className="report-metrics">
       <article><span>Recorded paid sales</span><strong>{money(paidSales)}</strong><small>{paidOrders.length} paid orders</small></article>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import StockMovementForm from "./stock-movement-form";
+import RoleAccessDenied from "../role-access-denied";
 
 type ProductRow = { id: string; title: string };
 type VariantRow = { id: string; product_id: string; sku: string | null; title: string; price_minor: number; currency: string };
@@ -11,7 +12,7 @@ export default async function InventoryPage({ params }: { params: Promise<{ tena
   const { tenantSlug } = await params;
   const supabase = await createSupabaseServerClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) redirect("/auth?next=/dashboard");
+  if (authError || !user) redirect(`/auth?next=${encodeURIComponent(`/dashboard/${tenantSlug}/inventory`)}`);
 
   const { data: tenant } = await supabase.from("tenants")
     .select("id, name, slug, status").eq("slug", tenantSlug).maybeSingle();
@@ -20,6 +21,9 @@ export default async function InventoryPage({ params }: { params: Promise<{ tena
   const { data: membership } = await supabase.from("tenant_memberships")
     .select("role").eq("tenant_id", tenant.id).eq("user_id", user.id).eq("active", true).maybeSingle();
   if (!membership) notFound();
+  if (!["owner", "manager", "stock_clerk"].includes(membership.role)) {
+    return <RoleAccessDenied tenantSlug={tenantSlug} role={membership.role} area="inventory" />;
+  }
 
   const [{ data: locations, error: locationsError }, { data: productData, error: productError }, { data: variantData, error: variantError }] = await Promise.all([
     supabase.from("inventory_locations").select("id, name, code, active").eq("tenant_id", tenant.id).eq("active", true).order("name"),
@@ -54,14 +58,14 @@ export default async function InventoryPage({ params }: { params: Promise<{ tena
     };
   });
   const canManage = ["owner", "manager", "stock_clerk"].includes(membership.role);
+  const canManageProducts = ["owner", "manager", "catalog_editor"].includes(membership.role);
 
   return (
     <main className="dashboard-page">
-      <p><Link href="/dashboard">← Your businesses</Link> · <Link href={`/dashboard/${tenant.slug}/products`}>Products</Link></p>
       <header className="dashboard-header"><div><p className="eyebrow">INVENTORY</p><h1>{tenant.name}</h1><p className="auth-description">Stock balances and recorded movements for {activeLocation?.name ?? "your locations"}.</p></div><span className="workspace-status">{membership.role.replaceAll("_", " ")}</span></header>
       <section className="workspace-list">
         {!activeLocation && <div className="empty-state"><h2>No active stock location</h2><p>Apply the latest migration to create the default Main store location.</p></div>}
-        {variants.length === 0 ? <div className="empty-state"><h2>No product variants yet</h2><p>Create a product first. Every product starts with a default variant.</p><Link className="workspace-action" href={`/dashboard/${tenant.slug}/products`}>Open products →</Link></div> : variants.map(variant => {
+        {variants.length === 0 ? <div className="empty-state"><h2>No product variants yet</h2><p>Create a product first. Every product starts with a default variant.</p>{canManageProducts ? <Link className="workspace-action" href={`/dashboard/${tenant.slug}/products`}>Open products →</Link> : <p className="field-help">Ask a workspace owner, manager or catalog editor to add the first product.</p>}</div> : variants.map(variant => {
           const product = productById.get(variant.product_id);
           const balance = balances.find(item => item.variant_id === variant.id);
           const onHand = balance?.on_hand ?? 0;
