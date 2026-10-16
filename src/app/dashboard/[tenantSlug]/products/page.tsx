@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import NewProductForm from "./new-product-form";
 import ProductEditor from "./product-editor";
 import ProductCategoryAssignment from "./product-category-assignment";
+import VariantManager, { type ManagedVariant } from "./variant-manager";
 
 type ProductRow = {
   id: string;
@@ -17,13 +18,7 @@ type ProductRow = {
 
 type CategoryRow = { id: string; name: string; status: string };
 
-type VariantRow = {
-  id: string;
-  product_id: string;
-  sku: string | null;
-  price_minor: number;
-  currency: string;
-};
+type VariantRow = ManagedVariant & { product_id: string };
 
 export default async function ProductsPage({ params }: { params: Promise<{ tenantSlug: string }> }) {
   const { tenantSlug } = await params;
@@ -68,7 +63,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
   let variants: VariantRow[] = [];
   if (products.length) {
     const { data, error } = await supabase.from("product_variants")
-      .select("id, product_id, sku, price_minor, currency")
+      .select("id, product_id, title, sku, price_minor, currency, options, status")
       .eq("tenant_id", tenant.id)
       .in("product_id", products.map(product => product.id));
     if (error) {
@@ -84,10 +79,12 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
       <header className="dashboard-header"><div><p className="eyebrow">PRODUCT CATALOGUE</p><h1>{tenant.name}</h1><p className="auth-description">Manage your products and draft prices.</p></div><span className="workspace-status">{membership.role.replaceAll("_", " ")}</span></header>
       <section className="workspace-list">
         {products.length === 0 ? <div className="empty-state"><h2>No products yet</h2><p>Add your first product. It will be saved as a draft and will not appear on a public storefront.</p></div> : products.map(product => {
-          const variant = variants.find(item => item.product_id === product.id);
+          const productVariants = variants.filter(item => item.product_id === product.id);
+          const variant = productVariants.find(item => item.status !== "archived") ?? productVariants[0];
           return <article className="workspace-card product-card" key={product.id}>
             <div><h2>{product.title}</h2><p>/{product.slug}{variant?.sku ? ` · SKU ${variant.sku}` : ""}</p>{product.description && <p>{product.description}</p>}<p className="product-category-label">{categories.find(category => category.id === product.category_id)?.name ?? "Uncategorized"}</p><span className="workspace-status">{product.status}</span></div>
-            <div className="product-card-side"><strong className="product-price">{variant ? new Intl.NumberFormat("en-KE", { style: "currency", currency: variant.currency }).format(variant.price_minor / 100) : "Price unavailable"}</strong>{canManage && <ProductCategoryAssignment tenantId={tenant.id} productId={product.id} currentCategoryId={product.category_id} categories={categories} />}{canManage && variant && <ProductEditor tenantId={tenant.id} productId={product.id} variantId={variant.id} initialTitle={product.title} initialSlug={product.slug} initialDescription={product.description} initialPriceMinor={variant.price_minor} initialSku={variant.sku} initialStatus={product.status} />}</div>
+            <div className="product-card-side"><strong className="product-price">{variant ? new Intl.NumberFormat("en-KE", { style: "currency", currency: variant.currency }).format(variant.price_minor / 100) : "Price unavailable"}</strong>{canManage && <ProductCategoryAssignment tenantId={tenant.id} productId={product.id} currentCategoryId={product.category_id} categories={categories} />}{canManage && variant && <ProductEditor tenantId={tenant.id} productId={product.id} variantId={variant.id} initialTitle={product.title} initialSlug={product.slug} initialDescription={product.description} initialPriceMinor={variant.price_minor} initialSku={variant.sku} initialStatus={product.status} />}
+              {canManage && <VariantManager tenantId={tenant.id} productId={product.id} variants={productVariants} />}</div>
           </article>;
         })}
       </section>
