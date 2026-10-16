@@ -14,6 +14,8 @@ This repository contains an early application scaffold on `feat/mvp-application-
 - Server-rendered dashboard that checks the authenticated user and loads only their active tenant memberships.
 - Tenant onboarding through a database RPC that atomically creates a tenant and its owner membership. The browser cannot set its own role or supply another user's ID.
 - Server-side sign-out endpoint.
+- Tenant-scoped product catalogue page and product creation form.
+- Atomic database RPC creates a draft product and its initial KES-priced variant together; role authorization is checked in the database and prices are submitted as integer minor units.
 - Draft pull request: [PR #1](https://github.com/learninghub44/kenya-multitenant-commerce-docs/pull/1).
 
 ## Important limitations
