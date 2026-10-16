@@ -1,12 +1,18 @@
 # Kenya Multi-Tenant Commerce & Retail ERP
 
-Product and engineering documentation for a Kenya-first, multi-tenant commerce SaaS. It combines hosted storefronts with practical back-office operations: product publishing, inventory/stock control, orders, purchasing, customers, sales reporting, and payment integrations.
+A Kenya-first, multi-tenant commerce SaaS combining hosted storefronts with practical retail operations: product publishing, inventory/stock control, orders, purchasing, customers, sales reporting, and payment integrations.
 
-> **Status:** planning documentation, not a deployed application. Provider contracts, fees, settlement rules, and tax/accounting obligations must be verified before implementation or launch.
+> **Status:** early application scaffold and initial database foundation. This is not a deployed or production-ready application. Provider contracts, fees, settlement rules, and tax/accounting obligations must be verified before launch.
 
 ## Product vision
 
 Help Kenyan SMEs sell online and manage day-to-day retail operations from one mobile-first workspace. Every business gets an isolated store, a public storefront on its own subdomain, and tools to maintain its catalogue, stock, orders, and business records.
+
+## Application scaffold
+
+The feature branch includes authentication and tenant onboarding, product/category/variant management, signed Cloudinary image uploads, inventory operations, a published-catalogue storefront and order-request flow, order/payment-attestation/fulfilment screens, basic customer/supplier/expense/purchasing workflows, and live-record reports. The branch is still an unverified development implementation: online payment gateways and automated provider callbacks are not implemented, and database migrations and application flows have not been tested against a configured Supabase project.
+
+**Implementation progress and known limitations:** [Implementation status](docs/23-implementation-status.md).
 
 ## Documentation map
 
@@ -32,18 +38,21 @@ Help Kenyan SMEs sell online and manage day-to-day retail operations from one mo
 - [Open decisions](docs/20-open-decisions.md)
 - [Environment variables](docs/21-environment-variables.md)
 - [Glossary](docs/22-glossary.md)
+- [Implementation status](docs/23-implementation-status.md)
+- [Commerce and ERP domain foundation](docs/25-commerce-erp-domain.md)
+- [Review and release checklist](docs/26-review-and-release-checklist.md)
 - [Agent instructions](AGENTS.md)
 
-## Suggested initial stack
+## Stack and architecture
 
-- TypeScript and Next.js for the merchant console and public storefronts.
+- TypeScript and Next.js for merchant console and public storefronts.
 - Supabase Postgres, Auth, and Row Level Security for data and identity.
 - Cloudinary for product image transformation and delivery.
 - A host that explicitly supports wildcard subdomains and managed TLS; validate platform limits before committing.
 - Server-side payment adapters for Daraja and PayHero, with verified callbacks, idempotency, and reconciliation.
 - GitHub Actions for checks and deployment after tests are in place.
 
-These are starting recommendations, not a mandate to over-engineer. Prefer a modular monolith and simple, well-tested boundaries.
+Prefer a modular monolith and simple, well-tested boundaries. This is not a mandate to over-engineer.
 
 ## Non-negotiable rules
 
@@ -61,3 +70,5 @@ These are starting recommendations, not a mandate to over-engineer. Prefer a mod
 ## First implementation milestone
 
 Build tenant signup and isolation, merchant profile/settings, product CRUD and publishing, stock ledger, public store by subdomain, cart/checkout, order management, and one verified payment path in sandbox. Add the second provider only after the payment abstraction and reconciliation flow are tested.
+
+Do not deploy live payments or describe the product as production-ready until the security, inventory, payment, and operational release gates in the documentation have passed.
