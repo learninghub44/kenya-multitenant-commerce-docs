@@ -111,7 +111,7 @@ export default function ErpManager({ tenantId, role, customers, suppliers, expen
   return <div className="erp-manager">
     {(error || message) && <div className={error ? "form-message error" : "form-message"} role={error ? "alert" : "status"}>{error || message}</div>}
     <section className="erp-section">
-      <div className="erp-section-heading"><div><p className="eyebrow">CUSTOMER DIRECTORY</p><h2>Customers</h2></div><span className="workspace-status">{customers.length}</span></div>
+      <div className="erp-section-heading"><div><p className="eyebrow">Customer directory</p><h2>Customers</h2></div><span className="workspace-status">{customers.length}</span></div>
       {customers.length>0 && <div className="erp-record-list">{customers.slice(0,30).map(customer=><div key={customer.id}><strong>{customer.display_name}</strong><small>{customer.phone || customer.email || "No contact details"}</small></div>)}</div>}
       {canCustomers && <form className="product-form" onSubmit={addCustomer}>
         <h3>Add customer</h3><label>Name</label><input required maxLength={180} value={customerName} onChange={e=>setCustomerName(e.target.value)}/>
@@ -121,7 +121,7 @@ export default function ErpManager({ tenantId, role, customers, suppliers, expen
       </form>}
     </section>
     <section className="erp-section">
-      <div className="erp-section-heading"><div><p className="eyebrow">SUPPLIER DIRECTORY</p><h2>Suppliers</h2></div><span className="workspace-status">{suppliers.length}</span></div>
+      <div className="erp-section-heading"><div><p className="eyebrow">Supplier directory</p><h2>Suppliers</h2></div><span className="workspace-status">{suppliers.length}</span></div>
       {suppliers.length>0 && <div className="erp-record-list">{suppliers.map(supplier=><div key={supplier.id}><strong>{supplier.name}</strong><small>{supplier.phone || supplier.email || "No contact details"}{supplier.active ? "" : " · inactive"}</small></div>)}</div>}
       {canSuppliers && <form className="product-form" onSubmit={addSupplier}>
         <h3>Add supplier</h3><label>Name</label><input required maxLength={180} value={supplierName} onChange={e=>setSupplierName(e.target.value)}/>
@@ -131,7 +131,7 @@ export default function ErpManager({ tenantId, role, customers, suppliers, expen
       </form>}
     </section>
     <section className="erp-section">
-      <div className="erp-section-heading"><div><p className="eyebrow">PURCHASING</p><h2>Purchase orders</h2></div><span className="workspace-status">{purchaseOrders.length}</span></div>
+      <div className="erp-section-heading"><div><p className="eyebrow">Purchasing</p><h2>Purchase orders</h2></div><span className="workspace-status">{purchaseOrders.length}</span></div>
       <div className="erp-record-list">{purchaseOrders.map(po=><div key={po.id}><strong>{po.reference}</strong><small>{suppliers.find(s=>s.id===po.supplier_id)?.name ?? "Supplier"} · {po.status.replaceAll("_"," ")}</small>
         {canPurchasing && po.status==="draft" && <button className="secondary-button" type="button" disabled={busy} onClick={()=>void callRpc("transition_purchase_order",{p_tenant_id:tenantId,p_purchase_order_id:po.id,p_status:"submitted"},"Purchase order submitted.")}>Submit</button>}
       </div>)}</div>
@@ -156,7 +156,7 @@ export default function ErpManager({ tenantId, role, customers, suppliers, expen
       </form>}
     </section>
     <section className="erp-section">
-      <div className="erp-section-heading"><div><p className="eyebrow">EXPENSE TRACKING</p><h2>Expenses</h2></div><span className="workspace-status">{expenses.length}</span></div>
+      <div className="erp-section-heading"><div><p className="eyebrow">Expense tracking</p><h2>Expenses</h2></div><span className="workspace-status">{expenses.length}</span></div>
       {expenses.length>0 && <div className="erp-record-list">{expenses.slice(0,50).map(expense=><div key={expense.id}><strong>{expense.description}</strong><small>{expense.category} · {expense.expense_date}{expense.reference ? ` · ${expense.reference}` : ""}</small><b>{new Intl.NumberFormat("en-KE",{style:"currency",currency:"KES"}).format(expense.amount_minor/100)}</b></div>)}</div>}
       {canRecordExpense && <form className="product-form" onSubmit={addExpense}>
         <h3>Record expense</h3><label>Description</label><input required maxLength={240} value={expenseDescription} onChange={e=>setExpenseDescription(e.target.value)}/>

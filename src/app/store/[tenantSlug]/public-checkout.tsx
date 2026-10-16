@@ -76,7 +76,7 @@ export default function PublicCheckout({ storeSlug, products }: { storeSlug: str
   }
 
   return <section className="public-checkout" aria-label="Order request">
-    <header><p className="eyebrow">ORDER REQUEST</p><h2>Ready to order?</h2><p>Submit your order request. Online payment is not enabled yet; the store will need to confirm payment arrangements with you.</p></header>
+    <header><p className="eyebrow">Order request</p><h2>Ready to order?</h2><p>Submit your order request. Online payment is not enabled yet; the store will need to confirm payment arrangements with you.</p></header>
     {order ? <div className="order-confirmation" role="status">
       <h3>Order request received</h3><p>Reference: <strong>{order.order_number}</strong></p>
       <p>Total: <strong>{new Intl.NumberFormat("en-KE", { style: "currency", currency: order.currency }).format(order.total_minor / 100)}</strong></p>

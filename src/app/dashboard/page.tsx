@@ -16,7 +16,7 @@ export default async function DashboardPage() {
   if (error) {
     return (
       <main className="dashboard-page workspaces-page">
-        <p className="eyebrow">YOUR WORKSPACES</p>
+        <p className="eyebrow">Your workspaces</p>
         <h1>Your businesses</h1>
         <p className="dashboard-alert" role="alert">Could not load your workspaces. Refresh the page, and check Supabase access if the issue continues.</p>
         <Link className="primary-button inline-button" href="/onboarding">Try workspace setup</Link>
@@ -33,7 +33,7 @@ export default async function DashboardPage() {
     <main className="dashboard-page">
       <header className="workspaces-header">
         <div>
-          <p className="eyebrow">YOUR WORKSPACES</p>
+          <p className="eyebrow">Your workspaces</p>
           <h1>Your businesses</h1>
           <p className="auth-description">Choose a business to manage its catalogue, stock and orders.</p>
         </div>
@@ -47,7 +47,7 @@ export default async function DashboardPage() {
           <div className="empty-state workspace-empty">
             <span className="workspace-empty-mark" aria-hidden="true">+</span>
             <div>
-              <p className="eyebrow">A FRESH START</p>
+              <p className="eyebrow">A fresh start</p>
               <h2>No business workspace yet</h2>
               <p>Create a workspace to start organising your catalogue and day-to-day operations.</p>
             </div>

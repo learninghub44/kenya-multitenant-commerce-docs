@@ -12,7 +12,7 @@ export default function RoleAccessDenied({
   return (
     <main className="dashboard-page access-denied-page">
       <section className="access-denied-card">
-        <p className="eyebrow">WORKSPACE ACCESS</p>
+        <p className="eyebrow">Workspace access</p>
         <h1>Access not included</h1>
         <p>
           Your <strong>{role.replaceAll("_", " ")}</strong> role does not include access to {area}.
