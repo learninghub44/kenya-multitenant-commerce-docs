@@ -50,7 +50,7 @@ begin
     end loop;
 
     update public.orders set status='cancelled',payment_status='cancelled',
-      notes=left(concat_ws(E'\\n',nullif(notes,''),'Checkout reservation expired after 30 minutes'),5000),
+      notes=left(concat_ws(E'\n',nullif(notes,''),'Checkout reservation expired after 30 minutes'),5000),
       updated_at=now()
     where id=expired_order.id and tenant_id=p_tenant_id
       and status='pending' and payment_status='pending';
@@ -128,7 +128,7 @@ begin
       end loop;
     end if;
     update public.orders set status='cancelled',payment_status='cancelled',
-      notes=left(concat_ws(E'\\n',nullif(notes,''),nullif(trim(p_reason),'')),5000),updated_at=now()
+      notes=left(concat_ws(E'\n',nullif(notes,''),nullif(trim(p_reason),'')),5000),updated_at=now()
     where id=p_order_id and tenant_id=p_tenant_id;
   elsif p_status='processing' then
     if target_order.status<>'confirmed' or target_order.payment_status<>'succeeded' then
