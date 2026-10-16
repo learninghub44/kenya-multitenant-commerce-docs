@@ -2,14 +2,14 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Commerce Workspace",
-  description: "A practical storefront and retail operations workspace for Kenyan businesses."
+  title: "Commerce Workspace — Sell online. Run your business.",
+  description: "Create your online shop and manage products, inventory and orders from one practical workspace built for growing Kenyan businesses."
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#f7f7f5"
+  themeColor: "#244f3b"
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
