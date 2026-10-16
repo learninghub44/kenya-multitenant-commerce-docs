@@ -42,6 +42,7 @@ The feature branch includes authentication and tenant onboarding, product/catego
 - [Commerce and ERP domain foundation](docs/25-commerce-erp-domain.md)
 - [Review and release checklist](docs/26-review-and-release-checklist.md)
 - [Cloudflare Workers deployment](docs/28-cloudflare-workers-deployment.md)
+- [CI/CD, merge and release policy](docs/29-ci-cd-policy.md)
 - [Agent instructions](AGENTS.md)
 
 ## Stack and architecture
@@ -51,7 +52,7 @@ The feature branch includes authentication and tenant onboarding, product/catego
 - Cloudinary for product image transformation and delivery.
 - A host that explicitly supports wildcard subdomains and managed TLS; validate platform limits before committing.
 - Server-side payment adapters for Daraja and PayHero, with verified callbacks, idempotency, and reconciliation.
-- GitHub Actions for checks and deployment after tests are in place.
+- GitHub Actions for pull-request checks; Cloudflare Workers Builds is the recommended deployment path.
 
 Prefer a modular monolith and simple, well-tested boundaries. This is not a mandate to over-engineer.
 
