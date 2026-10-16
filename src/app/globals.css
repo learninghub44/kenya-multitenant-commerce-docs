@@ -77,3 +77,12 @@ li p { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; 
 @media (max-width: 540px) { .product-card { align-items: stretch; } .product-price { white-space: normal; } }
 
 .product-form select { width: 100%; min-width: 0; padding: 12px 13px; border: 1px solid #d7d9d2; border-radius: 9px; background: white; color: var(--text); font: inherit; }
+
+.product-card-side { display: grid; justify-items: end; align-content: start; gap: 12px; min-width: 150px; }
+.product-editor { width: 100%; max-width: 380px; }
+.product-editor summary { cursor: pointer; color: var(--text); font-size: 13px; font-weight: 650; padding: 9px 11px; border: 1px solid var(--border); border-radius: 9px; background: white; list-style-position: inside; }
+.product-editor[open] { margin-top: 8px; }
+.product-form-compact { margin-top: 10px; padding: 16px; gap: 7px; }
+.product-form-compact label { margin-top: 4px; }
+.product-form-compact input, .product-form-compact textarea, .product-form-compact select { padding: 10px 11px; font-size: 13px; }
+@media (max-width: 540px) { .product-card-side { justify-items: stretch; min-width: 0; } .product-editor { max-width: none; } }
