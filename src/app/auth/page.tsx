@@ -1,12 +1,11 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 export default function AuthPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [mode, setMode] = useState<"signin" | "signup">("signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,7 +29,7 @@ export default function AuthPage() {
         setMessage("Check your email for the confirmation link. Once confirmed, return here to sign in.");
         return;
       }
-      router.replace(searchParams.get("next")?.startsWith("/") ? searchParams.get("next")! : "/dashboard");
+      router.replace("/dashboard");
       router.refresh();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Authentication failed. Please try again.");
