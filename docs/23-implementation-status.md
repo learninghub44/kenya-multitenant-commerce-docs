@@ -31,3 +31,12 @@ The application foundation has been expanded on the current feature branch and i
 - The service-role key must remain server-only. Public checkout and normal merchant mutations should use narrow database RPCs with role validation.
 - A customer-submitted order or browser redirect is not proof of payment. Manual payment recording is a staff attestation, not provider verification.
 - Apply migrations in timestamp order. Do not merge or deploy until cross-tenant RLS, concurrent stock reservation, callback replay, and backup/restore release gates pass.
+
+
+## Caching, idempotency and deployment review
+
+- Dynamic/private dashboard, authentication, onboarding, storefront/order-request and API responses now receive `private, no-store` cache headers; immutable build assets can still use the framework's content-hashed asset caching.
+- CI now caches npm downloads and the ESLint flat-config composition has been corrected. The latest run must still finish before merge.
+- Migration `202610160021_order_idempotency_and_stock_consistency.sql` blocks repeated terminal order transitions and makes reservation-release operations fail closed when the reserved quantity does not reconcile.
+- Deployment split, environment secrets, cache policy, CI hardening and remaining blockers are documented in `docs/27-caching-idempotency-cicd-deployment.md`.
+- No committed package lockfile exists yet, no production deployment target is configured, and the separate platform-admin app has not been implemented. Do not represent these as completed.
