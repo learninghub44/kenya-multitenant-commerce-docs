@@ -94,3 +94,20 @@ li p { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; 
 .category-assignment .form-message { margin: 0; }
 .product-category-label { margin: 8px 0; color: var(--muted); font-size: 12px; }
 @media (max-width: 540px) { .category-assignment { max-width: none; } }
+
+
+/* Catalogue lifecycle and variant management */
+.category-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.variant-manager { width: 100%; margin-top: 12px; padding: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--background); }
+.variant-manager > summary { cursor: pointer; font-size: 13px; font-weight: 700; }
+.variant-list { display: grid; gap: 8px; margin-top: 12px; }
+.variant-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--border); border-radius: 9px; background: var(--surface); }
+.variant-row p { margin: 5px 0; color: var(--muted); font-size: 12px; }
+.variant-row .field-help { overflow-wrap: anywhere; }
+.product-card-side { display: grid; gap: 12px; min-width: 0; }
+@media (max-width: 640px) {
+  .workspace-card, .variant-row { align-items: stretch; flex-direction: column; }
+  .category-actions { width: 100%; }
+  .category-actions button { flex: 1 1 auto; }
+  .product-card-side { width: 100%; }
+}
