@@ -10,7 +10,7 @@ Help Kenyan SMEs sell online and manage day-to-day retail operations from one mo
 
 ## Application scaffold
 
-The `feat/mvp-application-foundation` branch includes a Next.js/TypeScript starter, Supabase session refresh, email/password authentication UI, authenticated tenant dashboard, atomic tenant onboarding RPC, tenant-scoped product listing, atomic product creation, validated product editing and draft/published status controls, plus stock overview and transactional idempotent receipt/adjustment operations. It remains an early scaffold: migrations and application flows have not yet been tested against a configured Supabase project.
+The feature branch includes authentication and tenant onboarding, product/category/variant management, signed Cloudinary image uploads, inventory operations, a published-catalogue storefront and order-request flow, order/payment-attestation/fulfilment screens, basic customer/supplier/expense/purchasing workflows, and live-record reports. The branch is still an unverified development implementation: online payment gateways and automated provider callbacks are not implemented, and database migrations and application flows have not been tested against a configured Supabase project.
 
 **Implementation progress and known limitations:** [Implementation status](docs/23-implementation-status.md).
 
@@ -39,6 +39,8 @@ The `feat/mvp-application-foundation` branch includes a Next.js/TypeScript start
 - [Environment variables](docs/21-environment-variables.md)
 - [Glossary](docs/22-glossary.md)
 - [Implementation status](docs/23-implementation-status.md)
+- [Commerce and ERP domain foundation](docs/25-commerce-erp-domain.md)
+- [Review and release checklist](docs/26-review-and-release-checklist.md)
 - [Agent instructions](AGENTS.md)
 
 ## Stack and architecture
