@@ -1,7 +1,7 @@
 -- Structural security regression tests. Run after migrations with: supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(13);
+select extensions.plan(15);
 
 select extensions.ok(
   (select count(*) = 22 from pg_class c
@@ -81,6 +81,16 @@ select extensions.ok(
 select extensions.ok(
   not has_function_privilege('anon','public.create_tenant_expense(uuid,text,text,bigint,date,text,text)','EXECUTE'),
   'anonymous users cannot create expense records'
+);
+
+select extensions.ok(
+  position('Terminal orders cannot be transitioned again' in pg_get_functiondef('public.transition_order_status(uuid,uuid,text,text)'::regprocedure)) > 0,
+  'order transition RPC rejects repeat transitions on terminal orders'
+);
+
+select extensions.ok(
+  position('reserved>=order_line.quantity' in pg_get_functiondef('public.release_expired_reservations_for_tenant(uuid)'::regprocedure)) > 0,
+  'reservation expiry refuses to clamp inconsistent stock balances'
 );
 
 select * from extensions.finish();
