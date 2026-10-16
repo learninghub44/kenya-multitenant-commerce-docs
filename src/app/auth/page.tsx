@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 export default function AuthPage() {
@@ -41,7 +42,7 @@ export default function AuthPage() {
   return (
     <main className="auth-page">
       <section className="auth-card" aria-labelledby="auth-title">
-        <a className="back-link" href="/">Commerce Workspace</a>
+        <Link className="back-link" href="/">Commerce Workspace</Link>
         <p className="eyebrow">MERCHANT ACCOUNT</p>
         <h1 id="auth-title">{mode === "signup" ? "Create your account" : "Welcome back"}</h1>
         <p className="auth-description">One secure account for your products, stock and orders.</p>
