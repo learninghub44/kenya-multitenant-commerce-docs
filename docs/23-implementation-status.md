@@ -16,6 +16,8 @@ This repository contains an early application scaffold on `feat/mvp-application-
 - Server-side sign-out endpoint.
 - Tenant-scoped product catalogue page and product creation form.
 - Atomic database RPC creates a draft product and its initial KES-priced variant together; role authorization is checked in the database and prices are submitted as integer minor units.
+- Inventory overview with a default Main store location, on-hand/reserved display, and stock receipt/adjustment form.
+- Atomic, idempotent inventory RPC serializes retries and concurrent movements, validates stock roles, prevents negative stock or reducing below reserved quantity, and updates the balance and ledger in one transaction.
 - Draft pull request: [PR #1](https://github.com/learninghub44/kenya-multitenant-commerce-docs/pull/1).
 
 ## Important limitations
