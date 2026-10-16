@@ -40,7 +40,7 @@ This document describes the current implementation on `feat/mvp-application-foun
 
 ## Migration order
 
-Apply every migration in timestamp order, `202610160001` through `202610160020`, to a disposable development Supabase project first. Review each migration, inspect SQL errors, and test cross-tenant isolation before using any production data. Never skip an earlier migration.
+Apply every migration in timestamp order, `202610160001` through `202610160021`, to a disposable development Supabase project first. Review each migration, inspect SQL errors, and test cross-tenant isolation before using any production data. Never skip an earlier migration.
 
 ## Review procedure
 
@@ -51,3 +51,11 @@ Apply every migration in timestamp order, `202610160001` through `202610160020`,
 5. Configure Cloudinary and test image uploads with authorized and unauthorized users.
 6. Do not enable live payments until the provider-specific integration, callback verification, replay handling, reconciliation, refunds, and sandbox tests are complete.
 7. Merge only after the review and release gates pass.
+
+
+## Additional review items
+
+- Check migration `202610160021_order_idempotency_and_stock_consistency.sql` on a disposable database; it rejects repeated terminal transitions and stops reservation release if the reserved balance is inconsistent.
+- Private routes are explicitly `private, no-store`; do not put tenant/customer/order/payment data behind shared caches.
+- CI caches npm downloads, but a committed `package-lock.json` is still required before changing to `npm ci` and calling dependency installs reproducible.
+- See `docs/27-caching-idempotency-cicd-deployment.md` for separate client/admin deployment requirements and environment setup.
