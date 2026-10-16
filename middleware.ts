@@ -29,6 +29,33 @@ export async function middleware(request: NextRequest) {
   // Do not trust a client-side session alone. getUser validates the session
   // against Supabase Auth and refreshes cookies when needed.
   await supabase.auth.getUser();
+
+  // Wildcard subdomains map to the explicit storefront route. APP_URL must use
+  // the apex/root application domain (for example https://example.co.ke).
+  // Reserved platform hosts are never treated as merchant slugs.
+  const reservedHosts = new Set(["www", "app", "admin", "api", "mail", "support"]);
+  const configuredAppUrl = process.env.APP_URL;
+  if (configuredAppUrl) {
+    try {
+      const rootHost = new URL(configuredAppUrl).hostname.toLowerCase();
+      const requestHost = request.nextUrl.hostname.toLowerCase();
+      if (requestHost.endsWith("." + rootHost)) {
+        const subdomain = requestHost.slice(0, -(rootHost.length + 1));
+        const isSingleLabel = !subdomain.includes(".");
+        const validSlug = /^[a-z0-9](?:[a-z0-9-]{1,48}[a-z0-9])?$/.test(subdomain);
+        const alreadyStoreRoute = request.nextUrl.pathname.startsWith("/store/");
+        if (isSingleLabel && validSlug && !reservedHosts.has(subdomain) && !alreadyStoreRoute &&
+            !request.nextUrl.pathname.startsWith("/_next/") &&
+            !request.nextUrl.pathname.startsWith("/api/")) {
+          const rewritten = request.nextUrl.clone();
+          rewritten.pathname = "/store/" + subdomain;
+          return NextResponse.rewrite(rewritten, { request: { headers: request.headers } });
+        }
+      }
+    } catch {
+      // Invalid APP_URL disables wildcard routing instead of guessing a host.
+    }
+  }
   return response;
 }
 
