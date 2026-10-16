@@ -1,7 +1,7 @@
 -- Structural security regression tests. Run after migrations with: supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(20);
+select extensions.plan(21);
 
 select extensions.ok(
   (select count(*) = 22 from pg_class c
@@ -126,6 +126,35 @@ select extensions.ok(
   not has_schema_privilege('anon','private','USAGE')
   and has_schema_privilege('authenticated','private','USAGE'),
   'private schema is unavailable to anonymous clients and available to authenticated RLS evaluation'
+);
+
+
+select extensions.ok(
+  not exists (
+    select 1
+    from pg_policy pol
+    join pg_depend d on d.classid='pg_policy'::regclass and d.objid=pol.oid and d.refclassid='pg_proc'::regclass
+    join pg_proc fn on fn.oid=d.refobjid
+    join pg_namespace ns on ns.oid=fn.pronamespace
+    where pol.polrelid in (
+      select c.oid from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public'
+    )
+      and ns.nspname='public'
+      and fn.proname in ('is_active_tenant_member','has_tenant_role')
+  )
+  and exists (
+    select 1
+    from pg_policy pol
+    join pg_depend d on d.classid='pg_policy'::regclass and d.objid=pol.oid and d.refclassid='pg_proc'::regclass
+    join pg_proc fn on fn.oid=d.refobjid
+    join pg_namespace ns on ns.oid=fn.pronamespace
+    where pol.polrelid in (
+      select c.oid from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public'
+    )
+      and ns.nspname='private'
+      and fn.proname in ('is_active_tenant_member','has_tenant_role')
+  ),
+  'tenant RLS policies bind to private helpers rather than public RPC functions'
 );
 
 select * from extensions.finish();
