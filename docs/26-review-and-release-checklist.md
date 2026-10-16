@@ -40,7 +40,7 @@ This document describes the current implementation on `feat/mvp-application-foun
 
 ## Migration order
 
-Apply every migration in timestamp order, `202610160001` through `202610160016`, to a disposable development Supabase project first. Review each migration, inspect SQL errors, and test cross-tenant isolation before using any production data. Never skip an earlier migration.
+Apply every migration in timestamp order, `202610160001` through `202610160020`, to a disposable development Supabase project first. Review each migration, inspect SQL errors, and test cross-tenant isolation before using any production data. Never skip an earlier migration.
 
 ## Review procedure
 
