@@ -5,6 +5,22 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
+function getSafeNextPath() {
+  const requestedNext = new URLSearchParams(window.location.search).get("next");
+  if (!requestedNext || !requestedNext.startsWith("/") || requestedNext.startsWith("//") || requestedNext.includes("\\")) {
+    return "/dashboard";
+  }
+
+  try {
+    const destination = new URL(requestedNext, window.location.origin);
+    return destination.origin === window.location.origin
+      ? `${destination.pathname}${destination.search}${destination.hash}`
+      : "/dashboard";
+  } catch {
+    return "/dashboard";
+  }
+}
+
 export default function AuthPage() {
   const router = useRouter();
   const [mode, setMode] = useState<"signin" | "signup">("signup");
@@ -34,7 +50,7 @@ export default function AuthPage() {
         setMessage("Check your email for the confirmation link. Once confirmed, return here to sign in.");
         return;
       }
-      router.replace("/dashboard");
+      router.replace(getSafeNextPath());
       router.refresh();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Authentication failed. Please try again.");

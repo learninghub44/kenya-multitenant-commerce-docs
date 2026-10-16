@@ -44,7 +44,7 @@ export default function StockMovementForm({
       const supabase = createSupabaseBrowserClient();
       const { data: userData, error: userError } = await supabase.auth.getUser();
       if (userError || !userData.user) {
-        router.replace("/auth?next=/dashboard");
+        router.replace(`/auth?next=${encodeURIComponent(window.location.pathname)}`);
         return;
       }
       keyRef.current ??= crypto.randomUUID();

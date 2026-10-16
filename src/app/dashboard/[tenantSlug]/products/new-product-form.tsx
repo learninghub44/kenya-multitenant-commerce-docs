@@ -40,7 +40,7 @@ export default function NewProductForm({ tenantId }: { tenantId: string }) {
       const supabase = createSupabaseBrowserClient();
       const { data: userData, error: userError } = await supabase.auth.getUser();
       if (userError || !userData.user) {
-        router.replace("/auth?next=/dashboard");
+        router.replace(`/auth?next=${encodeURIComponent(window.location.pathname)}`);
         return;
       }
       const { error: createError } = await supabase.rpc("create_product_with_default_variant", {

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import OrderActions from "./order-actions";
+import RoleAccessDenied from "../role-access-denied";
 
 type OrderRow = {
   id: string; order_number: string; status: string; payment_status: string;
@@ -19,13 +20,16 @@ export default async function OrdersPage({ params }: { params: Promise<{ tenantS
   const { tenantSlug } = await params;
   const supabase = await createSupabaseServerClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) redirect("/auth?next=/dashboard");
+  if (authError || !user) redirect(`/auth?next=${encodeURIComponent(`/dashboard/${tenantSlug}/orders`)}`);
   const { data: tenant, error: tenantError } = await supabase.from("tenants")
     .select("id,name,slug,status").eq("slug", tenantSlug).maybeSingle();
   if (tenantError || !tenant || tenant.status !== "active") notFound();
   const { data: membership } = await supabase.from("tenant_memberships")
     .select("role").eq("tenant_id", tenant.id).eq("user_id", user.id).eq("active", true).maybeSingle();
   if (!membership) notFound();
+  if (!["owner", "manager", "order_operator"].includes(membership.role)) {
+    return <RoleAccessDenied tenantSlug={tenantSlug} role={membership.role} area="orders" />;
+  }
 
   const { data: orderData, error: orderError } = await supabase.from("orders")
     .select("id,order_number,status,payment_status,total_minor,currency,customer_name_snapshot,customer_phone_snapshot,delivery_address_snapshot,created_at,notes")
@@ -46,7 +50,6 @@ export default async function OrdersPage({ params }: { params: Promise<{ tenantS
   const canManageOrders = ["owner","manager","order_operator"].includes(membership.role);
 
   return <main className="dashboard-page">
-    <p><Link href="/dashboard">← Your businesses</Link> · <Link href={`/dashboard/${tenant.slug}/products`}>Products</Link> · <Link href={`/dashboard/${tenant.slug}/inventory`}>Inventory</Link></p>
     <header className="dashboard-header"><div><p className="eyebrow">SALES & FULFILMENT</p><h1>Orders</h1><p className="auth-description">Orders for {tenant.name}. Online payment integration is not enabled; staff can record a payment only after independently verifying receipt.</p></div><span className="workspace-status">{orders.length} recent orders</span></header>
     <section className="workspace-list">
       {orders.length===0 ? <div className="empty-state"><h2>No orders yet</h2><p>Customer order requests from the public storefront will appear here.</p></div> : orders.map(order => <article className="order-card" key={order.id}>

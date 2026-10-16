@@ -2,18 +2,22 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import ErpManager from "./erp-manager";
+import RoleAccessDenied from "../role-access-denied";
 
 export default async function ErpPage({ params }: { params: Promise<{ tenantSlug: string }> }) {
   const { tenantSlug } = await params;
   const supabase = await createSupabaseServerClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) redirect("/auth?next=/dashboard");
+  if (authError || !user) redirect(`/auth?next=${encodeURIComponent(`/dashboard/${tenantSlug}/erp`)}`);
   const { data: tenant, error: tenantError } = await supabase.from("tenants")
     .select("id,name,slug,status").eq("slug",tenantSlug).maybeSingle();
   if (tenantError || !tenant || tenant.status!=="active") notFound();
   const { data: membership } = await supabase.from("tenant_memberships")
     .select("role").eq("tenant_id",tenant.id).eq("user_id",user.id).eq("active",true).maybeSingle();
   if (!membership) notFound();
+  if (!["owner", "manager"].includes(membership.role)) {
+    return <RoleAccessDenied tenantSlug={tenantSlug} role={membership.role} area="business records" />;
+  }
 
   const [customerResult,supplierResult,expenseResult,poResult,poItemResult,variantResult,productResult,locationResult] = await Promise.all([
     supabase.from("customers").select("id,display_name,phone,email").eq("tenant_id",tenant.id).order("display_name").limit(100),
@@ -29,7 +33,6 @@ export default async function ErpPage({ params }: { params: Promise<{ tenantSlug
   if (failed) return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><p role="alert">Could not load the ERP workspace. Confirm migrations 008 and 016 are applied, then check the database permissions.</p></main>;
 
   return <main className="dashboard-page">
-    <p><Link href="/dashboard">← Your businesses</Link> · <Link href={`/dashboard/${tenant.slug}/products`}>Products</Link> · <Link href={`/dashboard/${tenant.slug}/inventory`}>Inventory</Link> · <Link href={`/dashboard/${tenant.slug}/orders`}>Orders</Link></p>
     <header className="dashboard-header"><div><p className="eyebrow">BUSINESS OPERATIONS</p><h1>ERP workspace</h1><p className="auth-description">Customers, suppliers, purchasing, goods receipts and expense records for {tenant.name}.</p></div><span className="workspace-status">{membership.role.replaceAll("_"," ")}</span></header>
     <ErpManager tenantId={tenant.id} role={membership.role}
       customers={customerResult.data ?? []} suppliers={supplierResult.data ?? []} expenses={expenseResult.data ?? []}

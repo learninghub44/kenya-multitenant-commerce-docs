@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
@@ -49,7 +50,7 @@ export default function OnboardingPage() {
   return (
     <main className="auth-page">
       <section className="auth-card" aria-labelledby="onboarding-title">
-        <a className="back-link" href="/dashboard">← Dashboard</a>
+        <Link className="back-link" href="/dashboard">← Dashboard</Link>
         <p className="eyebrow">SET UP YOUR BUSINESS</p>
         <h1 id="onboarding-title">Create a workspace</h1>
         <p className="auth-description">Your workspace keeps your catalogue, inventory and team membership separate from other businesses.</p>
