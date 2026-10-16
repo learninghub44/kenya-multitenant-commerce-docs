@@ -2,8 +2,10 @@ name: CI
 
 on:
   pull_request:
+    branches: [main]
   push:
-    branches: [main, feat/mvp-application-foundation]
+    branches: [main, feat/mvp-application-foundation, feat/cloudflare-workers-deployment]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -14,8 +16,13 @@ concurrency:
 
 jobs:
   verify:
+    name: verify
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
     steps:
       - name: Check out source
         uses: actions/checkout@v4
@@ -36,14 +43,13 @@ jobs:
         run: npm run typecheck
       - name: Lint
         run: npm run lint
-      - name: Build
+      - name: Next.js build
         run: npm run build
-        env:
-          NEXT_TELEMETRY_DISABLED: 1
-          NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+      - name: Cloudflare OpenNext build
+        run: npm run build:cloudflare
 
   database-security:
+    name: database-security
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
