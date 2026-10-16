@@ -33,6 +33,12 @@ select extensions.ok(
 );
 
 select extensions.ok(
+  (select count(*)=4 from pg_class c join pg_namespace n on n.oid=c.relnamespace
+   where n.nspname='public' and c.relname=any(array['payment_events','audit_events','notification_outbox','goods_receipt_items']) and c.relrowsecurity),
+  'audit, webhook, outbox and receipt-line tables have RLS enabled'
+);
+
+select extensions.ok(
   has_function_privilege('anon','public.get_public_storefront(text)','EXECUTE'),
   'anonymous visitors can execute the narrow published-storefront read function'
 );
