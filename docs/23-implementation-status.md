@@ -9,7 +9,7 @@ The application foundation has been expanded on the current feature branch and i
 - Tenant-safe Postgres schema, RLS, composite tenant foreign keys, integer minor-unit money, and transactional/idempotent stock receipts and adjustments.
 - Public storefront route at /store/{tenantSlug}, wildcard subdomain rewrite based on APP_URL, and a public RPC restricted to active stores and published catalogue data.
 - Public order-request cart. Server/database resolves product prices and validates stock, creates an idempotent pending order, and reserves tracked stock transactionally.
-- 30-minute reservation expiry logic invoked when another order is created for the same tenant.
+- 30-minute reservation expiry logic invoked when a storefront refresh or another order occurs for the same tenant.
 - Tenant-scoped order list, manual payment attestation for a staff member who has independently verified funds, validated order state transitions, reservation release on cancellation, and stock decrement/ledger entry on fulfilment.
 - Customer and supplier creation, expense recording with audit events, purchase-order creation/submission, and transactional goods receipt posting.
 - Reports for recorded paid sales, expenses, order status, and low-stock watchlist.
