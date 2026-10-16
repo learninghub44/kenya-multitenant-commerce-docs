@@ -5,6 +5,7 @@ import NewProductForm from "./new-product-form";
 import ProductEditor from "./product-editor";
 import ProductCategoryAssignment from "./product-category-assignment";
 import VariantManager, { type ManagedVariant } from "./variant-manager";
+import ProductImageManager from "./product-image-manager";
 
 type ProductRow = {
   id: string;
@@ -19,6 +20,7 @@ type ProductRow = {
 type CategoryRow = { id: string; name: string; status: string };
 
 type VariantRow = ManagedVariant & { product_id: string };
+type ProductImageRow = { id: string; product_id: string; secure_url: string; alt_text: string; position: number };
 
 export default async function ProductsPage({ params }: { params: Promise<{ tenantSlug: string }> }) {
   const { tenantSlug } = await params;
@@ -72,6 +74,15 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
     variants = (data ?? []) as VariantRow[];
   }
 
+  const { data: imageData, error: imageError } = products.length
+    ? await supabase.from("product_images").select("id, product_id, secure_url, alt_text, position")
+        .eq("tenant_id", tenant.id).in("product_id", products.map(product => product.id)).order("position")
+    : { data: [], error: null };
+  if (imageError) {
+    return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><p role="alert">Could not load product images. Confirm the image migration is applied.</p></main>;
+  }
+  const images = (imageData ?? []) as ProductImageRow[];
+
   const canManage = ["owner", "manager", "catalog_editor"].includes(membership.role);
   return (
     <main className="dashboard-page">
@@ -84,7 +95,8 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
           return <article className="workspace-card product-card" key={product.id}>
             <div><h2>{product.title}</h2><p>/{product.slug}{variant?.sku ? ` · SKU ${variant.sku}` : ""}</p>{product.description && <p>{product.description}</p>}<p className="product-category-label">{categories.find(category => category.id === product.category_id)?.name ?? "Uncategorized"}</p><span className="workspace-status">{product.status}</span></div>
             <div className="product-card-side"><strong className="product-price">{variant ? new Intl.NumberFormat("en-KE", { style: "currency", currency: variant.currency }).format(variant.price_minor / 100) : "Price unavailable"}</strong>{canManage && <ProductCategoryAssignment tenantId={tenant.id} productId={product.id} currentCategoryId={product.category_id} categories={categories} />}{canManage && variant && <ProductEditor tenantId={tenant.id} productId={product.id} variantId={variant.id} initialTitle={product.title} initialSlug={product.slug} initialDescription={product.description} initialPriceMinor={variant.price_minor} initialSku={variant.sku} initialStatus={product.status} />}
-              {canManage && <VariantManager tenantId={tenant.id} productId={product.id} variants={productVariants} />}</div>
+              {canManage && <VariantManager tenantId={tenant.id} productId={product.id} variants={productVariants} />}
+              {canManage && <ProductImageManager tenantId={tenant.id} productId={product.id} images={images.filter(image => image.product_id === product.id)} />}</div>
           </article>;
         })}
       </section>
