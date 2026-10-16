@@ -9,7 +9,7 @@ This document describes the current implementation on `feat/mvp-application-foun
 - Inventory balance overview and idempotent receipt/adjustment RPCs.
 - Explicit public storefront route at `/store/{tenantSlug}`; wildcard subdomain rewrite when `APP_URL` is the root domain.
 - Public catalogue read RPC exposes only active stores and published products/variants/categories.
-- Public order request/cart. Prices are loaded and validated in the database; stock-tracked variants are reserved transactionally, requests are idempotent, and abandoned reservations are released on a subsequent checkout after 30 minutes.
+- Public order request/cart. Prices are loaded and validated in the database; stock-tracked variants are reserved transactionally, requests are idempotent, and abandoned reservations expire after 30 minutes and are cleaned up on storefront refresh or checkout.
 - Tenant-scoped orders view; manual payment recording requires an authorized staff member to attest to an actual payment reference; state transitions are checked in the database; fulfilment decrements reserved and on-hand stock in one transaction and records a movement.
 - Customer and supplier creation, expense recording with audit event, purchase order creation/submission, and goods receipt posting to the stock ledger.
 - Live-record reports for recorded paid sales, expenses, order statuses, and low stock.
@@ -20,13 +20,13 @@ This document describes the current implementation on `feat/mvp-application-foun
 - **Daraja/PayHero integration:** no provider initiation API, authenticated/verified callback processor, settlement reconciliation, refund flow, or sandbox end-to-end test. Manual payment recording is not a payment gateway.
 - **Online payment is disabled:** public storefront submits an order request only. It does not collect payment.
 - Product/category/variant lifecycle has basic controls; there is no bulk import/export, variant image ordering/removal UI, custom store branding, discounts, shipping rules, or customer-facing order tracking.
-- Reservation expiry cleanup currently runs when a new order is inserted for the same tenant; a scheduled cleanup job/monitor is still needed for quiet stores.
+- Reservation expiry cleanup runs on storefront refresh or a new order for the same tenant; a scheduled cleanup job and monitoring are still needed.
 - Purchase order UI currently creates one line per order; there is no supplier balance/accounting, partial receipt history screen, purchase returns, or invoice matching.
 - No tenant staff invitation/role-management screen, platform super-admin console, custom-domain verification, or DNS/TLS automation.
 - Reports are operational summaries over the latest 1,000 loaded rows, not a full accounting/tax ledger or date-filtered analytics.
 - No complete audit/outbox worker, email/SMS delivery provider, alerting, backup/restore drill, privacy request workflow, or production deployment setup.
-- No confirmed execution of migrations against a real Supabase project. No dependency install, TypeScript check, lint, build, browser E2E, RLS test, concurrent-stock test, webhook replay test, or backup restore has been completed in the authoring environment.
-- The workflow was added, but no successful CI run has been observed yet. Check the PR's Checks tab.
+- No confirmed execution of migrations against a real Supabase project. A structural SQL security regression test exists at `supabase/tests/security_boundaries.test.sql`. No successful CI run has been observed, and no dependency install, TypeScript check, lint, build, migration execution, browser E2E, concurrent-stock test, webhook replay test, or backup restore has been completed in the authoring environment.
+- The CI workflow runs application checks and starts local Supabase to apply migrations and run structural database security tests. No successful CI run has been observed yet. Check the PR's Checks tab.
 
 ## Required environment variables
 
