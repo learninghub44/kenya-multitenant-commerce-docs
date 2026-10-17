@@ -22,7 +22,7 @@ port = 54323
 [auth]
 enabled = true
 site_url = "http://localhost:3000"
-additional_redirect_urls = ["http://127.0.0.1:3000"]
+additional_redirect_urls = ["http://127.0.0.1:3000", "http://localhost:3000/auth/callback", "http://127.0.0.1:3000/auth/callback"]
 jwt_expiry = 3600
 enable_signup = true
 
@@ -37,3 +37,11 @@ file_size_limit = "5MiB"
 
 [analytics]
 enabled = false
+
+# Google sign-in (local development). Production: enable Google in the Supabase
+# dashboard (Authentication > Providers) and add the redirect URLs from docs/30-authentication.md.
+[auth.external.google]
+enabled = true
+client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
+skip_nonce_check = false

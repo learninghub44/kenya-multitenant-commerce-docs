@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { storeDisplayAddress } from "@/lib/store-url";
 
 export default async function DashboardPage() {
   const supabase = await createSupabaseServerClient();
@@ -58,7 +59,7 @@ export default async function DashboardPage() {
             <span className="business-mark" aria-hidden="true">{item.tenant.name.slice(0, 1).toUpperCase()}</span>
             <div className="business-card-copy">
               <h2>{item.tenant.name}</h2>
-              <p className="business-slug">{item.tenant.slug}</p>
+              <p className="business-slug">{storeDisplayAddress(item.tenant.slug)}</p>
               <div className="business-meta">
                 <span className="workspace-status">{item.tenant.currency}</span>
                 <span className="business-meta-dot" aria-hidden="true" />

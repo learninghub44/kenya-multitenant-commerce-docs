@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import styles from "./storefront-catalog.module.css";
+import { telHref } from "@/lib/contact-links";
 
 type StoreVariant = {
   variant_id: string;
@@ -40,11 +41,24 @@ function lowestPrice(product: StoreProduct) {
   return prices.length ? Math.min(...prices) : null;
 }
 
+export type CatalogProfile = {
+  tagline: string | null;
+  about: string | null;
+  logo_url: string | null;
+  banner_url: string | null;
+  phone: string | null;
+  whatsapp: string | null;
+  town: string | null;
+  county: string | null;
+};
+
 export default function StorefrontCatalog({
   storeName,
+  profile,
   products,
 }: {
   storeName: string;
+  profile: CatalogProfile;
   products: StoreProduct[];
 }) {
   const [query, setQuery] = useState("");
@@ -116,36 +130,51 @@ export default function StorefrontCatalog({
     <>
       <header className={styles.storeHeader}>
         <a className={styles.brand} href="#top" aria-label={`${storeName} home`}>
-          <span className={styles.brandMark} aria-hidden="true">
-            {storeName.trim().charAt(0).toLocaleUpperCase()}
-          </span>
+          {profile.logo_url ? (
+            <span className={styles.brandLogo}>
+              <Image src={profile.logo_url} alt="" fill sizes="44px" unoptimized />
+            </span>
+          ) : (
+            <span className={styles.brandMark} aria-hidden="true">
+              {storeName.trim().charAt(0).toLocaleUpperCase()}
+            </span>
+          )}
           <span className={styles.brandName}>{storeName}</span>
         </a>
-        <a className={styles.cartLink} href="#order-request">
-          <span aria-hidden="true">▣</span>
-          <span>Order &amp; checkout</span>
-        </a>
+        <div className={styles.headerActions}>
+          {profile.phone && (
+            <a className={styles.headerContact} href={telHref(profile.phone)}>Call us</a>
+          )}
+          <a className={styles.cartLink} href="#order-request">
+            <span>Order &amp; checkout</span>
+          </a>
+        </div>
       </header>
 
-      <section className={styles.hero} id="top" aria-labelledby="store-heading">
+      <section className={`${styles.hero} ${profile.banner_url ? styles.heroWithBanner : ""}`} id="top" aria-labelledby="store-heading">
+        {profile.banner_url && (
+          <div className={styles.heroBanner} aria-hidden="true">
+            <Image src={profile.banner_url} alt="" fill sizes="100vw" priority unoptimized />
+          </div>
+        )}
         <div className={styles.heroCopy}>
-          <p className={styles.kicker}>THE ONLINE STORE</p>
-          <h1 id="store-heading">
-            Good finds.
-            <br />
-            <span>Easy ordering.</span>
-          </h1>
+          <p className={styles.kicker}>
+            {[profile.town, profile.county].filter(Boolean).join(", ") || "Online shop"}
+          </p>
+          <h1 id="store-heading">{profile.tagline || `Welcome to ${storeName}`}</h1>
           <p>
-            Explore the collection, compare prices, and send your order in a few
-            simple steps.
+            {profile.about
+              ? profile.about.length > 200 ? `${profile.about.slice(0, 200).trimEnd()}…` : profile.about
+              : "Explore the collection, compare prices, and send your order in a few simple steps."}
           </p>
           <a className={styles.heroAction} href="#shop">
-            Explore products <span aria-hidden="true">↓</span>
+            Shop now <span aria-hidden="true">↓</span>
           </a>
+          {profile.about && <a className={styles.heroAboutLink} href="#about">About us</a>}
           <p className={styles.heroNote}>Browse the catalogue. Order directly from the store.</p>
         </div>
 
-        <div className={styles.heroArt} aria-label="Featured products">
+        {heroProducts.length > 0 && <div className={styles.heroArt} aria-label="Featured products">
           {heroProducts.map((product, index) => {
             const image = product.images[0];
             const price = lowestPrice(product);
@@ -176,8 +205,8 @@ export default function StorefrontCatalog({
               </article>
             );
           })}
-          <span className={styles.heroArtLabel}>FROM THIS STORE</span>
-        </div>
+          <span className={styles.heroArtLabel}>From this store</span>
+        </div>}
       </section>
 
       <div className={styles.serviceStrip} aria-label="Shopping information">
@@ -198,7 +227,7 @@ export default function StorefrontCatalog({
       <section className={styles.shop} id="shop" aria-labelledby="catalog-heading">
         <div className={styles.sectionHeading}>
           <div>
-            <p className={styles.kicker}>MADE FOR YOU</p>
+            <p className={styles.kicker}>Our products</p>
             <h2 id="catalog-heading">Shop the collection</h2>
             <p>Explore categories or search for something specific.</p>
           </div>
@@ -264,7 +293,12 @@ export default function StorefrontCatalog({
           ))}
         </div>
 
-        {filtered.length ? (
+        {products.length === 0 ? (
+          <div className={styles.noProducts}>
+            <h3>Products are coming soon</h3>
+            <p>{storeName} is getting ready. Contact the shop below to ask what is available.</p>
+          </div>
+        ) : filtered.length ? (
           <div className={styles.productGrid}>
             {filtered.map((product) => {
               const price = lowestPrice(product);

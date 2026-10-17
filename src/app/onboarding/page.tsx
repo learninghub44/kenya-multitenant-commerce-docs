@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import AuthShell from "../auth/auth-shell";
+import { storeDisplayAddress } from "@/lib/store-url";
+import { RESERVED_SLUGS } from "@/lib/reserved-slugs";
 
 function slugify(value: string) {
   return value.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
@@ -33,6 +35,7 @@ export default function OnboardingPage() {
       const cleanName = name.trim();
       const cleanSlug = slugify(slug);
       if (cleanName.length < 2 || cleanName.length > 120) throw new Error("Business name must be between 2 and 120 characters.");
+      if (RESERVED_SLUGS.has(cleanSlug)) throw new Error("That store address is reserved. Choose another one.");
       if (!/^[a-z0-9](?:[a-z0-9-]{1,48}[a-z0-9])$/.test(cleanSlug)) throw new Error("Choose a store address with 3–50 letters, numbers or hyphens; start and end with a letter or number.");
       const { error: rpcError } = await supabase.rpc("create_tenant_for_current_user", {
         p_name: cleanName,
@@ -64,7 +67,7 @@ export default function OnboardingPage() {
           <input id="business-name" autoComplete="organization" placeholder="e.g. Wanjiku Fashions" required minLength={2} maxLength={120} value={name} onChange={e => { setName(e.target.value); if (!slugEdited) setSlug(slugify(e.target.value)); }} />
           <label htmlFor="store-address">Store address</label>
           <input id="store-address" required minLength={3} maxLength={50} value={slug} onChange={e => { setSlugEdited(true); setSlug(slugify(e.target.value)); }} />
-          <p className="field-help">Your store link will end with <strong>/store/{slug || "your-store"}</strong>. Custom domains are not available yet.</p>
+          <p className="field-help">Your shop will live at <strong>{storeDisplayAddress(slug || "your-store")}</strong>.</p>
           {error && <p className="form-message error" role="alert">{error}</p>}
           <button className="primary-button" type="submit" disabled={busy}>{busy ? "Creating workspace…" : "Create workspace"}</button>
         </form>

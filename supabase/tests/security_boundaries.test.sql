@@ -1,7 +1,7 @@
 -- Structural security regression tests. Run after migrations with: supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(15);
+select extensions.plan(20);
 
 select extensions.ok(
   (select count(*) = 22 from pg_class c
@@ -91,6 +91,33 @@ select extensions.ok(
 select extensions.ok(
   position('reserved>=order_line.quantity' in pg_get_functiondef('public.release_expired_reservations_for_tenant(uuid)'::regprocedure)) > 0,
   'reservation expiry refuses to clamp inconsistent stock balances'
+);
+
+select extensions.ok(
+  (select relrowsecurity from pg_class where oid = 'public.store_profiles'::regclass),
+  'store profiles have row-level security enabled'
+);
+
+select extensions.ok(
+  not exists(select 1 from pg_policies where schemaname='public' and tablename='store_profiles' and cmd in ('ALL','INSERT','UPDATE','DELETE')),
+  'store profiles have no direct client write policies'
+);
+
+select extensions.ok(
+  not has_function_privilege('anon','public.save_store_profile(uuid,jsonb)','EXECUTE')
+  and has_function_privilege('authenticated','public.save_store_profile(uuid,jsonb)','EXECUTE'),
+  'only authenticated users can call the role-checked store profile writer'
+);
+
+select extensions.ok(
+  has_function_privilege('anon','public.get_public_store_profile(text)','EXECUTE'),
+  'anonymous visitors can read the narrow public store profile'
+);
+
+select extensions.ok(
+  position('has_tenant_role' in pg_get_functiondef('public.save_store_profile(uuid,jsonb)'::regprocedure)) > 0
+  and position('reserved' in pg_get_functiondef('public.create_tenant_for_current_user(text,text)'::regprocedure)) > 0,
+  'store profile writes are role-checked and reserved subdomains are rejected at tenant creation'
 );
 
 select * from extensions.finish();

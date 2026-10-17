@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { storeUrl } from "@/lib/store-url";
 
 type RecentOrder = {
   id: string;
@@ -122,9 +123,9 @@ export default async function BusinessOverviewPage({
             Your live workspace snapshot. Start with the work that needs your attention.
           </p>
         </div>
-        <Link className="overview-store-link" href={`/store/${tenant.slug}`} target="_blank" rel="noreferrer">
+        <a className="overview-store-link" href={storeUrl(tenant.slug)} target="_blank" rel="noreferrer">
           View storefront <span aria-hidden="true">↗</span>
-        </Link>
+        </a>
       </header>
 
       {queryErrors.length > 0 && (

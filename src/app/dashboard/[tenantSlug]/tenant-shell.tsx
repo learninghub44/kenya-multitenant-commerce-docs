@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { storeUrl } from "@/lib/store-url";
 
 type TenantShellProps = {
   tenantSlug: string;
@@ -20,6 +21,7 @@ const navItems = [
   { label: "Orders", path: "/orders", roles: ["owner", "manager", "order_operator"] },
   { label: "Business records", path: "/erp", roles: ["owner", "manager"] },
   { label: "Reports", path: "/reports", roles: ["owner", "manager", "finance_viewer"] },
+  { label: "Store profile", path: "/settings", roles: ["owner", "manager"] },
 ];
 
 function roleLabel(role: string) {
@@ -79,9 +81,9 @@ export default function TenantShell({
         {renderNavigation("tenant-navigation")}
 
         <div className="tenant-sidebar-footer">
-          <Link href={`/store/${tenantSlug}`} target="_blank" rel="noreferrer">
+          <a href={storeUrl(tenantSlug)} target="_blank" rel="noreferrer">
             View storefront <span aria-hidden="true">↗</span>
-          </Link>
+          </a>
           <Link href="/dashboard">Switch business</Link>
         </div>
       </aside>

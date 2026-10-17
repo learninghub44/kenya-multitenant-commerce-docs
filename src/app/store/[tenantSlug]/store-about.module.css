@@ -1,0 +1,28 @@
+.about { background: #f5faf6; border-top: 1px solid #dbe8de; }
+.grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); max-width: 1280px; margin: 0 auto; padding: clamp(40px, 6vw, 80px) clamp(18px, 4vw, 56px); }
+.story h2, .contact h2 { margin: 0 0 16px; font-size: clamp(26px, 3.4vw, 36px); line-height: 1.1; }
+.aboutText { max-width: 62ch; margin: 0 0 28px; color: #3a4d43; font-size: 17px; line-height: 1.7; white-space: pre-line; }
+.owner { display: flex; align-items: flex-start; gap: 20px; padding: 22px; border: 1px solid #dbe8de; border-radius: 16px; background: #fff; }
+.ownerPhoto { position: relative; display: grid; flex: 0 0 96px; width: 96px; height: 96px; place-items: center; overflow: hidden; border-radius: 50%; background: #e2f6e9; color: #0a6e35; font-family: var(--font-display); font-size: 36px; font-weight: 700; }
+.ownerPhoto img { object-fit: cover; }
+.ownerLabel { margin: 0 0 4px; color: #0a6e35; font-size: 14px; font-weight: 700; }
+.owner h3 { margin: 0; font-size: 22px; }
+.ownerTitle { margin: 2px 0 0; color: #4f6257; font-size: 15px; }
+.ownerBio { margin: 12px 0 0; color: #3a4d43; font-size: 16px; line-height: 1.65; white-space: pre-line; }
+.contact { align-self: start; padding: 26px; border: 1px solid #dbe8de; border-radius: 16px; background: #fff; }
+.contactButtons { display: grid; gap: 10px; margin-bottom: 8px; }
+.whatsapp, .call { display: flex; align-items: center; justify-content: center; min-height: 50px; padding: 0 16px; border-radius: 12px; font-size: 16px; font-weight: 700; text-align: center; text-decoration: none; overflow-wrap: anywhere; }
+.whatsapp { background: #0f8a43; color: #fff; }
+.whatsapp:hover { background: #0a6e35; }
+.call { border: 1px solid #b9d3c2; background: #fff; color: #12261f; }
+.call:hover { background: #e2f6e9; }
+.detail { margin-top: 22px; padding-top: 18px; border-top: 1px solid #dbe8de; }
+.detail h3 { margin: 0 0 6px; font-size: 17px; }
+.detail p { margin: 0 0 6px; color: #3a4d43; font-size: 16px; line-height: 1.6; }
+.hours { white-space: pre-line; }
+.detail a { color: #0a6e35; font-size: 15px; font-weight: 650; }
+.socials { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 0; padding: 0; list-style: none; }
+.socials a { display: inline-block; padding: 8px 14px; border: 1px solid #b9d3c2; border-radius: 999px; color: #12261f; text-decoration: none; }
+.socials a:hover { background: #e2f6e9; }
+@media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+@media (max-width: 480px) { .owner { flex-direction: column; } }
