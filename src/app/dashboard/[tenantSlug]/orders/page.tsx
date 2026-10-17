@@ -50,7 +50,7 @@ export default async function OrdersPage({ params }: { params: Promise<{ tenantS
   const canManageOrders = ["owner","manager","order_operator"].includes(membership.role);
 
   return <main className="dashboard-page">
-    <header className="dashboard-header"><div><p className="eyebrow">SALES & FULFILMENT</p><h1>Orders</h1><p className="auth-description">Orders for {tenant.name}. Online payment integration is not enabled; staff can record a payment only after independently verifying receipt.</p></div><span className="workspace-status">{orders.length} recent orders</span></header>
+    <header className="dashboard-header"><div><p className="eyebrow">Sales & fulfilment</p><h1>Orders</h1><p className="auth-description">Orders for {tenant.name}. Online payment integration is not enabled; staff can record a payment only after independently verifying receipt.</p></div><span className="workspace-status">{orders.length} recent orders</span></header>
     <section className="workspace-list">
       {orders.length===0 ? <div className="empty-state"><h2>No orders yet</h2><p>Customer order requests from the public storefront will appear here.</p></div> : orders.map(order => <article className="order-card" key={order.id}>
         <div className="order-card-header"><div><p className="eyebrow">{order.order_number}</p><h2>{order.customer_name_snapshot}</h2><p>{order.customer_phone_snapshot}</p></div><div className="order-badges"><span className="workspace-status">{order.status.replaceAll("_"," ")}</span><span className="workspace-status">{order.payment_status.replaceAll("_"," ")}</span></div></div>

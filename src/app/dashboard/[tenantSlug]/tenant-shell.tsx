@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { storeUrl } from "@/lib/store-url";
+import Logo from "@/components/logo";
 
 type TenantShellProps = {
   tenantSlug: string;
@@ -20,6 +22,7 @@ const navItems = [
   { label: "Orders", path: "/orders", roles: ["owner", "manager", "order_operator"] },
   { label: "Business records", path: "/erp", roles: ["owner", "manager"] },
   { label: "Reports", path: "/reports", roles: ["owner", "manager", "finance_viewer"] },
+  { label: "Store profile", path: "/settings", roles: ["owner", "manager"] },
 ];
 
 function roleLabel(role: string) {
@@ -65,13 +68,10 @@ export default function TenantShell({
   return (
     <div className="tenant-app">
       <aside className="tenant-sidebar">
-        <Link className="tenant-brand" href="/dashboard" aria-label="Commerce Workspace — all businesses">
-          <span className="tenant-brand-mark" aria-hidden="true">C</span>
-          <span>Commerce <span>Workspace</span></span>
-        </Link>
+        <Logo href="/dashboard" size={40} className="tenant-logo" />
 
         <div className="tenant-side-context">
-          <span className="tenant-side-label">BUSINESS WORKSPACE</span>
+          <span className="tenant-side-label">Business workspace</span>
           <strong>{tenantName}</strong>
           <span className="tenant-role">{roleLabel(role)}</span>
         </div>
@@ -79,17 +79,18 @@ export default function TenantShell({
         {renderNavigation("tenant-navigation")}
 
         <div className="tenant-sidebar-footer">
-          <Link href={`/store/${tenantSlug}`} target="_blank" rel="noreferrer">
+          <a href={storeUrl(tenantSlug)} target="_blank" rel="noreferrer">
             View storefront <span aria-hidden="true">↗</span>
-          </Link>
+          </a>
           <Link href="/dashboard">Switch business</Link>
         </div>
       </aside>
 
       <div className="tenant-stage">
         <header className="tenant-topbar">
+          <Logo href="/dashboard" size={36} markOnly className="tenant-topbar-logo" />
           <div className="tenant-topbar-context">
-            <span>BUSINESS WORKSPACE</span>
+            <span>Business workspace</span>
             <strong>{tenantName}</strong>
           </div>
           <div className="tenant-account">

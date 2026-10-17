@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { storeUrl } from "@/lib/store-url";
 
 type RecentOrder = {
   id: string;
@@ -116,15 +117,15 @@ export default async function BusinessOverviewPage({
     <main className="dashboard-page business-overview">
       <header className="overview-heading">
         <div>
-          <p className="eyebrow">BUSINESS OVERVIEW</p>
+          <p className="eyebrow">Business overview</p>
           <h1>{tenant.name}</h1>
           <p className="auth-description">
             Your live workspace snapshot. Start with the work that needs your attention.
           </p>
         </div>
-        <Link className="overview-store-link" href={`/store/${tenant.slug}`} target="_blank" rel="noreferrer">
+        <a className="overview-store-link" href={storeUrl(tenant.slug)} target="_blank" rel="noreferrer">
           View storefront <span aria-hidden="true">↗</span>
-        </Link>
+        </a>
       </header>
 
       {queryErrors.length > 0 && (
@@ -164,7 +165,7 @@ export default async function BusinessOverviewPage({
         {canViewOrders ? <article className="overview-panel overview-orders">
           <header className="overview-panel-heading">
             <div>
-              <p className="eyebrow">RECENT ACTIVITY</p>
+              <p className="eyebrow">Recent activity</p>
               <h2>Latest orders</h2>
             </div>
             <Link href={`/dashboard/${tenant.slug}/orders`}>All orders <span aria-hidden="true">→</span></Link>
@@ -201,7 +202,7 @@ export default async function BusinessOverviewPage({
           )}
         </article> : (
           <article className="overview-panel overview-role-note">
-            <p className="eyebrow">YOUR WORKSPACE</p>
+            <p className="eyebrow">Your workspace</p>
             <h2>{overviewFocus?.title ?? "Workspace access"}</h2>
             <p>{overviewFocus?.description ?? "Your current role does not have a dedicated workspace section."}</p>
             {overviewFocus && (
@@ -213,7 +214,7 @@ export default async function BusinessOverviewPage({
         )}
 
         <aside className="overview-panel overview-actions">
-          <p className="eyebrow">QUICK ACCESS</p>
+          <p className="eyebrow">Quick access</p>
           <h2>Keep work moving</h2>
           <p className="overview-actions-copy">Go straight to the areas your team uses most.</p>
           <div className="overview-action-list">

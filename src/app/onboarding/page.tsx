@@ -4,6 +4,9 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import AuthShell from "../auth/auth-shell";
+import { storeDisplayAddress } from "@/lib/store-url";
+import { RESERVED_SLUGS } from "@/lib/reserved-slugs";
 
 function slugify(value: string) {
   return value.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
@@ -32,6 +35,7 @@ export default function OnboardingPage() {
       const cleanName = name.trim();
       const cleanSlug = slugify(slug);
       if (cleanName.length < 2 || cleanName.length > 120) throw new Error("Business name must be between 2 and 120 characters.");
+      if (RESERVED_SLUGS.has(cleanSlug)) throw new Error("That store address is reserved. Choose another one.");
       if (!/^[a-z0-9](?:[a-z0-9-]{1,48}[a-z0-9])$/.test(cleanSlug)) throw new Error("Choose a store address with 3–50 letters, numbers or hyphens; start and end with a letter or number.");
       const { error: rpcError } = await supabase.rpc("create_tenant_for_current_user", {
         p_name: cleanName,
@@ -48,22 +52,26 @@ export default function OnboardingPage() {
   }
 
   return (
-    <main className="auth-page">
+    <AuthShell
+      headline="Give your business "
+      accent="its own workspace."
+      summary="Each workspace keeps its catalogue, stock and team separate from your other businesses."
+    >
       <section className="auth-card" aria-labelledby="onboarding-title">
-        <Link className="back-link" href="/dashboard">← Dashboard</Link>
-        <p className="eyebrow">SET UP YOUR BUSINESS</p>
+        <Link className="back-link" href="/dashboard">← Back to your businesses</Link>
+        <p className="eyebrow">Set up your business</p>
         <h1 id="onboarding-title">Create a workspace</h1>
-        <p className="auth-description">Your workspace keeps your catalogue, inventory and team membership separate from other businesses.</p>
+        <p className="auth-description">Start with a name and a store address. You can add products next.</p>
         <form onSubmit={submit}>
           <label htmlFor="business-name">Business name</label>
-          <input id="business-name" autoComplete="organization" required minLength={2} maxLength={120} value={name} onChange={e => { setName(e.target.value); if (!slugEdited) setSlug(slugify(e.target.value)); }} />
+          <input id="business-name" autoComplete="organization" placeholder="e.g. Wanjiku Fashions" required minLength={2} maxLength={120} value={name} onChange={e => { setName(e.target.value); if (!slugEdited) setSlug(slugify(e.target.value)); }} />
           <label htmlFor="store-address">Store address</label>
-          <div className="slug-field"><input id="store-address" required minLength={3} maxLength={50} value={slug} onChange={e => { setSlugEdited(true); setSlug(slugify(e.target.value)); }} /><span>.your-store-domain</span></div>
-          <p className="field-help">This becomes your unique store slug. Domain routing is not enabled yet.</p>
+          <input id="store-address" required minLength={3} maxLength={50} value={slug} onChange={e => { setSlugEdited(true); setSlug(slugify(e.target.value)); }} />
+          <p className="field-help">Your shop will live at <strong>{storeDisplayAddress(slug || "your-store")}</strong>.</p>
           {error && <p className="form-message error" role="alert">{error}</p>}
           <button className="primary-button" type="submit" disabled={busy}>{busy ? "Creating workspace…" : "Create workspace"}</button>
         </form>
       </section>
-    </main>
+    </AuthShell>
   );
 }

@@ -59,7 +59,7 @@ export default async function ReportsPage({ params }: { params: Promise<{ tenant
   }).sort((a,b)=>a.available-b.available);
 
   return <main className="dashboard-page">
-    <header className="dashboard-header"><div><p className="eyebrow">BUSINESS PERFORMANCE</p><h1>Reports</h1><p className="auth-description">Live records from {tenant.name}. Sales figures include only orders with a recorded successful payment; this is not an accounting statement.</p></div><span className="workspace-status">Last {orders.length} orders</span></header>
+    <header className="dashboard-header"><div><p className="eyebrow">Business performance</p><h1>Reports</h1><p className="auth-description">Live records from {tenant.name}. Sales figures include only orders with a recorded successful payment; this is not an accounting statement.</p></div><span className="workspace-status">Last {orders.length} orders</span></header>
     <section className="report-metrics">
       <article><span>Recorded paid sales</span><strong>{money(paidSales)}</strong><small>{paidOrders.length} paid orders</small></article>
       <article><span>Recorded expenses</span><strong>{money(expenseTotal)}</strong><small>{expenses.length} expense records{!["owner","manager","finance_viewer"].includes(membership.role) ? " · finance access required for full totals" : ""}</small></article>

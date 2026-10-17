@@ -62,7 +62,7 @@ export default async function InventoryPage({ params }: { params: Promise<{ tena
 
   return (
     <main className="dashboard-page">
-      <header className="dashboard-header"><div><p className="eyebrow">INVENTORY</p><h1>{tenant.name}</h1><p className="auth-description">Stock balances and recorded movements for {activeLocation?.name ?? "your locations"}.</p></div><span className="workspace-status">{membership.role.replaceAll("_", " ")}</span></header>
+      <header className="dashboard-header"><div><p className="eyebrow">Inventory</p><h1>{tenant.name}</h1><p className="auth-description">Stock balances and recorded movements for {activeLocation?.name ?? "your locations"}.</p></div><span className="workspace-status">{membership.role.replaceAll("_", " ")}</span></header>
       <section className="workspace-list">
         {!activeLocation && <div className="empty-state"><h2>No active stock location</h2><p>Apply the latest migration to create the default Main store location.</p></div>}
         {variants.length === 0 ? <div className="empty-state"><h2>No product variants yet</h2><p>Create a product first. Every product starts with a default variant.</p>{canManageProducts ? <Link className="workspace-action" href={`/dashboard/${tenant.slug}/products`}>Open products →</Link> : <p className="field-help">Ask a workspace owner, manager or catalog editor to add the first product.</p>}</div> : variants.map(variant => {

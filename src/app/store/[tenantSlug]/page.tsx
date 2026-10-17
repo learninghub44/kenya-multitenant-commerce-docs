@@ -2,7 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import PublicCheckout from "./public-checkout";
+import Logo from "@/components/logo";
 import StorefrontCatalog from "./storefront-catalog";
+import StoreAbout, { type PublicStoreProfile } from "./store-about";
 
 type StorefrontRow = {
   store_name: string;
@@ -30,14 +32,18 @@ export default async function StorefrontPage({ params }: { params: Promise<{ ten
   if (refreshError) {
     return <main className="storefront-page"><Link href="/">Commerce Workspace</Link><section className="empty-state"><h1>Store temporarily unavailable</h1><p>Stock availability could not be refreshed safely. Please try again shortly.</p></section></main>;
   }
-  const { data, error } = await supabase.rpc("get_public_storefront", { p_store_slug: tenantSlug });
-  if (error) {
+  const [{ data, error }, { data: profileData, error: profileError }] = await Promise.all([
+    supabase.rpc("get_public_storefront", { p_store_slug: tenantSlug }),
+    supabase.rpc("get_public_store_profile", { p_store_slug: tenantSlug }),
+  ]);
+  if (error || profileError) {
     return <main className="storefront-page"><Link href="/">Commerce Workspace</Link><section className="empty-state"><h1>Store temporarily unavailable</h1><p>The public catalogue could not be loaded. The store owner may need to finish setup.</p></section></main>;
   }
-  const rows = (data ?? []) as StorefrontRow[];
-  if (rows.length === 0) {
-    return <main className="storefront-page"><Link href="/">Commerce Workspace</Link><section className="empty-state"><h1>Store not found or no published products</h1><p>This store may be inactive or its products may still be drafts.</p></section></main>;
+  const profile = ((profileData ?? []) as PublicStoreProfile[])[0];
+  if (!profile) {
+    return <main className="storefront-page"><Link href="/">Commerce Workspace</Link><section className="empty-state"><h1>Store not found</h1><p>This store does not exist or is no longer active.</p></section></main>;
   }
+  const rows = (data ?? []) as StorefrontRow[];
 
   const products = Array.from(new Map(rows.map(row => [row.product_id, row])).values()).map(product => ({
     ...product,
@@ -45,7 +51,10 @@ export default async function StorefrontPage({ params }: { params: Promise<{ ten
   }));
 
   return <main className="storefront-page">
-    <StorefrontCatalog storeName={rows[0].store_name} products={products.map(product => ({
+    <StorefrontCatalog storeName={profile.store_name} profile={{
+      tagline: profile.tagline, about: profile.about, logo_url: profile.logo_url, banner_url: profile.banner_url,
+      phone: profile.phone, whatsapp: profile.whatsapp, town: profile.town, county: profile.county
+    }} products={products.map(product => ({
       product_id: product.product_id,
       product_title: product.product_title,
       product_description: product.product_description,
@@ -59,7 +68,7 @@ export default async function StorefrontPage({ params }: { params: Promise<{ ten
         available_quantity: variant.available_quantity
       }))
     }))} />
-    <div id="order-request">
+    {products.length > 0 && <div id="order-request">
       <PublicCheckout storeSlug={tenantSlug} products={products.map(product => ({
         product_id: product.product_id,
         product_title: product.product_title,
@@ -69,7 +78,14 @@ export default async function StorefrontPage({ params }: { params: Promise<{ ten
           available_quantity: variant.available_quantity
         }))
       }))} />
-    </div>
-    <footer className="storefront-footer"><p>Order requests are confirmed by the store. Online payment is not enabled.</p></footer>
+    </div>}
+    <StoreAbout profile={profile} />
+    <footer className="storefront-footer">
+      <p><strong>{profile.store_name}</strong>{profile.town ? ` · ${[profile.town, profile.county].filter(Boolean).join(", ")}` : ""}</p>
+      <p>Order requests are confirmed by the store. Online payment is not enabled.</p>
+      <a className="powered-by" href={process.env.NEXT_PUBLIC_APP_URL ?? "/"} aria-label="Powered by Commerce Workspace">
+        <span>Powered by</span> <Logo size={26} />
+      </a>
+    </footer>
   </main>;
 }

@@ -33,7 +33,7 @@ export default async function ErpPage({ params }: { params: Promise<{ tenantSlug
   if (failed) return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><p role="alert">Could not load the ERP workspace. Confirm migrations 008 and 016 are applied, then check the database permissions.</p></main>;
 
   return <main className="dashboard-page">
-    <header className="dashboard-header"><div><p className="eyebrow">BUSINESS OPERATIONS</p><h1>ERP workspace</h1><p className="auth-description">Customers, suppliers, purchasing, goods receipts and expense records for {tenant.name}.</p></div><span className="workspace-status">{membership.role.replaceAll("_"," ")}</span></header>
+    <header className="dashboard-header"><div><p className="eyebrow">Business operations</p><h1>ERP workspace</h1><p className="auth-description">Customers, suppliers, purchasing, goods receipts and expense records for {tenant.name}.</p></div><span className="workspace-status">{membership.role.replaceAll("_"," ")}</span></header>
     <ErpManager tenantId={tenant.id} role={membership.role}
       customers={customerResult.data ?? []} suppliers={supplierResult.data ?? []} expenses={expenseResult.data ?? []}
       purchaseOrders={poResult.data ?? []} purchaseItems={poItemResult.data ?? []} variants={variantResult.data ?? []}

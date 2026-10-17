@@ -1,0 +1,31 @@
+import Logo from "@/components/logo";
+import type { ReactNode } from "react";
+
+type AuthShellProps = {
+  headline: string;
+  accent: string;
+  summary: string;
+  points?: string[];
+  children: ReactNode;
+};
+
+export default function AuthShell({ headline, accent, summary, points, children }: AuthShellProps) {
+  return (
+    <main className="auth-shell">
+      <aside className="auth-aside">
+        <Logo href="/" tone="light" size={44} />
+        <div>
+          <h2>{headline}<span>{accent}</span></h2>
+          <p>{summary}</p>
+          {points && (
+            <ul className="auth-points">
+              {points.map((point) => <li key={point}>{point}</li>)}
+            </ul>
+          )}
+        </div>
+        <small>Built for growing Kenyan businesses.</small>
+      </aside>
+      <div className="auth-main">{children}</div>
+    </main>
+  );
+}

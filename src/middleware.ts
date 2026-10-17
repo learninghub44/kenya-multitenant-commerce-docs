@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { RESERVED_SLUGS } from "./lib/reserved-slugs";
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -33,12 +34,15 @@ export async function middleware(request: NextRequest) {
   // Wildcard subdomains map to the explicit storefront route. APP_URL must use
   // the apex/root application domain (for example https://example.co.ke).
   // Reserved platform hosts are never treated as merchant slugs.
-  const reservedHosts = new Set(["www", "app", "admin", "api", "mail", "support"]);
+  const reservedHosts = RESERVED_SLUGS;
   const configuredAppUrl = process.env.APP_URL;
   if (configuredAppUrl) {
     try {
       const rootHost = new URL(configuredAppUrl).hostname.toLowerCase();
-      const requestHost = request.nextUrl.hostname.toLowerCase();
+      // Prefer the real Host header: nextUrl.hostname can report the server's own
+      // address instead of the public hostname depending on the runtime.
+      const requestHost = (request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? request.nextUrl.hostname)
+        .split(",")[0].trim().split(":")[0].toLowerCase();
       if (requestHost.endsWith("." + rootHost)) {
         const subdomain = requestHost.slice(0, -(rootHost.length + 1));
         const isSingleLabel = !subdomain.includes(".");
