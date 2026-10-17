@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { storeDisplayAddress } from "@/lib/store-url";
+import Logo from "@/components/logo";
 
 export default async function DashboardPage() {
   const supabase = await createSupabaseServerClient();
@@ -32,6 +33,7 @@ export default async function DashboardPage() {
   });
   return (
     <main className="dashboard-page">
+      <Logo href="/" size={42} className="page-logo" />
       <header className="workspaces-header">
         <div>
           <p className="eyebrow">Your workspaces</p>

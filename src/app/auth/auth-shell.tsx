@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Logo from "@/components/logo";
 import type { ReactNode } from "react";
 
 type AuthShellProps = {
@@ -13,10 +13,7 @@ export default function AuthShell({ headline, accent, summary, points, children 
   return (
     <main className="auth-shell">
       <aside className="auth-aside">
-        <Link className="auth-brand" href="/" aria-label="Commerce Workspace home">
-          <span className="auth-brand-mark" aria-hidden="true">C</span>
-          Commerce Workspace
-        </Link>
+        <Logo href="/" tone="light" size={44} />
         <div>
           <h2>{headline}<span>{accent}</span></h2>
           <p>{summary}</p>

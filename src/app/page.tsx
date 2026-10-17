@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Logo from "@/components/logo";
 import styles from "./home.module.css";
 
 const capabilities = [
@@ -12,7 +13,7 @@ export default function HomePage() {
   return (
     <main className={styles.page}>
       <header className={styles.nav}>
-        <Link className={styles.brand} href="/" aria-label="Commerce Workspace home"><span className={styles.brandMark}>C</span>Commerce Workspace</Link>
+        <Logo href="/" size={44} />
         <nav aria-label="Main navigation">
           <a href="#features">What you get</a>
           <Link href="/auth?mode=signin">Sign in</Link>
@@ -70,7 +71,7 @@ export default function HomePage() {
       </section>
 
       <footer className={styles.footer}>
-        <Link className={styles.brand} href="/"><span className={styles.brandMark}>C</span>Commerce Workspace</Link>
+        <Logo href="/" size={40} />
         <Link href="/auth">Sign in or create an account</Link>
       </footer>
     </main>

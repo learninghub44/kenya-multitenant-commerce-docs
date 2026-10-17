@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import PublicCheckout from "./public-checkout";
+import Logo from "@/components/logo";
 import StorefrontCatalog from "./storefront-catalog";
 import StoreAbout, { type PublicStoreProfile } from "./store-about";
 
@@ -82,7 +83,9 @@ export default async function StorefrontPage({ params }: { params: Promise<{ ten
     <footer className="storefront-footer">
       <p><strong>{profile.store_name}</strong>{profile.town ? ` · ${[profile.town, profile.county].filter(Boolean).join(", ")}` : ""}</p>
       <p>Order requests are confirmed by the store. Online payment is not enabled.</p>
-      <p>Powered by Commerce Workspace</p>
+      <a className="powered-by" href={process.env.NEXT_PUBLIC_APP_URL ?? "/"} aria-label="Powered by Commerce Workspace">
+        <span>Powered by</span> <Logo size={26} />
+      </a>
     </footer>
   </main>;
 }
