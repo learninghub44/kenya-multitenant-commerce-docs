@@ -39,10 +39,13 @@ export default function TenantShell({
 }: TenantShellProps) {
   const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [openPath, setOpenPath] = useState(pathname);
   const basePath = `/dashboard/${tenantSlug}`;
   const visibleItems = navItems.filter((item) => item.roles.includes(role));
-  const drawerIsOpen = mobileNavOpen && openPath === pathname;
+  const drawerIsOpen = mobileNavOpen;
+
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (!drawerIsOpen) return;
@@ -144,7 +147,6 @@ export default function TenantShell({
               if (drawerIsOpen) {
                 closeMobileNavigation();
               } else {
-                setOpenPath(pathname);
                 setMobileNavOpen(true);
               }
             }}
