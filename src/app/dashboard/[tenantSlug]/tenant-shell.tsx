@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { storeUrl } from "@/lib/store-url";
 import Logo from "@/components/logo";
@@ -37,10 +38,34 @@ export default function TenantShell({
   children,
 }: TenantShellProps) {
   const pathname = usePathname();
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [openPath, setOpenPath] = useState(pathname);
   const basePath = `/dashboard/${tenantSlug}`;
   const visibleItems = navItems.filter((item) => item.roles.includes(role));
+  const drawerIsOpen = mobileNavOpen && openPath === pathname;
 
-  function renderNavigation(className: string) {
+  useEffect(() => {
+    if (!drawerIsOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setMobileNavOpen(false);
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [drawerIsOpen]);
+
+  function closeMobileNavigation() {
+    setMobileNavOpen(false);
+  }
+
+  function renderNavigation(className: string, onNavigate?: () => void) {
     return (
       <nav className={className} aria-label="Business workspace">
         {visibleItems.map((item) => {
@@ -54,6 +79,7 @@ export default function TenantShell({
               className={`tenant-nav-link${active ? " is-active" : ""}`}
               href={href}
               aria-current={active ? "page" : undefined}
+              onClick={onNavigate}
               key={item.path || "overview"}
             >
               <span className="tenant-nav-mark" aria-hidden="true" />
@@ -65,10 +91,24 @@ export default function TenantShell({
     );
   }
 
-  return (
-    <div className="tenant-app">
-      <aside className="tenant-sidebar">
-        <Logo href="/dashboard" size={40} className="tenant-logo" />
+  function renderSidebar(onNavigate?: () => void, drawer = false) {
+    return (
+      <aside className={drawer ? "tenant-sidebar tenant-sidebar-drawer" : "tenant-sidebar"}>
+        <div className="tenant-sidebar-heading">
+          <Logo href="/dashboard" size={40} className="tenant-logo" />
+          {drawer && (
+            <button
+              className="tenant-drawer-close"
+              type="button"
+              aria-label="Close navigation"
+              onClick={closeMobileNavigation}
+            >
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
+                <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+            </button>
+          )}
+        </div>
 
         <div className="tenant-side-context">
           <span className="tenant-side-label">Business workspace</span>
@@ -76,18 +116,49 @@ export default function TenantShell({
           <span className="tenant-role">{roleLabel(role)}</span>
         </div>
 
-        {renderNavigation("tenant-navigation")}
+        {renderNavigation("tenant-navigation", onNavigate)}
 
         <div className="tenant-sidebar-footer">
-          <a href={storeUrl(tenantSlug)} target="_blank" rel="noreferrer">
+          <a href={storeUrl(tenantSlug)} target="_blank" rel="noreferrer" onClick={onNavigate}>
             View storefront <span aria-hidden="true">↗</span>
           </a>
-          <Link href="/dashboard">Switch business</Link>
+          <Link href="/dashboard" onClick={onNavigate}>Switch business</Link>
         </div>
       </aside>
+    );
+  }
+
+  return (
+    <div className="tenant-app">
+      {renderSidebar()}
 
       <div className="tenant-stage">
         <header className="tenant-topbar">
+          <button
+            className="tenant-mobile-menu-button"
+            type="button"
+            aria-label={drawerIsOpen ? "Close navigation" : "Open navigation"}
+            aria-expanded={drawerIsOpen}
+            aria-controls="tenant-mobile-drawer"
+            onClick={() => {
+              if (drawerIsOpen) {
+                closeMobileNavigation();
+              } else {
+                setOpenPath(pathname);
+                setMobileNavOpen(true);
+              }
+            }}
+          >
+            {drawerIsOpen ? (
+              <svg viewBox="0 0 24 24" width="23" height="23" fill="none" aria-hidden="true">
+                <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" width="23" height="23" fill="none" aria-hidden="true">
+                <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+            )}
+          </button>
           <Logo href="/dashboard" size={36} markOnly className="tenant-topbar-logo" />
           <div className="tenant-topbar-context">
             <span>Business workspace</span>
@@ -101,7 +172,19 @@ export default function TenantShell({
           </div>
         </header>
 
-        {renderNavigation("tenant-mobile-navigation")}
+        {drawerIsOpen && (
+          <div className="tenant-mobile-drawer-layer">
+            <button
+              className="tenant-mobile-backdrop"
+              type="button"
+              aria-label="Close navigation"
+              onClick={closeMobileNavigation}
+            />
+            <div id="tenant-mobile-drawer" className="tenant-mobile-drawer" role="dialog" aria-modal="true" aria-label="Business navigation">
+              {renderSidebar(closeMobileNavigation, true)}
+            </div>
+          </div>
+        )}
 
         <div className="tenant-content">{children}</div>
       </div>
