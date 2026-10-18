@@ -16,8 +16,8 @@ export default function HomePage() {
         <Logo href="/" size={44} />
         <nav aria-label="Main navigation">
           <a href="#features">What you get</a>
-          <Link href="/auth?mode=signin">Sign in</Link>
-          <Link className={styles.navCta} href="/auth">Get started</Link>
+          <Link className={styles.navSignIn} href="/login">Sign in</Link>
+          <Link className={styles.navCta} href="/register">Get started</Link>
         </nav>
       </header>
 
@@ -27,7 +27,7 @@ export default function HomePage() {
           <h1>Sell online and run the business behind it.</h1>
           <p className={styles.heroDescription}>Your online shop, stock, orders and business records in one workspace. Set up your catalogue today and grow at your own pace.</p>
           <div className={styles.heroActions}>
-            <Link className={styles.primaryCta} href="/auth">Create your workspace</Link>
+            <Link className={styles.primaryCta} href="/register">Create your workspace</Link>
             <Link className={styles.textCta} href="#features">See what you get</Link>
           </div>
         </div>
@@ -67,12 +67,12 @@ export default function HomePage() {
           <h2>Bring your business into one workspace.</h2>
           <p>Create an account, name your business and add your first product.</p>
         </div>
-        <Link className={styles.ctaLight} href="/auth">Get started</Link>
+        <Link className={styles.ctaLight} href="/register">Get started</Link>
       </section>
 
       <footer className={styles.footer}>
         <Logo href="/" size={40} />
-        <Link href="/auth">Sign in or create an account</Link>
+        <Link href="/login">Sign in</Link>
       </footer>
     </main>
   );

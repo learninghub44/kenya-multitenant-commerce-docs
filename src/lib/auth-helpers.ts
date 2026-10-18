@@ -23,7 +23,7 @@ export function passwordProblem(value: string): string | null {
 // Accepts 07XX, 01XX, 254XXXXXXXXX and +254XXXXXXXXX. Returns +254XXXXXXXXX or null.
 export function normalizeKenyanPhone(input: string): string | null {
   const digits = input.replace(/[\s()-]/g, "");
-  const match = /^(?:\+?254|0)([71]\d{8})$/.exec(digits);
+  const match = /^(?:\+?254|0)?([71]\d{8})$/.exec(digits);
   return match ? `+254${match[1]}` : null;
 }
 
