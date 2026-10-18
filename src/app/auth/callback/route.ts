@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const next = getSafeNextPath(searchParams.get("next"), origin);
-  const fail = (reason: string) => NextResponse.redirect(new URL(`/auth?error=${encodeURIComponent(reason)}`, origin));
+  const fail = (reason: string) => NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(reason)}`, origin));
 
   if (searchParams.get("error")) return fail("cancelled");
 

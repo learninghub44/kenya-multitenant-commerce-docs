@@ -98,7 +98,7 @@ export default function TenantShell({
     return (
       <aside className={drawer ? "tenant-sidebar tenant-sidebar-drawer" : "tenant-sidebar"}>
         <div className="tenant-sidebar-heading">
-          <Logo href="/dashboard" size={40} className="tenant-logo" />
+          <Logo href="/dashboard" size={drawer ? 34 : 40} className="tenant-logo" />
           {drawer && (
             <button
               className="tenant-drawer-close"

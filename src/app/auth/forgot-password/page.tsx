@@ -32,7 +32,7 @@ export default function ForgotPasswordPage() {
   return (
     <AuthShell headline="Locked out? " accent="We'll get you back in." summary="Enter your email and we will send a link to choose a new password.">
       <section className="auth-card" aria-labelledby="forgot-title">
-        <Link className="back-link" href="/auth?mode=signin">← Back to sign in</Link>
+        <Link className="back-link" href="/login">← Back to sign in</Link>
         <h1 id="forgot-title">Reset your password</h1>
         <p className="auth-description">We will email you a link that works once.</p>
         {sent ? (
