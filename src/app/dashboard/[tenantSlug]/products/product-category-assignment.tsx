@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { errorMessage } from "@/lib/errors";
 
 type CategoryOption = { id: string; name: string };
 
@@ -38,7 +39,7 @@ export default function ProductCategoryAssignment({
       setSuccess("Category assignment saved.");
       router.refresh();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not assign category.");
+      setError(errorMessage(cause, "Could not assign category."));
     } finally {
       setBusy(false);
     }

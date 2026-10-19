@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { errorMessage } from "@/lib/errors";
 
 export default function OrderActions({ tenantId, orderId, status, paymentStatus, canRecordPayment, canManageOrders }: {
   tenantId: string; orderId: string; status: string; paymentStatus: string;
@@ -25,7 +26,7 @@ export default function OrderActions({ tenantId, orderId, status, paymentStatus,
       if (rpcError) throw rpcError;
       setMessage("Order updated."); setReference(""); router.refresh();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not update this order.");
+      setError(errorMessage(cause, "Could not update this order."));
     } finally { setBusy(false); }
   }
 

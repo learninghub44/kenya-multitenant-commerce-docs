@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ChangeEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { errorMessage } from "@/lib/errors";
 
 type ProductImage = { id: string; secure_url: string; alt_text: string; position: number };
 
@@ -60,7 +61,7 @@ export default function ProductImageManager({ tenantId, productId, images }: {
       if (saveError) throw saveError;
       setAltText(""); setMessage("Image uploaded and attached to this product."); router.refresh();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not upload product image.");
+      setError(errorMessage(cause, "Could not upload product image."));
     } finally { setBusy(false); }
   }
 

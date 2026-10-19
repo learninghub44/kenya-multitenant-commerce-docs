@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { errorMessage } from "@/lib/errors";
 
 type Category = { id: string; name: string; slug: string; status: string };
 
@@ -35,7 +36,7 @@ export default function CategoryManager({ tenantId, categories }: { tenantId: st
       if (rpcError) throw rpcError;
       setSuccess("Category created."); setName(""); setSlug(""); setSlugEdited(false); router.refresh();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not create this category.");
+      setError(errorMessage(cause, "Could not create this category."));
     } finally { setBusy(false); }
   }
 
@@ -65,7 +66,7 @@ export default function CategoryManager({ tenantId, categories }: { tenantId: st
       setSuccess(status === "archived" ? "Category archived. Existing product history is preserved." : "Category updated and published.");
       router.refresh();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not update this category.");
+      setError(errorMessage(cause, "Could not update this category."));
     } finally { setBusy(false); }
   }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
@@ -46,6 +46,16 @@ export default function AuthForm({ variant }: { variant: Variant }) {
   };
   const [otherHref, setOtherHref] = useState(isRegister ? "/login" : "/register");
 
+  const goNext = useCallback((requested: string | null) => {
+    const destination = getSafeNextPath(requested, window.location.origin);
+    if (/^https?:\/\//.test(destination)) {
+      window.location.assign(destination);
+    } else {
+      router.replace(destination);
+      router.refresh();
+    }
+  }, [router]);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const callbackError = params.get("error");
@@ -56,15 +66,15 @@ export default function AuthForm({ variant }: { variant: Variant }) {
     (async () => {
       try {
         const { data } = await createSupabaseBrowserClient().auth.getUser();
-        if (data.user) router.replace(getSafeNextPath(params.get("next"), window.location.origin));
+        if (data.user) goNext(params.get("next"));
       } catch {
         // No session or Supabase not reachable: stay on the form.
       }
     })();
-  }, [router, isRegister]);
+  }, [goNext, isRegister]);
 
   function callbackUrl() {
-    const next = getSafeNextPath(new URLSearchParams(window.location.search).get("next"), window.location.origin);
+    const next = getSafeNextPath(new URLSearchParams(window.location.search).get("next"), window.location.origin, "/dashboard");
     return `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
   }
 
@@ -138,8 +148,7 @@ export default function AuthForm({ variant }: { variant: Variant }) {
         if (result.error) throw result.error;
       }
 
-      router.replace(getSafeNextPath(new URLSearchParams(window.location.search).get("next"), window.location.origin));
-      router.refresh();
+      goNext(new URLSearchParams(window.location.search).get("next"));
     } catch (cause) {
       const raw = cause instanceof Error ? cause.message : "";
       if (raw.startsWith("__validation:")) {
