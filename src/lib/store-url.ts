@@ -20,3 +20,27 @@ export function storeDisplayAddress(slug: string): string {
   const url = storeUrl(slug);
   return url.startsWith("/") ? `/store${url.slice("/store".length)}` : url.replace(/^https?:\/\//, "");
 }
+
+// Sign-in and sign-up always happen on the root app domain. `returnTo` brings the buyer
+// back to the exact store page they came from.
+export function authUrl(page: "login" | "register", returnTo: string): string {
+  const base = process.env.NEXT_PUBLIC_APP_URL;
+  let origin = "";
+  if (base) {
+    try {
+      origin = new URL(base).origin;
+    } catch {
+      origin = "";
+    }
+  }
+  return `${origin}/${page}?next=${encodeURIComponent(returnTo)}`;
+}
+
+export function accountUrl(): string {
+  const base = process.env.NEXT_PUBLIC_APP_URL;
+  try {
+    return `${base ? new URL(base).origin : ""}/account`;
+  } catch {
+    return "/account";
+  }
+}

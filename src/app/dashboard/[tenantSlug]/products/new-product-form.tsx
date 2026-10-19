@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { errorMessage } from "@/lib/errors";
 
 function slugify(value: string) {
   return value.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
@@ -61,7 +62,7 @@ export default function NewProductForm({ tenantId }: { tenantId: string }) {
       setSku("");
       router.refresh();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not create this product.");
+      setError(errorMessage(cause, "Could not create this product."));
     } finally {
       setBusy(false);
     }

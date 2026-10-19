@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { errorMessage } from "@/lib/errors";
 
 export type ManagedVariant = {
   id: string; title: string; sku: string | null; price_minor: number;
@@ -55,7 +56,7 @@ export default function VariantManager({ tenantId, productId, variants }: {
       setTitle(""); setSku(""); setPrice(""); setOptions("{}");
       setMessage("Variant saved as a draft. Publish it when ready."); router.refresh();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not create variant.");
+      setError(errorMessage(cause, "Could not create variant."));
     } finally { setBusy(false); }
   }
 
@@ -92,7 +93,7 @@ export default function VariantManager({ tenantId, productId, variants }: {
       if (rpcError) throw rpcError;
       setMessage(status === "archived" ? "Variant archived." : "Variant updated."); router.refresh();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not update variant.");
+      setError(errorMessage(cause, "Could not update variant."));
     } finally { setBusy(false); }
   }
 

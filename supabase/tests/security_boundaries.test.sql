@@ -1,7 +1,7 @@
 -- Structural security regression tests. Run after migrations with: supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(20);
+select extensions.plan(24);
 
 select extensions.ok(
   (select count(*) = 22 from pg_class c
@@ -118,6 +118,33 @@ select extensions.ok(
   position('has_tenant_role' in pg_get_functiondef('public.save_store_profile(uuid,jsonb)'::regprocedure)) > 0
   and position('reserved' in pg_get_functiondef('public.create_tenant_for_current_user(text,text)'::regprocedure)) > 0,
   'store profile writes are role-checked and reserved subdomains are rejected at tenant creation'
+);
+
+select extensions.ok(
+  (select relrowsecurity from pg_class where oid = 'public.buyer_profiles'::regclass)
+  and (select relrowsecurity from pg_class where oid = 'public.wishlist_items'::regclass)
+  and not exists(select 1 from pg_policies where schemaname='public' and tablename in ('buyer_profiles','wishlist_items') and cmd in ('ALL','INSERT','UPDATE','DELETE')),
+  'buyer profiles and wishlists have row-level security and no direct client write policies'
+);
+
+select extensions.ok(
+  not has_function_privilege('anon','public.get_my_orders()','EXECUTE')
+  and not has_function_privilege('anon','public.toggle_wishlist(text,uuid)','EXECUTE')
+  and not has_function_privilege('anon','public.save_buyer_profile(text,text,text)','EXECUTE')
+  and not has_function_privilege('anon','public.get_my_wishlist_ids(text)','EXECUTE'),
+  'signed-out visitors cannot call buyer-only functions'
+);
+
+select extensions.ok(
+  has_function_privilege('anon','public.get_public_best_sellers(text,integer)','EXECUTE')
+  and has_function_privilege('anon','public.create_public_order(text,jsonb,text,text,text,text)','EXECUTE'),
+  'guests can still browse best sellers and check out'
+);
+
+select extensions.ok(
+  position('auth.uid()' in pg_get_functiondef('public.create_public_order(text,jsonb,text,text,text,text)'::regprocedure)) > 0
+  and position('buyer_user_id = auth.uid()' in pg_get_functiondef('public.get_my_orders()'::regprocedure)) > 0,
+  'orders are linked to and read back by the authenticated user id, never a client-supplied id'
 );
 
 select * from extensions.finish();

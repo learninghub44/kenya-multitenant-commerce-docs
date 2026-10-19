@@ -1,4 +1,25 @@
+function appRootHost(): string | null {
+  try {
+    return process.env.NEXT_PUBLIC_APP_URL ? new URL(process.env.NEXT_PUBLIC_APP_URL).hostname.toLowerCase() : null;
+  } catch {
+    return null;
+  }
+}
+
+// Returns a same-origin path, or an absolute https URL on a store subdomain of the app's
+// own root domain (so buyers return to the store they came from). Anything else falls back.
 export function getSafeNextPath(requested: string | null | undefined, origin: string, fallback = "/dashboard"): string {
+  if (requested && /^https:\/\//i.test(requested)) {
+    try {
+      const target = new URL(requested);
+      const root = appRootHost();
+      const host = target.hostname.toLowerCase();
+      if (root && !target.username && !target.password && (host === root || host.endsWith(`.${root}`))) return target.toString();
+    } catch {
+      // fall through to the fallback
+    }
+    return fallback;
+  }
   if (!requested || !requested.startsWith("/") || requested.startsWith("//") || requested.includes("\\")) return fallback;
   try {
     const destination = new URL(requested, origin);
@@ -40,4 +61,10 @@ export function friendlyAuthError(message: string): { text: string; code?: "unco
   }
   if (lower.includes("network") || lower.includes("failed to fetch")) return { text: "Could not reach the server. Check your connection and try again." };
   return { text: "Something went wrong. Please try again." };
+}
+
+// "+254712345678" -> "712345678" for fields that already show a +254 prefix.
+export function localKenyanPhone(phone: string): string {
+  const match = /^(?:\+?254|0)?([71]\d{8})$/.exec(phone.replace(/[\s()-]/g, ""));
+  return match ? match[1] : phone;
 }

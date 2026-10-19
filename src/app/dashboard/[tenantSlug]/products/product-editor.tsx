@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { errorMessage } from "@/lib/errors";
 
 export default function ProductEditor({
   tenantId, productId, variantId, initialTitle, initialSlug, initialDescription, initialPriceMinor, initialSku, initialStatus
@@ -63,7 +64,7 @@ export default function ProductEditor({
       setSuccess(status === "published" ? "Product saved with published status. Public storefront routing is not enabled yet." : "Product saved as a draft.");
       router.refresh();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not save this product.");
+      setError(errorMessage(cause, "Could not save this product."));
     } finally {
       setBusy(false);
     }

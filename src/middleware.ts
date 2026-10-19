@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { RESERVED_SLUGS } from "./lib/reserved-slugs";
+import { sharedCookieOptions } from "./lib/supabase/cookie-options";
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -13,6 +14,7 @@ export async function middleware(request: NextRequest) {
   if (!url || !anonKey) return response;
 
   const supabase = createServerClient(url, anonKey, {
+    cookieOptions: sharedCookieOptions(),
     cookies: {
       getAll() {
         return request.cookies.getAll();
@@ -57,6 +59,7 @@ export async function middleware(request: NextRequest) {
           // Wildcard hosts arrive at "/" before the internal rewrite, so apply
           // the private cache policy here as well as in next.config.ts.
           rewriteResponse.headers.set("Cache-Control", "private, no-store, max-age=0, must-revalidate");
+          for (const cookie of response.cookies.getAll()) rewriteResponse.cookies.set(cookie);
           return rewriteResponse;
         }
       }

@@ -7,6 +7,7 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import AuthShell from "../auth/auth-shell";
 import { storeDisplayAddress } from "@/lib/store-url";
 import { RESERVED_SLUGS } from "@/lib/reserved-slugs";
+import { errorMessage } from "@/lib/errors";
 
 function slugify(value: string) {
   return value.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
@@ -45,7 +46,7 @@ export default function OnboardingPage() {
       router.replace("/dashboard");
       router.refresh();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not create your business workspace.");
+      setError(errorMessage(cause, "Could not create your business workspace."));
     } finally {
       setBusy(false);
     }

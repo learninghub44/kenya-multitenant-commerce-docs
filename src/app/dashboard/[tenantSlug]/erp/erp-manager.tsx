@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { errorMessage } from "@/lib/errors";
 
 type Customer = { id: string; display_name: string; phone: string | null; email: string | null };
 type Supplier = { id: string; name: string; phone: string | null; email: string | null; active: boolean };
@@ -63,7 +64,7 @@ export default function ErpManager({ tenantId, role, customers, suppliers, expen
       setMessage(success); router.refresh();
       return true;
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "The operation failed.");
+      setError(errorMessage(cause, "The operation failed."));
       return false;
     } finally { setBusy(false); }
   }

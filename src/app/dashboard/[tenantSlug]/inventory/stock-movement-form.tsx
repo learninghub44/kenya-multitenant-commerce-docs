@@ -3,6 +3,7 @@
 import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { errorMessage } from "@/lib/errors";
 
 type VariantOption = { id: string; label: string; onHand: number };
 
@@ -64,7 +65,7 @@ export default function StockMovementForm({
       setReason("");
       router.refresh();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not save the stock movement.");
+      setError(errorMessage(cause, "Could not save the stock movement."));
     } finally {
       setBusy(false);
     }

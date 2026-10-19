@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { errorMessage } from "@/lib/errors";
 
 export type StoreProfile = {
   tagline: string | null; about: string | null; logo_url: string | null; banner_url: string | null;
@@ -50,7 +51,7 @@ function ImageField({ label, help, value, kind, tenantId, onChange, round }: {
       if (!response.ok || !uploaded.secure_url) throw new Error(uploaded.error?.message ?? "Upload failed.");
       onChange(uploaded.secure_url);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not upload this image.");
+      setError(errorMessage(cause, "Could not upload this image."));
     } finally { setBusy(false); }
   }
 
@@ -96,7 +97,7 @@ export default function StoreProfileForm({ tenantId, initial }: { tenantId: stri
       if (rpcError) throw rpcError;
       setSaved(true); router.refresh();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not save the store profile.");
+      setError(errorMessage(cause, "Could not save the store profile."));
     } finally { setBusy(false); }
   }
 
