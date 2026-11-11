@@ -1,7 +1,7 @@
 -- Structural security regression tests. Run after migrations with: supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(20);
+select extensions.plan(26);
 
 select extensions.ok(
   (select count(*) = 22 from pg_class c
@@ -118,6 +118,43 @@ select extensions.ok(
   position('has_tenant_role' in pg_get_functiondef('public.save_store_profile(uuid,jsonb)'::regprocedure)) > 0
   and position('reserved' in pg_get_functiondef('public.create_tenant_for_current_user(text,text)'::regprocedure)) > 0,
   'store profile writes are role-checked and reserved subdomains are rejected at tenant creation'
+);
+
+select extensions.ok(
+  (select relrowsecurity from pg_class where oid = 'public.tenant_invitations'::regclass)
+  and not exists(select 1 from pg_policies where schemaname='public' and tablename='tenant_invitations'),
+  'team invitations are protected by RLS without direct client policies'
+);
+
+select extensions.ok(
+  not has_function_privilege('anon','public.create_tenant_invitation(uuid,text,public.membership_role)','EXECUTE')
+  and has_function_privilege('authenticated','public.create_tenant_invitation(uuid,text,public.membership_role)','EXECUTE'),
+  'only authenticated users can request team invitations'
+);
+
+select extensions.ok(
+  not has_function_privilege('anon','public.accept_tenant_invitation(text)','EXECUTE')
+  and has_function_privilege('authenticated','public.accept_tenant_invitation(text)','EXECUTE'),
+  'only authenticated users can accept team invitations'
+);
+
+select extensions.ok(
+  position('A workspace must keep at least one active owner' in pg_get_functiondef('public.set_tenant_member_role(uuid,uuid,public.membership_role)'::regprocedure)) > 0
+  and position('A workspace must keep at least one active owner' in pg_get_functiondef('public.remove_tenant_member(uuid,uuid)'::regprocedure)) > 0,
+  'team RPCs prevent demoting or removing the last active owner'
+);
+
+select extensions.ok(
+  position('pg_advisory_xact_lock' in pg_get_functiondef('public.set_tenant_member_role(uuid,uuid,public.membership_role)'::regprocedure)) > 0
+  and position('pg_advisory_xact_lock' in pg_get_functiondef('public.remove_tenant_member(uuid,uuid)'::regprocedure)) > 0,
+  'owner-count changes are serialized per tenant to prevent concurrent last-owner removal'
+);
+
+select extensions.ok(
+  not has_function_privilege('anon','public.list_tenant_audit_events(uuid,integer)','EXECUTE')
+  and has_function_privilege('authenticated','public.list_tenant_audit_events(uuid,integer)','EXECUTE')
+  and position('has_tenant_role' in pg_get_functiondef('public.list_tenant_audit_events(uuid,integer)'::regprocedure)) > 0,
+  'audit history is exposed only through the authenticated owner-checked read RPC'
 );
 
 select * from extensions.finish();
