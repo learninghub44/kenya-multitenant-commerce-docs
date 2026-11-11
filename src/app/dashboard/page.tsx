@@ -7,7 +7,7 @@ import Logo from "@/components/logo";
 export default async function DashboardPage() {
   const supabase = await createSupabaseServerClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) redirect("/auth?next=/dashboard");
+  if (authError || !user) redirect("/login?next=/dashboard");
 
   const { data: memberships, error } = await supabase
     .from("tenant_memberships")
