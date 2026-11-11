@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { storeUrl } from "@/lib/store-url";
 import Logo from "@/components/logo";
+import styles from "./tenant-shell.module.css";
 
 type TenantShellProps = {
   tenantSlug: string;
@@ -73,7 +74,7 @@ export default function TenantShell({
 
   function renderNavigation(className: string, onNavigate?: () => void) {
     return (
-      <nav className={className} aria-label="Business workspace">
+      <nav className={`${className} ${styles.navigation}`} aria-label="Business workspace">
         {visibleItems.map((item) => {
           const href = `${basePath}${item.path}`;
           const active = item.path
@@ -99,7 +100,7 @@ export default function TenantShell({
 
   function renderSidebar(onNavigate?: () => void, drawer = false) {
     return (
-      <aside className={drawer ? "tenant-sidebar tenant-sidebar-drawer" : "tenant-sidebar"}>
+      <aside className={drawer ? `tenant-sidebar tenant-sidebar-drawer ${styles.sidebar}` : `tenant-sidebar ${styles.sidebar}`}>
         <div className="tenant-sidebar-heading">
           <Logo href="/dashboard" size={drawer ? 34 : 40} className="tenant-logo" />
           {drawer && (
@@ -191,15 +192,15 @@ export default function TenantShell({
           </div>
         )}
 
-        <a className="tenant-skip-link" href="#tenant-main">Skip to main content</a>
+        <a className={styles.skipLink} href="#tenant-main">Skip to main content</a>
         <div id="tenant-main" className="tenant-content">{children}</div>
 
-        <nav className="tenant-mobile-navigation" aria-label="Quick navigation">
+        <nav className={styles.mobileNavigation} aria-label="Quick navigation">
           {mobileItems.map((item) => {
             const href = `${basePath}${item.path}`;
             const active = item.path ? pathname === href || pathname.startsWith(`${href}/`) : pathname === basePath;
-            return <Link key={item.path || "overview"} className={`tenant-mobile-nav-link${active ? " is-active" : ""}`} href={href} aria-current={active ? "page" : undefined}>
-              <span className="tenant-mobile-nav-mark" aria-hidden="true" />
+            return <Link key={item.path || "overview"} className={`${styles.mobileNavLink} ${active ? styles.active : ""}`} href={href} aria-current={active ? "page" : undefined}>
+              <span className={styles.mobileNavMark} aria-hidden="true" />
               <span>{item.label}</span>
             </Link>;
           })}
