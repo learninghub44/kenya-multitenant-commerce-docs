@@ -38,7 +38,7 @@ export default function TenantActions({ initialTenants, canChangeStatus }: { ini
     {message && <p className="admin-message" role="status">{message}</p>}
     <div className="table-wrap"><table><thead><tr><th>Business</th><th>Store address</th><th>Status</th><th>Members</th><th>Created</th>{canChangeStatus && <th>Action</th>}</tr></thead>
       <tbody>{visible.map(tenant=><tr key={tenant.tenant_id}>
-        <td><strong>{tenant.tenant_name}</strong><small>{tenant.tenant_id}</small></td><td>{tenant.tenant_slug}</td>
+        <td><strong>{tenant.tenant_name}</strong></td><td>{tenant.tenant_slug}</td>
         <td><span className={`status ${tenant.tenant_status}`}>{tenant.tenant_status}</span></td><td>{tenant.active_members}</td><td>{new Date(tenant.created_at).toLocaleDateString()}</td>
         {canChangeStatus && <td><button className={`button ${tenant.tenant_status === "active" ? "button-danger" : "button-primary"}`} disabled={busy === tenant.tenant_id || tenant.tenant_status === "closed"} onClick={()=>changeStatus(tenant)}>{busy === tenant.tenant_id ? "Saving…" : tenant.tenant_status === "active" ? "Suspend" : "Reactivate"}</button></td>}
       </tr>)}</tbody>

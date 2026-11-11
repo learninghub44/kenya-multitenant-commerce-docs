@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, DragEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
@@ -18,50 +18,73 @@ export default function ProductImageManager({ tenantId, productId, images }: {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [dragging, setDragging] = useState(false);
+  const [progress, setProgress] = useState("");
+  const fileInput = useRef<HTMLInputElement>(null);
 
-  async function upload(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    event.target.value = "";
-    setBusy(true); setError(""); setMessage("");
+  async function uploadFiles(selected: File[]) {
+    if (!selected.length) return;
+    setBusy(true); setError(""); setMessage(""); setProgress("");
+    let completed = 0;
     try {
-      if (!["image/jpeg", "image/png", "image/webp", "image/avif"].includes(file.type)) {
-        throw new Error("Choose a JPG, PNG, WebP, or AVIF image.");
+      if (selected.length > 8) throw new Error("Upload up to 8 images at a time.");
+      for (const file of selected) {
+        if (!["image/jpeg", "image/png", "image/webp", "image/avif"].includes(file.type)) {
+          throw new Error(`${file.name}: choose a JPG, PNG, WebP, or AVIF image.`);
+        }
+        if (file.size > 5 * 1024 * 1024) throw new Error(`${file.name}: image must be 5 MB or smaller.`);
       }
-      if (file.size > 5 * 1024 * 1024) throw new Error("Image must be 5 MB or smaller.");
-      const signatureResponse = await fetch("/api/uploads/cloudinary-signature", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tenantId, productId })
-      });
-      const signatureData = await signatureResponse.json() as UploadSignature & { error?: string };
-      if (!signatureResponse.ok) throw new Error(signatureData.error ?? "Could not authorize upload.");
-
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("api_key", signatureData.apiKey);
-      formData.append("timestamp", String(signatureData.timestamp));
-      formData.append("folder", signatureData.folder);
-      formData.append("signature", signatureData.signature);
-      const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${encodeURIComponent(signatureData.cloudName)}/image/upload`, {
-        method: "POST", body: formData
-      });
-      const uploaded = await uploadResponse.json() as CloudinaryUpload;
-      if (!uploadResponse.ok || !uploaded.secure_url || !uploaded.public_id) {
-        throw new Error(uploaded.error?.message ?? "Cloudinary upload failed.");
+      for (const file of selected) {
+        setProgress(`Uploading ${completed + 1} of ${selected.length}`);
+        const signatureResponse = await fetch("/api/uploads/cloudinary-signature", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tenantId, productId })
+        });
+        const signatureData = await signatureResponse.json() as UploadSignature & { error?: string };
+        if (!signatureResponse.ok) throw new Error(signatureData.error ?? "Could not authorize upload.");
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("api_key", signatureData.apiKey);
+        formData.append("timestamp", String(signatureData.timestamp));
+        formData.append("folder", signatureData.folder);
+        formData.append("signature", signatureData.signature);
+        const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${encodeURIComponent(signatureData.cloudName)}/image/upload`, {
+          method: "POST", body: formData
+        });
+        const uploaded = await uploadResponse.json() as CloudinaryUpload;
+        if (!uploadResponse.ok || !uploaded.secure_url || !uploaded.public_id) {
+          throw new Error(uploaded.error?.message ?? `${file.name}: upload failed.`);
+        }
+        const supabase = createSupabaseBrowserClient();
+        const { data, error: authError } = await supabase.auth.getUser();
+        if (authError || !data.user) throw new Error("Your session has expired. Sign in again.");
+        const { error: saveError } = await supabase.rpc("register_product_image", {
+          p_tenant_id: tenantId, p_product_id: productId, p_public_id: uploaded.public_id,
+          p_secure_url: uploaded.secure_url, p_alt_text: altText.trim() || file.name.replace(/\.[^.]+$/, ""),
+          p_position: images.length + completed
+        });
+        if (saveError) throw saveError;
+        completed += 1;
       }
-
-      const supabase = createSupabaseBrowserClient();
-      const { data, error: authError } = await supabase.auth.getUser();
-      if (authError || !data.user) throw new Error("Your session has expired. Sign in again.");
-      const { error: saveError } = await supabase.rpc("register_product_image", {
-        p_tenant_id: tenantId, p_product_id: productId, p_public_id: uploaded.public_id,
-        p_secure_url: uploaded.secure_url, p_alt_text: altText.trim(), p_position: images.length
-      });
-      if (saveError) throw saveError;
-      setAltText(""); setMessage("Image uploaded and attached to this product."); router.refresh();
+      setAltText("");
+      setMessage(`${completed} ${completed === 1 ? "image" : "images"} uploaded and attached.`);
+      router.refresh();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not upload product image.");
-    } finally { setBusy(false); }
+      if (completed > 0) setMessage(`${completed} ${completed === 1 ? "image was" : "images were"} uploaded before the next file failed.`);
+      setError(cause instanceof Error ? cause.message : "Could not upload product images.");
+    } finally {
+      setBusy(false); setProgress("");
+      if (fileInput.current) fileInput.current.value = "";
+    }
+  }
+
+  function upload(event: ChangeEvent<HTMLInputElement>) {
+    void uploadFiles(Array.from(event.target.files ?? []));
+  }
+
+  function dropFiles(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault(); setDragging(false);
+    void uploadFiles(Array.from(event.dataTransfer.files));
   }
 
   return <details className="variant-manager">
@@ -74,9 +97,14 @@ export default function ProductImageManager({ tenantId, productId, images }: {
     </div>}
     <label htmlFor={`product-image-alt-${productId}`}>Image description (alt text)</label>
     <input id={`product-image-alt-${productId}`} maxLength={250} value={altText} onChange={event => setAltText(event.target.value)} />
-    <label htmlFor={`product-image-file-${productId}`}>Choose image (max 5 MB)</label>
-    <input id={`product-image-file-${productId}`} type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={busy} onChange={upload} />
-    {busy && <p role="status" className="form-message">Uploading image…</p>}
+    <label htmlFor={`product-image-file-${productId}`}>Product photos</label>
+    <div className={`product-image-dropzone${dragging ? " is-dragging" : ""}`} onDragOver={event => { event.preventDefault(); setDragging(true); }} onDragLeave={event => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDragging(false); }} onDrop={dropFiles}>
+      <span aria-hidden="true">↑</span><strong>{dragging ? "Drop images to upload" : "Drag images here"}</strong>
+      <small>JPG, PNG, WebP or AVIF · up to 5 MB each · 8 at a time</small>
+      <button type="button" className="secondary-button" disabled={busy} onClick={() => fileInput.current?.click()}>Browse images</button>
+      <input ref={fileInput} id={`product-image-file-${productId}`} type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple disabled={busy} onChange={upload} />
+    </div>
+    {busy && <p role="status" className="form-message">{progress || "Uploading images…"}</p>}
     {error && <p role="alert" className="form-message error">{error}</p>}
     {message && <p role="status" className="form-message">{message}</p>}
     <p className="field-help">Uploads use a short-lived server-generated signature. If the metadata save fails after upload, the Cloudinary file may need cleanup.</p>

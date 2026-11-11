@@ -18,3 +18,11 @@
 .supportFooter>a{color:var(--accent-strong);font-size:13px;font-weight:700;text-decoration:none;overflow-wrap:anywhere}.supportFooter>a:hover{text-decoration:underline;text-underline-offset:3px}
 @media(max-width:900px){.supportFooter{grid-template-columns:1fr 1fr}.supportFooter>div{grid-column:1/-1}}
 @media(max-width:560px){.supportFooter{grid-template-columns:1fr;margin:16px 14px 110px;padding:16px}.supportFooter>div{grid-column:auto}}
+
+.navigationGroup{display:grid;gap:3px}
+.navigationLabel{padding:0 11px;color:#87948b;font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}
+@media(max-width:760px){.navigationLabel{padding-top:4px}}
+
+.navigationGroup{display:grid;gap:3px}
+.navigationLabel{padding:0 11px;color:#87948b;font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}
+@media(max-width:760px){.navigationLabel{padding-top:4px}}

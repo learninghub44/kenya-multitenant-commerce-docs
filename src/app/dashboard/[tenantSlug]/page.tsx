@@ -95,9 +95,9 @@ export default async function BusinessOverviewPage({
     <main className="dashboard-page business-overview">
       <header className="overview-heading">
         <div>
-          <p className="eyebrow">Business overview</p>
+          <p className="eyebrow">Overview</p>
           <h1>{tenant.name}</h1>
-          <p className="auth-description">Your live workspace snapshot. Start with the work that needs your attention.</p>
+          <p className="auth-description">Your business at a glance.</p>
         </div>
         <a className="overview-store-link" href={storeUrl(tenant.slug)} target="_blank" rel="noreferrer">
           View storefront <span aria-hidden="true">↗</span>
@@ -178,7 +178,7 @@ export default async function BusinessOverviewPage({
         <aside className="overview-panel overview-actions">
           <p className="eyebrow">Quick access</p>
           <h2>Keep work moving</h2>
-          <p className="overview-actions-copy">Go straight to the areas your team uses most.</p>
+
           <div className="overview-action-list">
             {canAddProducts && <Link href={`/dashboard/${tenant.slug}/products`}><span><strong>Products</strong><small>Update your catalogue and pricing</small></span><span aria-hidden="true">→</span></Link>}
             {canViewInventory && <Link href={`/dashboard/${tenant.slug}/inventory`}><span><strong>Inventory</strong><small>Review stock by location</small></span><span aria-hidden="true">→</span></Link>}

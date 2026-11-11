@@ -68,7 +68,7 @@ export default function NewProductForm({ tenantId }: { tenantId: string }) {
   }
 
   return (
-    <form className="product-form" onSubmit={submit}>
+    <form id="add-product" className="product-form" onSubmit={submit}>
       <h2>Add a product</h2>
       <p className="auth-description">New products start as drafts. Price is stored in integer cents of KES (minor units).</p>
       <label htmlFor="product-title">Product name</label>
