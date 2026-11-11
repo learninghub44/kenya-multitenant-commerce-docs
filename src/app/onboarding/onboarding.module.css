@@ -1,0 +1,8 @@
+.progress{height:6px;margin:20px 0;overflow:hidden;border-radius:99px;background:var(--border)}
+.progress span{display:block;height:100%;border-radius:inherit;background:var(--accent);transition:width .2s ease}
+.checklist{display:grid;gap:12px;margin:22px 0;padding:18px;border:1px solid var(--border);border-radius:12px;background:var(--background);list-style:none}
+.checklist li,.checklist p{display:grid;gap:3px;margin:0}
+.checklist span{color:var(--muted);font-size:14px;line-height:1.5}
+.compact{gap:9px;padding:14px}
+.slugStatusSuccess{color:var(--accent-strong)}
+.slugStatusError{color:var(--danger)}

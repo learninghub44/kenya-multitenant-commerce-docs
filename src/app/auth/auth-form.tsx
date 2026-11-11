@@ -180,7 +180,7 @@ export default function AuthForm({ variant }: { variant: Variant }) {
         </div>
         {isRegister && (
           <div className="field">
-            <label htmlFor="phone">Phone <span className="optional">(optional, for M-Pesa)</span></label>
+            <label htmlFor="phone">Phone <span className="optional">(optional, for customer contact)</span></label>
             <div className="phone-field">
               <span aria-hidden="true">+254</span>
               <input id="phone" type="tel" inputMode="tel" autoComplete="tel-national" placeholder="712 345 678" maxLength={20} value={phone} onChange={e => setPhone(e.target.value)} />

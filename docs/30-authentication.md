@@ -18,3 +18,7 @@ Sign-in always happens on the root domain, never on store subdomains, so session
 
 ## Not included
 Apple sign-in and phone/SMS OTP need paid developer accounts or an SMS provider and are not enabled.
+
+
+## Workspace onboarding
+After authentication, `/onboarding` uses a progressive two-step flow: business name and store slug first, then optional public storefront contact details. A signed-in user can preflight a slug through `is_store_slug_available`; the unique tenant constraint remains the final authority against races. Workspace creation and optional public profile persistence run through `create_tenant_with_profile_for_current_user`, which delegates to the existing auth.uid()-based tenant and role-checked profile RPCs in one database transaction. The UI shows a setup checklist after creation.
