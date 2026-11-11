@@ -4,9 +4,18 @@ import Logo from "@/components/logo";
 const supportEmail = "support@christech.co.ke";
 
 export function MarketingHeader() {
-  return <header className="marketing-nav"><Logo href="/" size={44} /><nav aria-label="Main navigation">
-    <Link href="/features">Features</Link><Link href="/how-it-works">How it works</Link><Link href="/pricing">Pricing</Link><Link href="/support">Support</Link><Link href="/login">Sign in</Link><Link className="marketing-nav-cta" href="/register">Get started</Link>
-  </nav></header>;
+  return <header className="marketing-nav">
+    <Logo href="/" size={44} />
+    <nav className="marketing-desktop-nav" aria-label="Main navigation">
+      <Link href="/features">Features</Link><Link href="/how-it-works">How it works</Link><Link href="/pricing">Pricing</Link><Link href="/support">Support</Link><Link href="/login">Sign in</Link><Link className="marketing-nav-cta" href="/register">Get started</Link>
+    </nav>
+    <details className="marketing-mobile-menu">
+      <summary aria-label="Open navigation menu"><span></span><span></span><span></span><b>Menu</b></summary>
+      <nav aria-label="Mobile navigation">
+        <Link href="/features">Features</Link><Link href="/how-it-works">How it works</Link><Link href="/pricing">Pricing</Link><Link href="/support">Support</Link><Link href="/login">Sign in</Link><Link className="marketing-nav-cta" href="/register">Get started</Link>
+      </nav>
+    </details>
+  </header>;
 }
 
 export function MarketingFooter() {
