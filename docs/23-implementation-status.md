@@ -8,7 +8,9 @@ The project owner reports that the app is deployed and Supabase is connected. Th
 - Wrapped tenant access resolution in React `cache` so layouts and pages in the same server render can share the lookup.
 - Added a central typed tenant permission matrix and migrated the tenant dashboard layout and overview page to it.
 - Changed the tenant dashboard unauthenticated redirect to the documented `/login` route.
-- This is an incremental first pass, not completion of the full access-layer migration. Other tenant pages still need to be moved to the shared resolver and permission matrix. Loading/error/empty-state review and automated tests remain outstanding.
+- Migrated the categories, ERP, inventory, orders, products, reports and store-profile server pages to the shared tenant resolver and permission matrix. All seven page routes now redirect unauthenticated users to `/login` and derive tenant membership server-side.
+- Added tenant dashboard loading and recoverable error boundaries.
+- Remaining Phase 1 work: shared UI primitive consolidation, automated authorization tests, review of per-page loading/error/empty states, and running the complete validation suite. These changes have not yet been locally built or typechecked.
 - No database migration, production data, deployment configuration, or live Supabase project was changed.
 - TypeScript, ESLint, Next.js production build and Cloudflare OpenNext build have not been run for this branch. Do not merge until those checks and the remaining phase acceptance criteria pass.
 
