@@ -4,7 +4,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Platform administration",
-  description: "Restricted platform operations console."
+  description: "Restricted platform operations console.",
+  robots: { index: false, follow: false }
 };
 
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#17251d" };
