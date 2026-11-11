@@ -63,8 +63,7 @@ export default function OnboardingPage() {
     };
   }, [cleanSlug, slugSyntaxValid, reserved]);
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function createWorkspace(skipOptionalDetails = false) {
     setBusy(true);
     setError("");
     try {
@@ -87,20 +86,20 @@ export default function OnboardingPage() {
         throw new Error("That store address is unavailable. Choose another one.");
       }
 
-      const cleanPhone = phone.trim() ? normalizeKenyanPhone(phone) : null;
-      const cleanWhatsapp = whatsapp.trim() ? normalizeKenyanPhone(whatsapp) : null;
-      if (phone.trim() && !cleanPhone) throw new Error("Enter a valid Kenyan business phone number.");
-      if (whatsapp.trim() && !cleanWhatsapp) throw new Error("Enter a valid Kenyan WhatsApp number.");
-      const cleanEmail = email.trim().toLowerCase();
+      const cleanPhone = !skipOptionalDetails && phone.trim() ? normalizeKenyanPhone(phone) : null;
+      const cleanWhatsapp = !skipOptionalDetails && whatsapp.trim() ? normalizeKenyanPhone(whatsapp) : null;
+      if (!skipOptionalDetails && phone.trim() && !cleanPhone) throw new Error("Enter a valid Kenyan business phone number.");
+      if (!skipOptionalDetails && whatsapp.trim() && !cleanWhatsapp) throw new Error("Enter a valid Kenyan WhatsApp number.");
+      const cleanEmail = !skipOptionalDetails ? email.trim().toLowerCase() : "";
       if (cleanEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) throw new Error("Enter a valid business email address.");
 
       const profile = {
-        tagline: tagline.trim() || null,
+        tagline: !skipOptionalDetails ? tagline.trim() || null : null,
         phone: cleanPhone,
         whatsapp: cleanWhatsapp,
         email: cleanEmail || null,
-        town: town.trim() || null,
-        county: county.trim() || null
+        town: !skipOptionalDetails ? town.trim() || null : null,
+        county: !skipOptionalDetails ? county.trim() || null : null
       };
       const { error: createError } = await supabase.rpc("create_tenant_with_profile_for_current_user", {
         p_name: cleanName,
@@ -156,7 +155,7 @@ export default function OnboardingPage() {
                 <p><strong>First product</strong><span>Add this after your workspace is created</span></p>
               </div>
             ) : null}
-            <form onSubmit={submit}>
+            <form onSubmit={event => { event.preventDefault(); createWorkspace(false); }}>
               {step === 1 ? (
                 <>
                   <div className="field">
@@ -186,7 +185,7 @@ export default function OnboardingPage() {
                   {error && <p className="form-message error" role="alert">{error}</p>}
                   <button className="primary-button" type="submit" disabled={busy}>{busy ? "Creating workspace…" : "Create workspace"}</button>
                   <button className="inline-link-button" type="button" disabled={busy} onClick={() => { setError(""); setStep(1); }}>Back</button>
-                  <button className="inline-link-button" type="submit" disabled={busy} onClick={e => { e.preventDefault(); setTagline(""); setPhone(""); setWhatsapp(""); setEmail(""); setTown(""); setCounty(""); setError(""); }}>Skip optional details</button>
+                  <button className="inline-link-button" type="button" disabled={busy} onClick={() => createWorkspace(true)}>Skip optional details</button>
                 </>
               )}
             </form>
