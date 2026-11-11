@@ -7,7 +7,7 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
     <div className={styles.page}>
       <div className={styles.nav}><MarketingHeader /></div>
       <main>{children}</main>
-      <div className={styles.container}><MarketingFooter /></div>
+      <div className={styles.footer}><MarketingFooter /></div>
     </div>
   );
 }
