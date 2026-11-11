@@ -146,7 +146,7 @@ returns uuid
 language plpgsql
 security definer
 set search_path = pg_catalog, public, extensions
-as $
+as $$
 declare
   invite public.tenant_invitations%rowtype;
   current_email text := lower(coalesce(auth.jwt()->>'email', ''));
