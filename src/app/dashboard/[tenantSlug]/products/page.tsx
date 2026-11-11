@@ -34,7 +34,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
   if (access.reason === "membership_error") throw new Error("Could not verify your business access.");
   if (!access.tenant || !access.membership || !access.user) notFound();
   const { supabase, tenant, membership } = access;
-  if (!["owner", "manager", "catalog_editor"].includes(membership.role)) {
+  if (!hasTenantPermission(membership.role, "productsWrite")) {
     return <RoleAccessDenied tenantSlug={tenantSlug} role={membership.role} area="the product catalogue" />;
   }
 
@@ -75,7 +75,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
   }
   const images = (imageData ?? []) as ProductImageRow[];
 
-  const canManage = ["owner", "manager", "catalog_editor"].includes(membership.role);
+  const canManage = hasTenantPermission(membership.role, "productsWrite");
   return (
     <main className="dashboard-page">
       <header className="dashboard-header"><div><p className="eyebrow">Product catalogue</p><h1>{tenant.name}</h1><p className="auth-description">Manage your products and draft prices.</p></div><span className="workspace-status">{membership.role.replaceAll("_", " ")}</span></header>
