@@ -75,7 +75,7 @@ export default function HomePage() {
 
       <footer className={styles.footer}>
         <Logo href="/" size={40} />
-        <Link href="/login">Sign in</Link>
+        <div><Link href="/features">Features</Link> · <Link href="/how-it-works">How it works</Link> · <Link href="/pricing">Pricing</Link> · <Link href="/privacy">Privacy</Link> · <Link href="/terms">Terms</Link> · <Link href="/login">Sign in</Link></div>
       </footer>
     </main>
   );
