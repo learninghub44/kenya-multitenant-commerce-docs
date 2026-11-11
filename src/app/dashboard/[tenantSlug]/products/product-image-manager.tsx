@@ -29,13 +29,13 @@ export default function ProductImageManager({ tenantId, productId, images }: {
       if (selected.length > 8) throw new Error("Upload up to 8 images at a time.");
       for (const file of selected) {
         if (!["image/jpeg", "image/png", "image/webp", "image/avif"].includes(file.type)) {
-          throw new Error(\`\${file.name}: choose a JPG, PNG, WebP, or AVIF image.\`);
+          throw new Error(`${file.name}: choose a JPG, PNG, WebP, or AVIF image.`);
         }
-        if (file.size > 5 * 1024 * 1024) throw new Error(\`\${file.name}: image must be 5 MB or smaller.\`);
+        if (file.size > 5 * 1024 * 1024) throw new Error(`${file.name}: image must be 5 MB or smaller.`);
       }
       let completed = 0;
       for (const file of selected) {
-        setProgress(\`Uploading \${completed + 1} of \${selected.length}\`);
+        setProgress(`Uploading ${completed + 1} of ${selected.length}`);
         const signatureResponse = await fetch("/api/uploads/cloudinary-signature", {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ tenantId, productId })
@@ -48,12 +48,12 @@ export default function ProductImageManager({ tenantId, productId, images }: {
         formData.append("timestamp", String(signatureData.timestamp));
         formData.append("folder", signatureData.folder);
         formData.append("signature", signatureData.signature);
-        const uploadResponse = await fetch(\`https://api.cloudinary.com/v1_1/\${encodeURIComponent(signatureData.cloudName)}/image/upload\`, {
+        const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${encodeURIComponent(signatureData.cloudName)}/image/upload`, {
           method: "POST", body: formData
         });
         const uploaded = await uploadResponse.json() as CloudinaryUpload;
         if (!uploadResponse.ok || !uploaded.secure_url || !uploaded.public_id) {
-          throw new Error(uploaded.error?.message ?? \`\${file.name}: upload failed.\`);
+          throw new Error(uploaded.error?.message ?? `${file.name}: upload failed.`);
         }
         const supabase = createSupabaseBrowserClient();
         const { data, error: authError } = await supabase.auth.getUser();
@@ -67,7 +67,7 @@ export default function ProductImageManager({ tenantId, productId, images }: {
         completed += 1;
       }
       setAltText("");
-      setMessage(\`\${completed} \${completed === 1 ? "image" : "images"} uploaded and attached.\`);
+      setMessage(`${completed} ${completed === 1 ? "image" : "images"} uploaded and attached.`);
       router.refresh();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Could not upload product images.");
