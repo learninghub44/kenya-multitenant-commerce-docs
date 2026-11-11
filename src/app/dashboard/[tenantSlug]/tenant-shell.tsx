@@ -79,8 +79,8 @@ export default function TenantShell({
     return (
       <nav className={`${className} ${styles.navigation}`} aria-label="Business workspace">
         {Array.from(new Set(visibleItems.map((item) => item.group))).map((group) => (
-          <div className={tenant-navigation-group} key={group}>
-            <span className={tenant-navigation-label}>{group}</span>
+          <div className={styles.navigationGroup} key={group}>
+            <span className={styles.navigationLabel}>{group}</span>
             {visibleItems.filter((item) => item.group === group).map((item) => {
           const href = `${basePath}${item.path}`;
           const active = item.path
