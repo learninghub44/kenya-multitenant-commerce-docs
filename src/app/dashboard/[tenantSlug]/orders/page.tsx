@@ -4,7 +4,7 @@ import { getTenantAccess } from "@/lib/tenant-access";
 import { hasTenantPermission } from "@/lib/tenant-permissions";
 import OrderActions from "./order-actions";
 import RoleAccessDenied from "../role-access-denied";
-import { DashboardEmptyState, DashboardPageHeader } from "@/components/dashboard-primitives";
+import { DashboardEmptyState, DashboardNotice, DashboardPageHeader } from "@/components/dashboard-primitives";
 
 type OrderRow = {
   id: string; order_number: string; status: string; payment_status: string;
@@ -36,7 +36,7 @@ export default async function OrdersPage({ params }: { params: Promise<{ tenantS
     .select("id,order_number,status,payment_status,total_minor,currency,customer_name_snapshot,customer_phone_snapshot,delivery_address_snapshot,created_at,notes")
     .eq("tenant_id", tenant.id).order("created_at", { ascending: false }).limit(100);
   if (orderError) {
-    return <main className="dashboard-page"><Link href={`/dashboard/${tenant.slug}/products`}>← Products</Link><p role="alert">Could not load orders. Confirm the order migrations are applied.</p></main>;
+    return <main className="dashboard-page"><Link href={`/dashboard/${tenant.slug}/products`}>← Products</Link><DashboardNotice tone="error">Could not load orders. Confirm the order migrations are applied.</DashboardNotice></main>;
   }
   const orders = (orderData ?? []) as OrderRow[];
   const { data: itemData, error: itemError } = orders.length
@@ -44,7 +44,7 @@ export default async function OrdersPage({ params }: { params: Promise<{ tenantS
       .eq("tenant_id",tenant.id).in("order_id",orders.map(order => order.id))
     : { data: [], error: null };
   if (itemError) {
-    return <main className="dashboard-page"><Link href={`/dashboard/${tenant.slug}/products`}>← Products</Link><p role="alert">Could not load order items.</p></main>;
+    return <main className="dashboard-page"><Link href={`/dashboard/${tenant.slug}/products`}>← Products</Link><DashboardNotice tone="error">Could not load order items.</DashboardNotice></main>;
   }
   const items = (itemData ?? []) as ItemRow[];
   const canRecordPayment = hasTenantPermission(membership.role, "paymentsRecord");
