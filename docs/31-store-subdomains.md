@@ -11,3 +11,7 @@ Every store is served at `https://<slug>.<root-domain>`. `middleware.ts` rewrite
 
 ## Store profile
 Owners and managers edit `/dashboard/<slug>/settings`: tagline, about, logo, banner, owner introduction and photo, phone, WhatsApp, shop email, address, opening hours and social links. Data lives in `store_profiles`, written only through `save_store_profile` (role-checked, validated, audited) and read publicly through `get_public_store_profile`, which exposes only these published fields.
+
+
+## Slug availability
+Authenticated onboarding can check a candidate slug using `is_store_slug_available(text)`. This is a user-experience preflight only; the tenant slug unique constraint and reserved-slug validation in `create_tenant_for_current_user` remain authoritative at creation time. The preflight RPC is not executable by anonymous users.
