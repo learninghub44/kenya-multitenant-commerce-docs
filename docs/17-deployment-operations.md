@@ -9,3 +9,6 @@ Monitor error rate, latency, database capacity, failed jobs, payment initiation/
 Release flow: review code/migrations → run lint/type/unit/integration/RLS tests → deploy staging → test tenant routing and sandbox payments → verify secrets → deploy → smoke test storefront/dashboard/webhooks → monitor and keep rollback/forward-fix plan.
 
 Document incident ownership, how to disable a compromised payment connection, pause checkout safely, restore data, preserve evidence, and notify affected tenants.
+
+## Platform admin deployment
+Deploy `apps/platform-admin` as its own Cloudflare Worker with its own admin hostname and the Supabase public URL/anon key environment variables. Do not reuse the merchant app's Worker service or expose a service-role key. Enable Supabase TOTP MFA and provision the first platform operator through the controlled database-owner process documented in `apps/platform-admin/README.md`. Test AAL2 enforcement, role limits, audit writes and the tenant status lifecycle before production use.
