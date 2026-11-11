@@ -3,7 +3,8 @@ import styles from "../../marketing.module.css";
 
 export const metadata: Metadata = {
   title: "Privacy notice | Commerce Workspace",
-  description: "A plain-language overview of information handled by Commerce Workspace. This draft requires legal review."
+  description: "A plain-language overview of information handled by Commerce Workspace. This draft requires legal review.",
+  robots: { index: false, follow: false }
 };
 
 export default function PrivacyPage() {
