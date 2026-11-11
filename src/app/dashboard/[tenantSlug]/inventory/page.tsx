@@ -19,7 +19,7 @@ export default async function InventoryPage({ params }: { params: Promise<{ tena
   if (access.reason === "membership_error") throw new Error("Could not verify your business access.");
   if (!access.tenant || !access.membership || !access.user) notFound();
   const { supabase, tenant, membership } = access;
-  if (!["owner", "manager", "stock_clerk"].includes(membership.role)) {
+  if (!hasTenantPermission(membership.role, "inventoryWrite")) {
     return <RoleAccessDenied tenantSlug={tenantSlug} role={membership.role} area="inventory" />;
   }
 
@@ -55,8 +55,8 @@ export default async function InventoryPage({ params }: { params: Promise<{ tena
       onHand: balance?.on_hand ?? 0
     };
   });
-  const canManage = ["owner", "manager", "stock_clerk"].includes(membership.role);
-  const canManageProducts = ["owner", "manager", "catalog_editor"].includes(membership.role);
+  const canManage = hasTenantPermission(membership.role, "inventoryWrite");
+  const canManageProducts = hasTenantPermission(membership.role, "productsWrite");
 
   return (
     <main className="dashboard-page">
