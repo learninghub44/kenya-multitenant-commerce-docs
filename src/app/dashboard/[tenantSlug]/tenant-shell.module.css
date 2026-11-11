@@ -26,3 +26,12 @@
 .navigationGroup{display:grid;gap:3px}
 .navigationLabel{padding:0 11px;color:#87948b;font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}
 @media(max-width:760px){.navigationLabel{padding-top:4px}}
+
+@media(max-width:760px){
+ .mobileNavigation{grid-auto-columns:minmax(0,1fr);gap:3px;padding:6px 8px max(6px,env(safe-area-inset-bottom));background:rgba(255,255,255,.98);box-shadow:0 -5px 20px rgba(20,43,29,.07)}
+ .mobileNavLink{min-height:60px;gap:3px;padding:5px 2px;border-radius:10px;font-size:10px;line-height:1.2}
+ .mobileNavIcon{display:grid;place-items:center;width:28px;height:27px;border-radius:8px;color:currentColor}
+ .mobileNavIcon svg{display:block}
+ .active .mobileNavIcon{background:#dcefe2}
+ .mobileNavMark{display:none}
+}
