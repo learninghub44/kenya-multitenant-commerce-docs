@@ -15,7 +15,7 @@ export default async function ErpPage({ params }: { params: Promise<{ tenantSlug
   if (access.reason === "membership_error") throw new Error("Could not verify your business access.");
   if (!access.tenant || !access.membership || !access.user) notFound();
   const { supabase, tenant, membership } = access;
-  if (!["owner", "manager"].includes(membership.role)) {
+  if (!hasTenantPermission(membership.role, "settingsManage")) {
     return <RoleAccessDenied tenantSlug={tenantSlug} role={membership.role} area="business records" />;
   }
 
