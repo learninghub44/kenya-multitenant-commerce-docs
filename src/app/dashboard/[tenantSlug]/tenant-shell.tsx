@@ -17,17 +17,17 @@ type TenantShellProps = {
 };
 
 const navItems = [
-  { label: "Overview", path: "", roles: ["owner", "manager", "catalog_editor", "stock_clerk", "order_operator", "finance_viewer"] },
-  { label: "Products", path: "/products", roles: ["owner", "manager", "catalog_editor"] },
-  { label: "Categories", path: "/categories", roles: ["owner", "manager", "catalog_editor"] },
-  { label: "Inventory", path: "/inventory", roles: ["owner", "manager", "stock_clerk"] },
-  { label: "Orders", path: "/orders", roles: ["owner", "manager", "order_operator"] },
-  { label: "Business records", path: "/erp", roles: ["owner", "manager"] },
-  { label: "Reports", path: "/reports", roles: ["owner", "manager", "finance_viewer"] },
-  { label: "Store profile", path: "/settings", roles: ["owner", "manager"] },
-  { label: "Team", path: "/team", roles: ["owner"] },
-  { label: "Activity", path: "/activity", roles: ["owner"] },
-  { label: "Support", path: "/support", roles: ["owner", "manager", "catalog_editor", "stock_clerk", "order_operator", "finance_viewer"] },
+  { label: "Overview", path: "", group: "Workspace", roles: ["owner", "manager", "catalog_editor", "stock_clerk", "order_operator", "finance_viewer"] },
+  { label: "Orders", path: "/orders", group: "Sales", roles: ["owner", "manager", "order_operator"] },
+  { label: "Products", path: "/products", group: "Sales", roles: ["owner", "manager", "catalog_editor"] },
+  { label: "Categories", path: "/categories", group: "Sales", roles: ["owner", "manager", "catalog_editor"] },
+  { label: "Inventory", path: "/inventory", group: "Operations", roles: ["owner", "manager", "stock_clerk"] },
+  { label: "Business records", path: "/erp", group: "Operations", roles: ["owner", "manager"] },
+  { label: "Reports", path: "/reports", group: "Operations", roles: ["owner", "manager", "finance_viewer"] },
+  { label: "Store profile", path: "/settings", group: "Manage", roles: ["owner", "manager"] },
+  { label: "Team", path: "/team", group: "Manage", roles: ["owner"] },
+  { label: "Activity", path: "/activity", group: "Manage", roles: ["owner"] },
+  { label: "Support", path: "/support", group: "Help", roles: ["owner", "manager", "catalog_editor", "stock_clerk", "order_operator", "finance_viewer"] },
 ];
 
 function roleLabel(role: string) {
@@ -78,7 +78,10 @@ export default function TenantShell({
   function renderNavigation(className: string, onNavigate?: () => void) {
     return (
       <nav className={`${className} ${styles.navigation}`} aria-label="Business workspace">
-        {visibleItems.map((item) => {
+        {Array.from(new Set(visibleItems.map((item) => item.group))).map((group) => (
+          <div className={styles.navigationGroup} key={group}>
+            <span className={styles.navigationLabel}>{group}</span>
+            {visibleItems.filter((item) => item.group === group).map((item) => {
           const href = `${basePath}${item.path}`;
           const active = item.path
             ? pathname === href || pathname.startsWith(`${href}/`)
@@ -96,7 +99,9 @@ export default function TenantShell({
               {item.label}
             </Link>
           );
-        })}
+            })}
+          </div>
+        ))}
       </nav>
     );
   }
@@ -174,6 +179,9 @@ export default function TenantShell({
             <strong>{tenantName}</strong>
           </div>
           <div className="tenant-account">
+            {["owner", "manager", "catalog_editor"].includes(role) && (
+              <Link className="tenant-topbar-action" href={`${basePath}/products#add-product`}>+ Add product</Link>
+            )}
             {email && <span className="tenant-account-email">{email}</span>}
             <form action="/auth/signout" method="post">
               <button className="tenant-signout" type="submit">Sign out</button>
