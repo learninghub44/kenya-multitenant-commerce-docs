@@ -19,8 +19,9 @@
 .memberActions{display:flex;align-items:center;gap:8px}
 .memberActions select{width:auto;min-width:150px;min-height:38px;padding:7px 10px}
 .memberActions .secondary-button{min-height:38px;padding:0 12px;font-size:13px}
-.inviteStatus.accepted{background:#e8f3ff;color:#245b8f}
-.inviteStatus.revoked,.inviteStatus.expired{background:#f1f2f0;color:#657168}
+.accepted{background:#e8f3ff;color:#245b8f}
+.revoked,.expired{background:#f1f2f0;color:#657168}
+.pending{background:var(--accent-soft);color:var(--accent-strong)}
 .empty{margin:0;color:var(--muted);font-size:14px}
 .activityPanel{margin-top:24px}
 .activityList{display:grid}
