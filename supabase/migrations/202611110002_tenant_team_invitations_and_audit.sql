@@ -205,6 +205,9 @@ begin
     raise exception 'Only an owner can change team roles' using errcode = '42501';
   end if;
   perform pg_advisory_xact_lock(hashtextextended(p_tenant_id::text, 0));
+  if not public.has_tenant_role(p_tenant_id, array['owner']::public.membership_role[]) then
+    raise exception 'Only an owner can change team roles' using errcode = '42501';
+  end if;
   if p_role is null then raise exception 'Choose a valid team role' using errcode = '22023'; end if;
   select * into target from public.tenant_memberships
   where id = p_membership_id and tenant_id = p_tenant_id and active for update;
@@ -236,6 +239,9 @@ begin
     raise exception 'Only an owner can remove team members' using errcode = '42501';
   end if;
   perform pg_advisory_xact_lock(hashtextextended(p_tenant_id::text, 0));
+  if not public.has_tenant_role(p_tenant_id, array['owner']::public.membership_role[]) then
+    raise exception 'Only an owner can remove team members' using errcode = '42501';
+  end if;
   select * into target from public.tenant_memberships
   where id = p_membership_id and tenant_id = p_tenant_id and active for update;
   if not found then raise exception 'Active team member not found' using errcode = 'P0002'; end if;
