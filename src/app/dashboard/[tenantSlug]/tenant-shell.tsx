@@ -24,6 +24,8 @@ const navItems = [
   { label: "Business records", path: "/erp", roles: ["owner", "manager"] },
   { label: "Reports", path: "/reports", roles: ["owner", "manager", "finance_viewer"] },
   { label: "Store profile", path: "/settings", roles: ["owner", "manager"] },
+  { label: "Team", path: "/team", roles: ["owner"] },
+  { label: "Activity", path: "/activity", roles: ["owner"] },
 ];
 
 function roleLabel(role: string) {
