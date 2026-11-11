@@ -92,10 +92,10 @@ begin
   end if;
   select p.role into admin_role from public.platform_admins p
   where p.user_id = auth.uid() and p.active;
-  if admin_role not in ('super_admin', 'operations_admin') then
+  if admin_role is null or admin_role not in ('super_admin', 'operations_admin') then
     raise exception 'Your platform role cannot change tenant status' using errcode = '42501';
   end if;
-  if p_status not in ('active', 'suspended') then
+  if p_status is null or p_status not in ('active', 'suspended') then
     raise exception 'Only active or suspended status can be selected' using errcode = '22023';
   end if;
   if length(clean_reason) < 10 or length(clean_reason) > 500 then
