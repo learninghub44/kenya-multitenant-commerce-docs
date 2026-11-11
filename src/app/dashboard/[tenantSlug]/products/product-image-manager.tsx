@@ -25,6 +25,7 @@ export default function ProductImageManager({ tenantId, productId, images }: {
   async function uploadFiles(selected: File[]) {
     if (!selected.length) return;
     setBusy(true); setError(""); setMessage(""); setProgress("");
+    let completed = 0;
     try {
       if (selected.length > 8) throw new Error("Upload up to 8 images at a time.");
       for (const file of selected) {
@@ -33,7 +34,6 @@ export default function ProductImageManager({ tenantId, productId, images }: {
         }
         if (file.size > 5 * 1024 * 1024) throw new Error(`${file.name}: image must be 5 MB or smaller.`);
       }
-      let completed = 0;
       for (const file of selected) {
         setProgress(`Uploading ${completed + 1} of ${selected.length}`);
         const signatureResponse = await fetch("/api/uploads/cloudinary-signature", {
@@ -70,6 +70,7 @@ export default function ProductImageManager({ tenantId, productId, images }: {
       setMessage(`${completed} ${completed === 1 ? "image" : "images"} uploaded and attached.`);
       router.refresh();
     } catch (cause) {
+      if (completed > 0) setMessage(`${completed} ${completed === 1 ? "image was" : "images were"} uploaded before the next file failed.`);
       setError(cause instanceof Error ? cause.message : "Could not upload product images.");
     } finally {
       setBusy(false); setProgress("");
