@@ -32,7 +32,7 @@ export default function AuthShell({ headline, accent, summary, points, shopLink 
               <span>{storeDisplayAddress("yourshop")}</span>
             </div>
           )}
-          <small>Built for growing Kenyan businesses.</small>
+          <small>Made for growing businesses.</small>
         </div>
       </aside>
       <div className="auth-main">{children}</div>

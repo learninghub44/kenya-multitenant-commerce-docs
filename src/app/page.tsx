@@ -3,10 +3,10 @@ import Logo from "@/components/logo";
 import styles from "./home.module.css";
 
 const capabilities = [
-  { title: "An online shop that is yours", description: "Publish products with photos, prices and variants, then share one link so customers can browse and order from any phone." },
-  { title: "Stock you can trust", description: "Every stock change is recorded, so you always know what is on the shelf and what has moved." },
-  { title: "Orders without the chaos", description: "See new order requests, confirm them and mark them fulfilled, with customer details in one place." },
-  { title: "The business behind the shop", description: "Keep suppliers, customers, purchases and expenses next to your sales, with simple reports." },
+  { title: "Online catalogue", description: "Publish products, prices and photos in a shop customers can browse." },
+  { title: "Stock control", description: "Track quantities and keep a clear record of stock movements." },
+  { title: "Order management", description: "Review customer requests and manage fulfilment with your team." },
+  { title: "Business records", description: "Keep customers, suppliers, purchases and expenses together." },
 ];
 
 export default function HomePage() {
@@ -26,26 +26,25 @@ export default function HomePage() {
 
       <section className={styles.hero}>
         <div className={styles.heroCopy}>
-          <p className={styles.kicker}>For shops and small businesses in Kenya</p>
-          <h1>Sell online and run the business behind it.</h1>
-          <p className={styles.heroDescription}>Your online catalogue, stock, customer order requests and business records in one workspace. Set up your catalogue and share it with customers.</p>
-          <p className={styles.heroDescription}>The current storefront collects order requests only. Online payment collection is not available yet; merchants arrange payment directly with customers.</p>
+          <p className={styles.kicker}>Built for growing businesses</p>
+          <h1>Run your shop from one place.</h1>
+          <p className={styles.heroDescription}>Manage products, stock, customer orders and everyday business records in one simple workspace.</p>
           <div className={styles.heroActions}>
             <Link className={styles.primaryCta} href="/register">Create your workspace</Link>
-            <Link className={styles.textCta} href="#features">See what you get</Link>
+            <Link className={styles.textCta} href="#features">Explore features</Link>
           </div>
         </div>
         <div className={styles.preview} role="img" aria-label="Preview of the business workspace showing products, orders and stock">
-          <div className={styles.previewTop}><span /><span /><span /><b>Your business at a glance</b></div>
+          <div className={styles.previewTop}><span /><span /><span /><b>Business overview</b></div>
           <div className={styles.previewBody}>
             <div className={styles.previewTiles}>
-              <div><small>Products</small><strong>Catalogue</strong><span>Photos, prices, variants</span></div>
-              <div><small>Orders</small><strong>One inbox</strong><span>From request to fulfilled</span></div>
+              <div><small>Products</small><strong>Catalogue</strong><span>Photos and prices</span></div>
+              <div><small>Orders</small><strong>One inbox</strong><span>Requests and fulfilment</span></div>
             </div>
             <ul className={styles.previewList}>
-              <li><i className={styles.swatchSand} /><span><b>Product catalogue</b><small>Images, prices and variants</small></span></li>
+              <li><i className={styles.swatchSand} /><span><b>Product catalogue</b><small>Products and variants</small></span></li>
               <li><i className={styles.swatchSage} /><span><b>Stock and orders</b><small>Inventory and fulfilment</small></span></li>
-              <li><i className={styles.swatchSun} /><span><b>Business records</b><small>Suppliers, customers, expenses</small></span></li>
+              <li><i className={styles.swatchSun} /><span><b>Business records</b><small>Customers and expenses</small></span></li>
             </ul>
           </div>
         </div>
@@ -53,8 +52,8 @@ export default function HomePage() {
 
       <section className={styles.features} id="features">
         <div className={styles.sectionIntro}>
-          <h2>Everything you need to sell and keep track</h2>
-          <p>Practical tools for the work you do every day, without a complicated system to learn.</p>
+          <h2>The essentials, organised.</h2>
+          <p>Everything your team needs for day-to-day store operations.</p>
         </div>
         <div className={styles.featureGrid}>
           {capabilities.map((item) => (
@@ -64,22 +63,23 @@ export default function HomePage() {
             </article>
           ))}
         </div>
+        <p className={styles.paymentNote}>Storefront orders are requests. Customers arrange payment directly with the merchant.</p>
       </section>
 
       <section className={styles.bottomCta}>
         <div>
-          <h2>Bring your business into one workspace.</h2>
-          <p>Create an account, name your business and add your first product.</p>
+          <h2>Bring your business together.</h2>
+          <p>Set up your workspace and add your first product.</p>
         </div>
         <Link className={styles.ctaLight} href="/register">Get started</Link>
       </section>
 
       <footer className={styles.footer}>
-        <div className={styles.footerBrand}><Logo href="/" size={40} /><p>Practical tools to manage your catalogue, stock, customer requests and business records.</p></div>
+        <div className={styles.footerBrand}><Logo href="/" size={40} /><p>One workspace for your shop and daily operations.</p></div>
         <div className={styles.footerColumn}><h2>Explore</h2><Link href="/features">Features</Link><Link href="/how-it-works">How it works</Link><Link href="/pricing">Pricing</Link><Link href="/register">Get started</Link></div>
-        <div className={styles.footerColumn}><h2>Help and information</h2><Link href="/support">Help centre</Link><Link href="/privacy">Privacy notice</Link><Link href="/terms">Terms of use</Link><Link href="/login">Sign in</Link></div>
-        <div className={styles.footerColumn}><h2>Contact support</h2><a href="tel:+254701059192">+254 701 059 192</a><a href="tel:+254101024580">+254 101 024 580</a><a href="mailto:support@christech.co.ke">support@christech.co.ke</a></div>
-        <div className={styles.footerBottom}><span>© {new Date().getFullYear()} Commerce Workspace. All rights reserved.</span><span>Orders are requests; payment is arranged directly with the merchant.</span></div>
+        <div className={styles.footerColumn}><h2>Help</h2><Link href="/support">Support</Link><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/login">Sign in</Link></div>
+        <div className={styles.footerColumn}><h2>Contact</h2><a href="tel:+254701059192">+254 701 059 192</a><a href="tel:+254101024580">+254 101 024 580</a><a href="mailto:support@christech.co.ke">support@christech.co.ke</a></div>
+        <div className={styles.footerBottom}><span>© {new Date().getFullYear()} Commerce Workspace.</span><span>Orders are requests; payment is arranged with the merchant.</span></div>
       </footer>
     </main>
   );

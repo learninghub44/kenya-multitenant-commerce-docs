@@ -2,15 +2,15 @@ import type { Metadata } from "next";
 import AuthShell from "../auth/auth-shell";
 import AuthForm from "../auth/auth-form";
 
-export const metadata: Metadata = { title: "Create your free account — Commerce Workspace" };
+export const metadata: Metadata = { title: "Create an account | Commerce Workspace" };
 
 export default function RegisterPage() {
   return (
     <AuthShell
-      headline="Open your online shop "
-      accent="in minutes."
-      summary="Everything you need to sell online and keep your business organised."
-      points={["Your own shop link customers can share", "Stock that stays accurate as you sell", "Orders from request to fulfilment"]}
+      headline="Your business, "
+      accent="one workspace."
+      summary="Manage your shop and daily operations in one place."
+      points={["Publish your products", "Track stock and orders", "Work with your team"]}
       shopLink
     >
       <AuthForm variant="register" />
