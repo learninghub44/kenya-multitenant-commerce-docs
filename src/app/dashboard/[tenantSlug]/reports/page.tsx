@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getTenantAccess } from "@/lib/tenant-access";
+import { hasTenantPermission } from "@/lib/tenant-permissions";
 import RoleAccessDenied from "../role-access-denied";
 
 type Order = { id: string; status: string; payment_status: string; total_minor: number; created_at: string };
@@ -15,13 +16,14 @@ function money(value: number) {
 
 export default async function ReportsPage({ params }: { params: Promise<{ tenantSlug: string }> }) {
   const { tenantSlug } = await params;
-  const supabase = await createSupabaseServerClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) redirect(`/auth?next=${encodeURIComponent(`/dashboard/${tenantSlug}/reports`)}`);
-  const { data: tenant, error: tenantError } = await supabase.from("tenants").select("id,name,slug,status").eq("slug",tenantSlug).maybeSingle();
-  if (tenantError || !tenant || tenant.status!=="active") notFound();
-  const { data: membership } = await supabase.from("tenant_memberships").select("role").eq("tenant_id",tenant.id).eq("user_id",user.id).eq("active",true).maybeSingle();
-  if (!membership) notFound();
+  const access = await getTenantAccess(tenantSlug);
+  if (access.reason === "unauthenticated") {
+    redirect(`/login?next=${encodeURIComponent(`/dashboard/${tenantSlug}/reports`)}`);
+  }
+  if (access.reason === "tenant_error") throw new Error("Could not verify this business workspace.");
+  if (access.reason === "membership_error") throw new Error("Could not verify your business access.");
+  if (!access.tenant || !access.membership || !access.user) notFound();
+  const { supabase, tenant, membership } = access;
   if (!["owner", "manager", "finance_viewer"].includes(membership.role)) {
     return <RoleAccessDenied tenantSlug={tenantSlug} role={membership.role} area="reports" />;
   }
