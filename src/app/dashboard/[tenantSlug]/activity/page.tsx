@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import RoleAccessDenied from "../role-access-denied";
+import styles from "../team/team.module.css";
 
 type AuditEvent = { event_id: number; actor_email: string | null; action: string; entity_type: string; entity_id: string | null; request_id: string | null; occurred_at: string };
 
@@ -19,8 +20,8 @@ export default async function ActivityPage({ params }: { params: Promise<{ tenan
   return <main className="dashboard-page">
     <header className="dashboard-header"><div><p className="eyebrow">Workspace security</p><h1>Activity</h1><p className="auth-description">Recent changes recorded for {tenant.name}.</p></div></header>
     {error ? <p className="form-message error" role="alert">Could not load the activity history. Try again later.</p> : events.length === 0 ? <div className="empty-state"><h2>No activity recorded yet</h2><p>Team, store and operational changes will appear here when recorded by the application.</p></div> :
-      <div className="team-panel activity-panel"><div className="activity-list">
-        {events.map(event => <article className="activity-event" key={event.event_id}>
+      <div className={`${styles.panel} ${styles.activityPanel}`}><div className={styles.activityList}>
+        {events.map(event => <article className={styles.activityEvent} key={event.event_id}>
           <div><strong>{event.action.replaceAll(".", " ").replaceAll("_", " ")}</strong><span>{event.actor_email ?? "System"} · {event.entity_type}{event.entity_id ? ` #${event.entity_id}` : ""}</span></div>
           <time dateTime={event.occurred_at}>{new Date(event.occurred_at).toLocaleString()}</time>
         </article>)}
