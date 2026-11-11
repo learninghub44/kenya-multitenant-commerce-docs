@@ -7,3 +7,8 @@
 .supportCard>a:hover{text-decoration:underline;text-underline-offset:4px}
 @media(max-width:720px){.supportGrid{grid-template-columns:1fr;gap:14px;padding-bottom:48px}.supportCard{padding:22px}}
 @media(max-width:380px){.supportCard{grid-template-columns:42px minmax(0,1fr);gap:12px}.supportIcon{width:42px;height:42px}}
+
+.workspaceSupportPage{width:min(calc(100% - 48px),1160px);margin:0 auto;padding:clamp(36px,5vw,64px) 0 72px}
+.workspaceSupportPage>h1{margin:0 0 10px;font-size:clamp(32px,4vw,48px)}
+.workspaceSupportPage>.supportGrid{margin-top:30px}
+@media(max-width:560px){.workspaceSupportPage{width:calc(100% - 32px);padding:30px 0 48px}}
