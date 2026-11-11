@@ -15,7 +15,9 @@ export default function HomePage() {
       <header className={styles.nav}>
         <Logo href="/" size={44} />
         <nav aria-label="Main navigation">
-          <a href="#features">What you get</a>
+          <Link href="/features">Features</Link>
+          <Link href="/how-it-works">How it works</Link>
+          <Link href="/pricing">Pricing</Link>
           <Link className={styles.navSignIn} href="/login">Sign in</Link>
           <Link className={styles.navCta} href="/register">Get started</Link>
         </nav>
@@ -25,7 +27,8 @@ export default function HomePage() {
         <div className={styles.heroCopy}>
           <p className={styles.kicker}>For shops and small businesses in Kenya</p>
           <h1>Sell online and run the business behind it.</h1>
-          <p className={styles.heroDescription}>Your online shop, stock, orders and business records in one workspace. Set up your catalogue today and grow at your own pace.</p>
+          <p className={styles.heroDescription}>Your online catalogue, stock, customer order requests and business records in one workspace. Set up your catalogue and share it with customers.</p>
+          <p className={styles.heroDescription}>The current storefront collects order requests only. Online payment collection is not available yet; merchants arrange payment directly with customers.</p>
           <div className={styles.heroActions}>
             <Link className={styles.primaryCta} href="/register">Create your workspace</Link>
             <Link className={styles.textCta} href="#features">See what you get</Link>
@@ -72,7 +75,7 @@ export default function HomePage() {
 
       <footer className={styles.footer}>
         <Logo href="/" size={40} />
-        <Link href="/login">Sign in</Link>
+        <div><Link href="/features">Features</Link> · <Link href="/how-it-works">How it works</Link> · <Link href="/pricing">Pricing</Link> · <Link href="/privacy">Privacy</Link> · <Link href="/terms">Terms</Link> · <Link href="/login">Sign in</Link></div>
       </footer>
     </main>
   );
