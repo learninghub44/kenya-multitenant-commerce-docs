@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
@@ -34,7 +35,7 @@ export default function TeamManager({ tenantId, initialMembers, initialInvitatio
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  async function invite(event: React.FormEvent<HTMLFormElement>) {
+  async function invite(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setBusy(true); setError(""); setMessage(""); setInviteUrl("");
     try {
       const supabase = createSupabaseBrowserClient();
