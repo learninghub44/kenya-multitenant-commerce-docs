@@ -29,3 +29,9 @@
 .prose h2 { margin:34px 0 8px; font-size:22px; }
 .prose p,.prose li { color:#4f6257; line-height:1.8; }
 @media(max-width:760px){.nav{align-items:flex-start; flex-direction:column}.nav nav{gap:10px 18px}.grid{grid-template-columns:1fr}.footer{grid-template-columns:1fr}.footer p{grid-column:auto}.hero{padding-top:44px}}
+
+/* Layout wrappers for shared marketing chrome */
+.nav > header { display:flex; align-items:center; justify-content:space-between; gap:20px; width:100%; }
+.footer > footer { display:grid; grid-template-columns:auto 1fr; align-items:center; gap:18px 32px; width:100%; padding:0; border:0; }
+.footer > footer p { grid-column:1/-1; margin:0; color:#65776c; font-size:14px; }
+@media(max-width:760px){.nav > header{align-items:flex-start; flex-direction:column}.footer > footer{grid-template-columns:1fr}.footer > footer p{grid-column:auto}}
