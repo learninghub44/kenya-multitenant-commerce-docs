@@ -29,24 +29,35 @@ jobs:
       - name: Check out source
         uses: actions/checkout@v4
 
-      - name: Validate production secrets
+      - name: Check production secrets
+        id: credentials
         shell: bash
         run: |
           set -euo pipefail
+          missing=()
           for name in SUPABASE_ACCESS_TOKEN SUPABASE_DB_PASSWORD SUPABASE_PROJECT_REF; do
             if [[ -z "${!name}" ]]; then
-              echo "::error::Missing required GitHub production environment secret: ${name}"
-              exit 1
+              missing+=("$name")
             fi
           done
 
+          if (( ${#missing[@]} > 0 )); then
+            echo "::warning::Skipping production database migration because required GitHub production environment secrets are not configured: ${missing[*]}. Cloudflare application deployment is independent and may continue. Apply the pending migrations after configuring these secrets."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Set up Supabase CLI
+        if: steps.credentials.outputs.configured == 'true'
         uses: supabase/setup-cli@v3
         with:
           version: latest
 
       - name: Link production project
+        if: steps.credentials.outputs.configured == 'true'
         run: supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
 
       - name: Apply pending migrations
+        if: steps.credentials.outputs.configured == 'true'
         run: supabase db push --linked --yes
