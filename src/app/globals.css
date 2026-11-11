@@ -499,3 +499,14 @@ ul { margin: 0; padding: 0; list-style: none; }
 
 .powered-by { display: inline-flex; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; text-decoration: none; }
 .powered-by .logo-word { color: var(--text); }
+
+
+/* Progressive workspace onboarding */
+.onboarding-progress { height:6px; margin:20px 0; overflow:hidden; border-radius:99px; background:var(--border); }
+.onboarding-progress span { display:block; height:100%; border-radius:inherit; background:var(--accent); transition:width .2s ease; }
+.onboarding-checklist { display:grid; gap:12px; margin:22px 0; padding:18px; border:1px solid var(--border); border-radius:12px; background:var(--background); list-style:none; }
+.onboarding-checklist li,.onboarding-checklist p { display:grid; gap:3px; margin:0; }
+.onboarding-checklist span { color:var(--muted); font-size:14px; line-height:1.5; }
+.onboarding-checklist.compact { gap:9px; padding:14px; }
+.slug-status.success { color:var(--accent-strong); }
+.slug-status.error { color:var(--danger); }
