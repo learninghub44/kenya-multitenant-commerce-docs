@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getTenantAccess } from "@/lib/tenant-access";
+import { hasTenantPermission } from "@/lib/tenant-permissions";
 import OrderActions from "./order-actions";
 import RoleAccessDenied from "../role-access-denied";
+import { DashboardEmptyState, DashboardNotice, DashboardPageHeader } from "@/components/dashboard-primitives";
 
 type OrderRow = {
   id: string; order_number: string; status: string; payment_status: string;
@@ -18,16 +20,15 @@ type ItemRow = {
 
 export default async function OrdersPage({ params }: { params: Promise<{ tenantSlug: string }> }) {
   const { tenantSlug } = await params;
-  const supabase = await createSupabaseServerClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) redirect(`/auth?next=${encodeURIComponent(`/dashboard/${tenantSlug}/orders`)}`);
-  const { data: tenant, error: tenantError } = await supabase.from("tenants")
-    .select("id,name,slug,status").eq("slug", tenantSlug).maybeSingle();
-  if (tenantError || !tenant || tenant.status !== "active") notFound();
-  const { data: membership } = await supabase.from("tenant_memberships")
-    .select("role").eq("tenant_id", tenant.id).eq("user_id", user.id).eq("active", true).maybeSingle();
-  if (!membership) notFound();
-  if (!["owner", "manager", "order_operator"].includes(membership.role)) {
+  const access = await getTenantAccess(tenantSlug);
+  if (access.reason === "unauthenticated") {
+    redirect(`/login?next=${encodeURIComponent(`/dashboard/${tenantSlug}/orders`)}`);
+  }
+  if (access.reason === "tenant_error") throw new Error("Could not verify this business workspace.");
+  if (access.reason === "membership_error") throw new Error("Could not verify your business access.");
+  if (!access.tenant || !access.membership || !access.user) notFound();
+  const { supabase, tenant, membership } = access;
+  if (!hasTenantPermission(membership.role, "ordersWrite")) {
     return <RoleAccessDenied tenantSlug={tenantSlug} role={membership.role} area="orders" />;
   }
 
@@ -35,7 +36,7 @@ export default async function OrdersPage({ params }: { params: Promise<{ tenantS
     .select("id,order_number,status,payment_status,total_minor,currency,customer_name_snapshot,customer_phone_snapshot,delivery_address_snapshot,created_at,notes")
     .eq("tenant_id", tenant.id).order("created_at", { ascending: false }).limit(100);
   if (orderError) {
-    return <main className="dashboard-page"><Link href={`/dashboard/${tenant.slug}/products`}>← Products</Link><p role="alert">Could not load orders. Confirm the order migrations are applied.</p></main>;
+    return <main className="dashboard-page"><Link href={`/dashboard/${tenant.slug}/products`}>← Products</Link><DashboardNotice tone="error">Could not load orders. Confirm the order migrations are applied.</DashboardNotice></main>;
   }
   const orders = (orderData ?? []) as OrderRow[];
   const { data: itemData, error: itemError } = orders.length
@@ -43,16 +44,16 @@ export default async function OrdersPage({ params }: { params: Promise<{ tenantS
       .eq("tenant_id",tenant.id).in("order_id",orders.map(order => order.id))
     : { data: [], error: null };
   if (itemError) {
-    return <main className="dashboard-page"><Link href={`/dashboard/${tenant.slug}/products`}>← Products</Link><p role="alert">Could not load order items.</p></main>;
+    return <main className="dashboard-page"><Link href={`/dashboard/${tenant.slug}/products`}>← Products</Link><DashboardNotice tone="error">Could not load order items.</DashboardNotice></main>;
   }
   const items = (itemData ?? []) as ItemRow[];
-  const canRecordPayment = ["owner","manager"].includes(membership.role);
-  const canManageOrders = ["owner","manager","order_operator"].includes(membership.role);
+  const canRecordPayment = hasTenantPermission(membership.role, "paymentsRecord");
+  const canManageOrders = hasTenantPermission(membership.role, "ordersWrite");
 
   return <main className="dashboard-page">
-    <header className="dashboard-header"><div><p className="eyebrow">Sales & fulfilment</p><h1>Orders</h1><p className="auth-description">Orders for {tenant.name}. Online payment integration is not enabled; staff can record a payment only after independently verifying receipt.</p></div><span className="workspace-status">{orders.length} recent orders</span></header>
+    <DashboardPageHeader eyebrow="Sales & fulfilment" title="Orders" description={`Orders for ${tenant.name}. Online payment integration is not enabled; staff can record a payment only after independently verifying receipt.`} aside={<span className="workspace-status">{orders.length} recent orders</span>} />
     <section className="workspace-list">
-      {orders.length===0 ? <div className="empty-state"><h2>No orders yet</h2><p>Customer order requests from the public storefront will appear here.</p></div> : orders.map(order => <article className="order-card" key={order.id}>
+      {orders.length===0 ? <DashboardEmptyState title="No orders yet" description="Customer order requests from the public storefront will appear here." /> : orders.map(order => <article className="order-card" key={order.id}>
         <div className="order-card-header"><div><p className="eyebrow">{order.order_number}</p><h2>{order.customer_name_snapshot}</h2><p>{order.customer_phone_snapshot}</p></div><div className="order-badges"><span className="workspace-status">{order.status.replaceAll("_"," ")}</span><span className="workspace-status">{order.payment_status.replaceAll("_"," ")}</span></div></div>
         <p className="order-address">{order.delivery_address_snapshot || "No delivery address provided"}</p>
         <ul className="order-line-list">{items.filter(item => item.order_id===order.id).map(item => <li key={item.id}><span>{item.product_title_snapshot} — {item.variant_title_snapshot}{item.sku_snapshot ? ` · ${item.sku_snapshot}` : ""}<small>Qty {item.quantity} × {new Intl.NumberFormat("en-KE",{style:"currency",currency:order.currency}).format(item.unit_price_minor/100)}</small></span><strong>{new Intl.NumberFormat("en-KE",{style:"currency",currency:order.currency}).format(item.line_total_minor/100)}</strong></li>)}</ul>

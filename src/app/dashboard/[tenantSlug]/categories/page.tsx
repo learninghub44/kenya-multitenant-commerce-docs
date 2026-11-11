@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getTenantAccess } from "@/lib/tenant-access";
+import { hasTenantPermission } from "@/lib/tenant-permissions";
 import CategoryManager from "./category-manager";
 import RoleAccessDenied from "../role-access-denied";
 
@@ -8,18 +9,15 @@ type CategoryRow = { id: string; name: string; slug: string; status: string; cre
 
 export default async function CategoriesPage({ params }: { params: Promise<{ tenantSlug: string }> }) {
   const { tenantSlug } = await params;
-  const supabase = await createSupabaseServerClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) redirect(`/auth?next=${encodeURIComponent(`/dashboard/${tenantSlug}/categories`)}`);
-
-  const { data: tenant, error: tenantError } = await supabase.from("tenants")
-    .select("id, name, slug, status").eq("slug", tenantSlug).maybeSingle();
-  if (tenantError || !tenant || tenant.status !== "active") notFound();
-
-  const { data: membership } = await supabase.from("tenant_memberships")
-    .select("role").eq("tenant_id", tenant.id).eq("user_id", user.id).eq("active", true).maybeSingle();
-  if (!membership) notFound();
-  if (!["owner", "manager", "catalog_editor"].includes(membership.role)) {
+  const access = await getTenantAccess(tenantSlug);
+  if (access.reason === "unauthenticated") {
+    redirect(`/login?next=${encodeURIComponent(`/dashboard/${tenantSlug}/categories`)}`);
+  }
+  if (access.reason === "tenant_error") throw new Error("Could not verify this business workspace.");
+  if (access.reason === "membership_error") throw new Error("Could not verify your business access.");
+  if (!access.tenant || !access.membership || !access.user) notFound();
+  const { supabase, tenant, membership } = access;
+  if (!hasTenantPermission(membership.role, "productsWrite")) {
     return <RoleAccessDenied tenantSlug={tenantSlug} role={membership.role} area="product categories" />;
   }
 
@@ -29,7 +27,7 @@ export default async function CategoriesPage({ params }: { params: Promise<{ ten
     return <main className="dashboard-page"><Link href={`/dashboard/${tenant.slug}/products`}>← Products</Link><p role="alert">Could not load categories. Confirm the category migration is applied.</p></main>;
   }
 
-  const canManage = ["owner", "manager", "catalog_editor"].includes(membership.role);
+  const canManage = hasTenantPermission(membership.role, "productsWrite");
   const categories = (data ?? []) as CategoryRow[];
   return <main className="dashboard-page">
     <header className="dashboard-header"><div><p className="eyebrow">Product catalogue</p><h1>Categories</h1><p className="auth-description">Organize products for {tenant.name}.</p></div><span className="workspace-status">{categories.length} categories</span></header>

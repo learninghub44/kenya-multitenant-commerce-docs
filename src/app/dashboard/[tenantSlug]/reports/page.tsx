@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getTenantAccess } from "@/lib/tenant-access";
+import { hasTenantPermission } from "@/lib/tenant-permissions";
 import RoleAccessDenied from "../role-access-denied";
 
 type Order = { id: string; status: string; payment_status: string; total_minor: number; created_at: string };
@@ -15,20 +16,21 @@ function money(value: number) {
 
 export default async function ReportsPage({ params }: { params: Promise<{ tenantSlug: string }> }) {
   const { tenantSlug } = await params;
-  const supabase = await createSupabaseServerClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) redirect(`/auth?next=${encodeURIComponent(`/dashboard/${tenantSlug}/reports`)}`);
-  const { data: tenant, error: tenantError } = await supabase.from("tenants").select("id,name,slug,status").eq("slug",tenantSlug).maybeSingle();
-  if (tenantError || !tenant || tenant.status!=="active") notFound();
-  const { data: membership } = await supabase.from("tenant_memberships").select("role").eq("tenant_id",tenant.id).eq("user_id",user.id).eq("active",true).maybeSingle();
-  if (!membership) notFound();
-  if (!["owner", "manager", "finance_viewer"].includes(membership.role)) {
+  const access = await getTenantAccess(tenantSlug);
+  if (access.reason === "unauthenticated") {
+    redirect(`/login?next=${encodeURIComponent(`/dashboard/${tenantSlug}/reports`)}`);
+  }
+  if (access.reason === "tenant_error") throw new Error("Could not verify this business workspace.");
+  if (access.reason === "membership_error") throw new Error("Could not verify your business access.");
+  if (!access.tenant || !access.membership || !access.user) notFound();
+  const { supabase, tenant, membership } = access;
+  if (!hasTenantPermission(membership.role, "reportsRead")) {
     return <RoleAccessDenied tenantSlug={tenantSlug} role={membership.role} area="reports" />;
   }
 
   const [orderResult,expenseResult,variantResult,productResult,balanceResult] = await Promise.all([
     supabase.from("orders").select("id,status,payment_status,total_minor,created_at").eq("tenant_id",tenant.id).order("created_at",{ascending:false}).limit(1000),
-    ["owner","manager","finance_viewer"].includes(membership.role)
+    hasTenantPermission(membership.role, "reportsRead")
       ? supabase.from("expenses").select("id,description,category,amount_minor,expense_date").eq("tenant_id",tenant.id).order("expense_date",{ascending:false}).limit(1000)
       : Promise.resolve({data:[],error:null}),
     supabase.from("product_variants").select("id,product_id,title,sku").eq("tenant_id",tenant.id).neq("status","archived"),
@@ -62,7 +64,7 @@ export default async function ReportsPage({ params }: { params: Promise<{ tenant
     <header className="dashboard-header"><div><p className="eyebrow">Business performance</p><h1>Reports</h1><p className="auth-description">Live records from {tenant.name}. Sales figures include only orders with a recorded successful payment; this is not an accounting statement.</p></div><span className="workspace-status">Last {orders.length} orders</span></header>
     <section className="report-metrics">
       <article><span>Recorded paid sales</span><strong>{money(paidSales)}</strong><small>{paidOrders.length} paid orders</small></article>
-      <article><span>Recorded expenses</span><strong>{money(expenseTotal)}</strong><small>{expenses.length} expense records{!["owner","manager","finance_viewer"].includes(membership.role) ? " · finance access required for full totals" : ""}</small></article>
+      <article><span>Recorded expenses</span><strong>{money(expenseTotal)}</strong><small>{expenses.length} expense records{!hasTenantPermission(membership.role, "reportsRead") ? " · finance access required for full totals" : ""}</small></article>
       <article><span>Orders needing attention</span><strong>{pendingOrders}</strong><small>Pending or confirmed</small></article>
       <article><span>Low-stock variants</span><strong>{lowStock.length}</strong><small>At or below 5 available units</small></article>
     </section>
@@ -71,7 +73,7 @@ export default async function ReportsPage({ params }: { params: Promise<{ tenant
       <article className="workspace-card"><div><h2>Low-stock watchlist</h2><p>Available quantity is on-hand stock minus reservations across active locations.</p></div>
         {lowStock.length===0 ? <p>No tracked variants are currently at or below five available units.</p> : <div className="report-status-list">{lowStock.slice(0,30).map(item=><div key={item.variant.id}><span>{item.product.title} — {item.variant.title}{item.variant.sku ? ` · ${item.variant.sku}` : ""}<small>{item.onHand} on hand · {item.reserved} reserved</small></span><strong>{item.available} available</strong></div>)}</div>}
       </article>
-      {["owner","manager","finance_viewer"].includes(membership.role) && <article className="workspace-card"><div><h2>Recent expenses</h2><p>Latest 1,000 recorded expense rows.</p></div>
+      {hasTenantPermission(membership.role, "reportsRead") && <article className="workspace-card"><div><h2>Recent expenses</h2><p>Latest 1,000 recorded expense rows.</p></div>
         {expenses.length===0 ? <p>No expense records yet.</p> : <div className="report-status-list">{expenses.slice(0,20).map(expense=><div key={expense.id}><span>{expense.description}<small>{expense.category} · {expense.expense_date}</small></span><strong>{money(expense.amount_minor)}</strong></div>)}</div>}
       </article>}
     </section>

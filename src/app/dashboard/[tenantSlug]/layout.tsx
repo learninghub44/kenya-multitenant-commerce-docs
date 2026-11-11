@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getTenantAccess } from "@/lib/tenant-access";
 import TenantShell from "./tenant-shell";
 
 export default async function TenantDashboardLayout({
@@ -10,39 +10,25 @@ export default async function TenantDashboardLayout({
   params: Promise<{ tenantSlug: string }>;
 }>) {
   const { tenantSlug } = await params;
-  const supabase = await createSupabaseServerClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  const access = await getTenantAccess(tenantSlug);
 
-  if (authError || !user) {
-    redirect(`/auth?next=${encodeURIComponent(`/dashboard/${tenantSlug}`)}`);
+  if (access.reason === "unauthenticated") {
+    redirect(`/login?next=${encodeURIComponent(`/dashboard/${tenantSlug}`)}`);
   }
-
-  const { data: tenant, error: tenantError } = await supabase
-    .from("tenants")
-    .select("id, name, slug, status")
-    .eq("slug", tenantSlug)
-    .maybeSingle();
-
-  if (tenantError) throw new Error("Could not verify this business workspace.");
-  if (!tenant || tenant.status !== "active") notFound();
-
-  const { data: membership, error: membershipError } = await supabase
-    .from("tenant_memberships")
-    .select("role")
-    .eq("tenant_id", tenant.id)
-    .eq("user_id", user.id)
-    .eq("active", true)
-    .maybeSingle();
-
-  if (membershipError) throw new Error("Could not verify your business access.");
-  if (!membership) notFound();
+  if (access.reason === "tenant_error") {
+    throw new Error("Could not verify this business workspace.");
+  }
+  if (access.reason === "membership_error") {
+    throw new Error("Could not verify your business access.");
+  }
+  if (!access.tenant || !access.membership || !access.user) notFound();
 
   return (
     <TenantShell
-      tenantSlug={tenant.slug}
-      tenantName={tenant.name}
-      role={membership.role}
-      email={user.email ?? null}
+      tenantSlug={access.tenant.slug}
+      tenantName={access.tenant.name}
+      role={access.membership.role}
+      email={access.user.email ?? null}
     >
       {children}
     </TenantShell>

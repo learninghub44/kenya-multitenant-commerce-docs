@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getTenantAccess } from "@/lib/tenant-access";
+import { hasTenantPermission } from "@/lib/tenant-permissions";
 import RoleAccessDenied from "../role-access-denied";
 import NewProductForm from "./new-product-form";
 import ProductEditor from "./product-editor";
 import ProductCategoryAssignment from "./product-category-assignment";
 import VariantManager, { type ManagedVariant } from "./variant-manager";
 import ProductImageManager from "./product-image-manager";
+import { DashboardEmptyState, DashboardNotice, DashboardPageHeader } from "@/components/dashboard-primitives";
 
 type ProductRow = {
   id: string;
@@ -25,28 +27,15 @@ type ProductImageRow = { id: string; product_id: string; secure_url: string; alt
 
 export default async function ProductsPage({ params }: { params: Promise<{ tenantSlug: string }> }) {
   const { tenantSlug } = await params;
-  const supabase = await createSupabaseServerClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) redirect(`/auth?next=${encodeURIComponent(`/dashboard/${tenantSlug}/products`)}`);
-
-  const { data: tenant, error: tenantError } = await supabase
-    .from("tenants")
-    .select("id, name, slug, status")
-    .eq("slug", tenantSlug)
-    .maybeSingle();
-
-  // The tenant RLS policy returns no row for users outside that workspace.
-  if (tenantError || !tenant || tenant.status !== "active") notFound();
-
-  const { data: membership } = await supabase
-    .from("tenant_memberships")
-    .select("role")
-    .eq("tenant_id", tenant.id)
-    .eq("user_id", user.id)
-    .eq("active", true)
-    .maybeSingle();
-  if (!membership) notFound();
-  if (!["owner", "manager", "catalog_editor"].includes(membership.role)) {
+  const access = await getTenantAccess(tenantSlug);
+  if (access.reason === "unauthenticated") {
+    redirect(`/login?next=${encodeURIComponent(`/dashboard/${tenantSlug}/products`)}`);
+  }
+  if (access.reason === "tenant_error") throw new Error("Could not verify this business workspace.");
+  if (access.reason === "membership_error") throw new Error("Could not verify your business access.");
+  if (!access.tenant || !access.membership || !access.user) notFound();
+  const { supabase, tenant, membership } = access;
+  if (!hasTenantPermission(membership.role, "productsWrite")) {
     return <RoleAccessDenied tenantSlug={tenantSlug} role={membership.role} area="the product catalogue" />;
   }
 
@@ -56,14 +45,14 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
     .eq("tenant_id", tenant.id)
     .order("created_at", { ascending: false });
   if (productsError) {
-    return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><p role="alert">Could not load products. Confirm the Supabase migrations are applied.</p></main>;
+    return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><DashboardNotice tone="error">Could not load products. Confirm the Supabase migrations are applied.</DashboardNotice></main>;
   }
 
   const products = (productsData ?? []) as ProductRow[];
   const { data: categoriesData, error: categoriesError } = await supabase.from("categories")
     .select("id, name, status").eq("tenant_id", tenant.id).eq("status", "published").order("name");
   if (categoriesError) {
-    return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><p role="alert">Could not load categories. Confirm the category migration is applied.</p></main>;
+    return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><DashboardNotice tone="error">Could not load categories. Confirm the category migration is applied.</DashboardNotice></main>;
   }
   const categories = (categoriesData ?? []) as CategoryRow[];
   let variants: VariantRow[] = [];
@@ -73,7 +62,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
       .eq("tenant_id", tenant.id)
       .in("product_id", products.map(product => product.id));
     if (error) {
-      return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><p role="alert">Could not load product prices. Confirm the database migration.</p></main>;
+      return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><DashboardNotice tone="error">Could not load product prices. Confirm the database migration.</DashboardNotice></main>;
     }
     variants = (data ?? []) as VariantRow[];
   }
@@ -83,16 +72,16 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
         .eq("tenant_id", tenant.id).in("product_id", products.map(product => product.id)).order("position")
     : { data: [], error: null };
   if (imageError) {
-    return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><p role="alert">Could not load product images. Confirm the image migration is applied.</p></main>;
+    return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><DashboardNotice tone="error">Could not load product images. Confirm the image migration is applied.</DashboardNotice></main>;
   }
   const images = (imageData ?? []) as ProductImageRow[];
 
-  const canManage = ["owner", "manager", "catalog_editor"].includes(membership.role);
+  const canManage = hasTenantPermission(membership.role, "productsWrite");
   return (
     <main className="dashboard-page">
-      <header className="dashboard-header"><div><p className="eyebrow">Product catalogue</p><h1>{tenant.name}</h1><p className="auth-description">Manage your products and draft prices.</p></div><span className="workspace-status">{membership.role.replaceAll("_", " ")}</span></header>
+      <DashboardPageHeader eyebrow="Product catalogue" title={tenant.name} description="Manage your products and draft prices." aside={<span className="workspace-status">{membership.role.replaceAll("_", " ")}</span>} />
       <section className="workspace-list">
-        {products.length === 0 ? <div className="empty-state"><h2>No products yet</h2><p>Add your first product. It will be saved as a draft and will not appear on a public storefront.</p></div> : products.map(product => {
+        {products.length === 0 ? <DashboardEmptyState title="No products yet" description="Add your first product. It will be saved as a draft and will not appear on a public storefront." /> : products.map(product => {
           const productVariants = variants.filter(item => item.product_id === product.id);
           const variant = productVariants.find(item => item.status !== "archived");
           return <article className="workspace-card product-card" key={product.id}>

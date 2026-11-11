@@ -1,21 +1,21 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getTenantAccess } from "@/lib/tenant-access";
+import { hasTenantPermission } from "@/lib/tenant-permissions";
 import ErpManager from "./erp-manager";
 import RoleAccessDenied from "../role-access-denied";
 
 export default async function ErpPage({ params }: { params: Promise<{ tenantSlug: string }> }) {
   const { tenantSlug } = await params;
-  const supabase = await createSupabaseServerClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) redirect(`/auth?next=${encodeURIComponent(`/dashboard/${tenantSlug}/erp`)}`);
-  const { data: tenant, error: tenantError } = await supabase.from("tenants")
-    .select("id,name,slug,status").eq("slug",tenantSlug).maybeSingle();
-  if (tenantError || !tenant || tenant.status!=="active") notFound();
-  const { data: membership } = await supabase.from("tenant_memberships")
-    .select("role").eq("tenant_id",tenant.id).eq("user_id",user.id).eq("active",true).maybeSingle();
-  if (!membership) notFound();
-  if (!["owner", "manager"].includes(membership.role)) {
+  const access = await getTenantAccess(tenantSlug);
+  if (access.reason === "unauthenticated") {
+    redirect(`/login?next=${encodeURIComponent(`/dashboard/${tenantSlug}/erp`)}`);
+  }
+  if (access.reason === "tenant_error") throw new Error("Could not verify this business workspace.");
+  if (access.reason === "membership_error") throw new Error("Could not verify your business access.");
+  if (!access.tenant || !access.membership || !access.user) notFound();
+  const { supabase, tenant, membership } = access;
+  if (!hasTenantPermission(membership.role, "settingsManage")) {
     return <RoleAccessDenied tenantSlug={tenantSlug} role={membership.role} area="business records" />;
   }
 
