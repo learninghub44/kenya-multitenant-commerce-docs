@@ -5,7 +5,7 @@
 .panelHeading p{margin:0;color:var(--muted);font-size:14px;line-height:1.6}
 .count,.ownerLabel,.inviteStatus{display:inline-flex;align-items:center;min-height:28px;padding:4px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent-strong);font-size:12px;font-weight:700;white-space:nowrap}
 .inviteForm{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,.7fr) auto;align-items:end;gap:12px}
-.inviteForm .field{display:grid;gap:7px;min-width:0}
+.inviteForm :global(.field){display:grid;gap:7px;min-width:0}
 .inviteForm label,.inviteLink label{font-size:14px;font-weight:700}
 .inviteForm input,.inviteForm select,.memberActions select,.inviteLink input{width:100%;min-width:0;min-height:44px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text);font:inherit;font-size:14px}
 .inviteForm .primary-button{min-height:44px;white-space:nowrap}
