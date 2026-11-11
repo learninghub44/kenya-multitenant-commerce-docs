@@ -59,3 +59,42 @@ td small{display:block;margin-top:3px;font-size:10px;overflow-wrap:anywhere}
  .admin-actions{flex-wrap:wrap}
 }
 @media(max-width:380px){.admin-date-label{display:none}.admin-topbar-actions{gap:6px}}
+
+/* Mobile admin console: no squeezed columns or clipped actions */
+@media(max-width:640px){
+ .admin-shell{width:calc(100% - 24px);padding:12px 0 36px;gap:13px}
+ .admin-topbar{min-height:54px;padding-bottom:10px;gap:8px}
+ .admin-brand{font-size:12px;gap:8px}
+ .admin-brand-mark{width:32px;height:32px;border-radius:9px;font-size:15px}
+ .admin-brand small{font-size:9px}
+ .admin-topbar-actions{gap:6px}
+ .admin-topbar-actions .button{min-height:36px;padding-inline:10px;font-size:11px}
+ .admin-header{gap:8px;margin:3px 0 0}
+ .admin-header h1{font-size:28px}
+ .admin-header .muted{max-width:100%;overflow-wrap:anywhere;font-size:11px}
+ .admin-date-label{min-height:28px;padding-inline:8px;font-size:9px}
+ .admin-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .admin-metrics article{min-height:100px;padding:12px;border-radius:11px}
+ .admin-metrics article span{font-size:10px}
+ .admin-metrics article strong{font-size:25px}
+ .admin-metrics article small{font-size:9px}
+ .panel{min-width:0;padding:13px;border-radius:11px}
+ .panel h2{font-size:16px}
+ .panel .toolbar{gap:9px;margin-bottom:10px}
+ .panel .toolbar .muted{font-size:11px}
+ .panel .toolbar input{min-height:42px;font-size:16px}
+ .table-wrap{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+ table{min-width:660px}
+ th,td{padding:10px;font-size:11px}
+ .audit-row{gap:7px;padding:12px 0}
+ .audit-row p{overflow-wrap:anywhere}
+ .audit-row time{font-size:10px}
+ .admin-actions{gap:6px}
+ .admin-actions .button{flex:1 1 auto;min-height:40px}
+ .admin-reason{margin:10px 0;padding:11px}
+}
+@media(max-width:360px){
+ .admin-date-label{display:none}
+ .admin-brand small{display:none}
+ .admin-metrics article{padding:10px}
+}
