@@ -578,3 +578,27 @@ ul { margin: 0; padding: 0; list-style: none; }
 .navigationLabel{padding:0 11px;color:#87948b;font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}
 .tenant-sidebar-drawer .navigationGroup{gap:4px}
 @media(max-width:760px){.navigationLabel{padding-top:4px}}
+
+/* Screenshot-led dashboard summary cards */
+.overview-metric:nth-child(1){border-color:#0b6548;background:#0b6548;color:#fff}
+.overview-metric:nth-child(1)>span,.overview-metric:nth-child(1)>small{color:#e1f4e8}
+.overview-metric:nth-child(1)>strong{color:#fff}
+.overview-metric:nth-child(2){border-color:#f0df9c;background:#fff4c9}
+.overview-metric:nth-child(2)>span,.overview-metric:nth-child(2)>small{color:#66531b}
+.overview-metric:nth-child(2)>strong{color:#292a1f}
+.overview-metric:nth-child(3){border-color:#f3d0b9;background:#ffeadb}
+.overview-metric:nth-child(3)>span,.overview-metric:nth-child(3)>small{color:#795038}
+.overview-metric:nth-child(3)>strong{color:#402719}
+.overview-metric:nth-child(4){border-color:#d0e6c9;background:#e6f3df}
+.overview-metric:nth-child(4)>span,.overview-metric:nth-child(4)>small{color:#365c38}
+.overview-metric:nth-child(4)>strong{color:#174d31}
+.overview-actions-copy{display:none}
+@media(max-width:760px){
+ .overview-metric:nth-child(1){min-height:108px}
+ .overview-metric:nth-child(2),.overview-metric:nth-child(3),.overview-metric:nth-child(4){min-height:108px}
+}
+@media(max-width:360px){
+ .tenant-topbar-action{padding-inline:7px;font-size:10px}
+ .tenant-signout{font-size:11px}
+ .tenant-topbar-context>strong{max-width:32vw}
+}
