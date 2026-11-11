@@ -42,6 +42,9 @@ export default function TenantShell({
   const basePath = `/dashboard/${tenantSlug}`;
   const visibleItems = navItems.filter((item) => item.roles.includes(role));
   const drawerIsOpen = mobileNavOpen;
+  const activeItem = visibleItems.find((item) => item.path ? pathname === `${basePath}${item.path}` || pathname.startsWith(`${basePath}${item.path}/`) : pathname === basePath);
+  const quickNavOrder = ["", "/orders", "/products", "/inventory", "/reports"];
+  const mobileItems = quickNavOrder.map((path) => visibleItems.find((item) => item.path === path)).filter((item): item is (typeof navItems)[number] => Boolean(item)).slice(0, 4);
 
   useEffect(() => {
     setMobileNavOpen(false);
@@ -163,7 +166,7 @@ export default function TenantShell({
           </button>
           <Logo href="/dashboard" size={36} markOnly className="tenant-topbar-logo" />
           <div className="tenant-topbar-context">
-            <span>Business workspace</span>
+            <span>{activeItem?.label ?? "Business workspace"}</span>
             <strong>{tenantName}</strong>
           </div>
           <div className="tenant-account">
@@ -188,7 +191,19 @@ export default function TenantShell({
           </div>
         )}
 
-        <div className="tenant-content">{children}</div>
+        <a className="tenant-skip-link" href="#tenant-main">Skip to main content</a>
+        <main id="tenant-main" className="tenant-content">{children}</main>
+
+        <nav className="tenant-mobile-navigation" aria-label="Quick navigation">
+          {mobileItems.map((item) => {
+            const href = `${basePath}${item.path}`;
+            const active = item.path ? pathname === href || pathname.startsWith(`${href}/`) : pathname === basePath;
+            return <Link key={item.path || "overview"} className={`tenant-mobile-nav-link${active ? " is-active" : ""}`} href={href} aria-current={active ? "page" : undefined}>
+              <span className="tenant-mobile-nav-mark" aria-hidden="true" />
+              <span>{item.label}</span>
+            </Link>;
+          })}
+        </nav>
       </div>
     </div>
   );
