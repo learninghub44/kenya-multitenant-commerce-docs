@@ -284,3 +284,31 @@
 .noProducts h3{margin:0 0 6px;font-size:22px}
 .noProducts p{max-width:42ch;margin:0;color:#4f6257;font-size:16px}
 @media(max-width:640px){.headerContact{display:none}.heroAboutLink{display:block;margin:14px 0 0}}
+
+/* Storefront refinement: calm editorial layout and consistent responsive spacing */
+.storeHeader{position:sticky;top:0;z-index:30;min-height:72px;padding-block:13px;background:rgb(255 255 255 / 96%);backdrop-filter:blur(12px)}
+.brandName{font-size:17px}
+.hero{max-width:1500px;margin-inline:auto;border-radius:0 0 22px 22px}
+.shop{max-width:1500px}
+.productCard{box-shadow:0 2px 8px rgb(24 42 29 / 3%)}
+.productInfo{padding:15px}
+.productTitleRow h3{font-size:15px}
+.productDescription{min-height:40px}
+.productBottom{align-items:center}
+@media(max-width:760px){
+ .storeHeader{padding-inline:16px}
+ .hero{margin-inline:10px}
+ .shop{padding-inline:16px}
+ .productGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:520px){
+ .storeHeader{position:sticky;gap:8px}
+ .brandName{max-width:42vw;font-size:14px}
+ .cartLink{padding-inline:10px}
+ .shop{padding-inline:12px}
+ .productGrid{gap:10px}
+ .productInfo{padding:10px}
+ .productTitleRow h3{font-size:13px}
+ .productDescription{min-height:32px}
+ .priceBlock strong{font-size:13px}
+}
