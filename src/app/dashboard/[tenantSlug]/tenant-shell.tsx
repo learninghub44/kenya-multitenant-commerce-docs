@@ -192,7 +192,7 @@ export default function TenantShell({
         )}
 
         <a className="tenant-skip-link" href="#tenant-main">Skip to main content</a>
-        <main id="tenant-main" className="tenant-content">{children}</main>
+        <div id="tenant-main" className="tenant-content">{children}</div>
 
         <nav className="tenant-mobile-navigation" aria-label="Quick navigation">
           {mobileItems.map((item) => {
