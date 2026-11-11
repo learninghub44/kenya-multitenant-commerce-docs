@@ -211,7 +211,7 @@ export default function TenantShell({
             const href = `${basePath}${item.path}`;
             const active = item.path ? pathname === href || pathname.startsWith(`${href}/`) : pathname === basePath;
             return <Link key={item.path || "overview"} className={`${styles.mobileNavLink} ${active ? styles.active : ""}`} href={href} aria-current={active ? "page" : undefined}>
-              <span className={styles.mobileNavIcon} aria-hidden="true">{item.label === "Overview" ? "⌂" : item.label === "Orders" ? "▤" : item.label === "Products" ? "□" : "▥"}</span>
+              <span className={styles.mobileNavIcon} aria-hidden="true"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{item.label === "Overview" ? <><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9M9 20v-6h6v6"/></> : item.label === "Orders" ? <><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/></> : item.label === "Products" ? <><path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="m3 7 9 5 9-5M3 7v10l9 5 9-5V7M12 12v10"/></> : <><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/></>}</svg></span>
               <span>{item.label}</span>
             </Link>;
           })}
