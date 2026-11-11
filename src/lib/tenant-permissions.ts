@@ -16,6 +16,7 @@ export const TENANT_PERMISSIONS = {
   inventoryWrite: ["owner", "manager", "stock_clerk"],
   ordersRead: ["owner", "manager", "order_operator"],
   ordersWrite: ["owner", "manager", "order_operator"],
+  paymentsRecord: ["owner", "manager"],
   reportsRead: ["owner", "manager", "finance_viewer"],
   settingsManage: ["owner", "manager"],
   staffManage: ["owner"],
