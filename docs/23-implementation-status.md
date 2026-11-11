@@ -2,6 +2,16 @@
 
 The project owner reports that the app is deployed and Supabase is connected. This status describes the source in this checkout; the live deployment and signed-in Supabase UI were not verified during these frontend changes.
 
+## Phase 1 implementation in progress
+
+- Added a server-only tenant access resolver that derives the signed-in user, active tenant and active membership from Supabase using the requested tenant slug. It never accepts a browser-supplied tenant ID or role.
+- Wrapped tenant access resolution in React `cache` so layouts and pages in the same server render can share the lookup.
+- Added a central typed tenant permission matrix and migrated the tenant dashboard layout and overview page to it.
+- Changed the tenant dashboard unauthenticated redirect to the documented `/login` route.
+- This is an incremental first pass, not completion of the full access-layer migration. Other tenant pages still need to be moved to the shared resolver and permission matrix. Loading/error/empty-state review and automated tests remain outstanding.
+- No database migration, production data, deployment configuration, or live Supabase project was changed.
+- TypeScript, ESLint, Next.js production build and Cloudflare OpenNext build have not been run for this branch. Do not merge until those checks and the remaining phase acceptance criteria pass.
+
 ## Implemented
 
 - Next.js/TypeScript app, Supabase SSR/browser/admin clients, email/password auth, tenant onboarding, and tenant-role checks.
@@ -23,7 +33,6 @@ The project owner reports that the app is deployed and Supabase is connected. Th
 - Full order notification/outbox delivery, automated scheduled reservation cleanup, tenant staff invitations/role administration, platform super-admin, custom-domain verification, branding, bulk imports/exports, and comprehensive reporting/accounting are not implemented.
 - Purchasing UI currently supports one line per purchase order; customer/supplier editing, purchase returns, and supplier invoice reconciliation are not implemented.
 - No complete automated test suite for Postgres RLS, tenant isolation, stock concurrency, checkout idempotency, or payment replay is in place.
-- Local dependency install, TypeScript check, lint, Next.js production build, and Cloudflare OpenNext build pass for the UI changes in this checkout. No GitHub Actions run or authenticated browser end-to-end test against the connected Supabase project was verified.
 - The live Supabase schema was not inspected during these frontend changes; review migration status before making any future production schema change.
 
 ## Security boundaries to preserve
@@ -32,7 +41,6 @@ The project owner reports that the app is deployed and Supabase is connected. Th
 - The service-role key must remain server-only. Public checkout and normal merchant mutations should use narrow database RPCs with role validation.
 - A customer-submitted order or browser redirect is not proof of payment. Manual payment recording is a staff attestation, not provider verification.
 - Apply migrations in timestamp order. Do not merge or deploy until cross-tenant RLS, concurrent stock reservation, callback replay, and backup/restore release gates pass.
-
 
 ## Caching, idempotency and deployment review
 
