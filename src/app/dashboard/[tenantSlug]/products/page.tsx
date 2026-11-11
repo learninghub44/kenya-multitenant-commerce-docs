@@ -8,6 +8,7 @@ import ProductEditor from "./product-editor";
 import ProductCategoryAssignment from "./product-category-assignment";
 import VariantManager, { type ManagedVariant } from "./variant-manager";
 import ProductImageManager from "./product-image-manager";
+import { DashboardEmptyState, DashboardPageHeader } from "@/components/dashboard-primitives";
 
 type ProductRow = {
   id: string;
@@ -78,9 +79,9 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
   const canManage = hasTenantPermission(membership.role, "productsWrite");
   return (
     <main className="dashboard-page">
-      <header className="dashboard-header"><div><p className="eyebrow">Product catalogue</p><h1>{tenant.name}</h1><p className="auth-description">Manage your products and draft prices.</p></div><span className="workspace-status">{membership.role.replaceAll("_", " ")}</span></header>
+      <DashboardPageHeader eyebrow="Product catalogue" title={tenant.name} description="Manage your products and draft prices." aside={<span className="workspace-status">{membership.role.replaceAll("_", " ")}</span>} />
       <section className="workspace-list">
-        {products.length === 0 ? <div className="empty-state"><h2>No products yet</h2><p>Add your first product. It will be saved as a draft and will not appear on a public storefront.</p></div> : products.map(product => {
+        {products.length === 0 ? <DashboardEmptyState title="No products yet" description="Add your first product. It will be saved as a draft and will not appear on a public storefront." /> : products.map(product => {
           const productVariants = variants.filter(item => item.product_id === product.id);
           const variant = productVariants.find(item => item.status !== "archived");
           return <article className="workspace-card product-card" key={product.id}>
