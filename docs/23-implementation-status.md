@@ -41,3 +41,11 @@ The project owner reports that the app is deployed and Supabase is connected. Th
 - Migration `202610160021_order_idempotency_and_stock_consistency.sql` blocks repeated terminal order transitions and makes reservation-release operations fail closed when the reserved quantity does not reconcile.
 - Deployment split, environment secrets, cache policy, CI hardening and remaining blockers are documented in `docs/27-caching-idempotency-cicd-deployment.md`.
 - The project owner reports an existing deployment and connected Supabase, but the live target and settings were not verified in this checkout. No production data or migrations were changed here; the separate platform-admin app has not been implemented.
+
+
+## Phase 2 — Public marketing pages
+- Added public feature, workflow, pricing-information, privacy-draft and terms-draft pages on a separate feature branch.
+- Public claims are constrained to the current order-request workflow; online payment collection is explicitly stated as unavailable.
+- Added robots and sitemap routes. Sitemap output requires NEXT_PUBLIC_SITE_URL to be configured.
+- Privacy and terms content is a review draft, not legal advice or approved contractual policy.
+- Validation must pass CI, including the Cloudflare OpenNext build, before release.
