@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import styles from "./team.module.css";
 
 export type TeamRole = "owner" | "manager" | "catalog_editor" | "stock_clerk" | "order_operator" | "finance_viewer";
 export type TeamMember = { membership_id: string; user_id: string; member_email: string; role: string; active: boolean; joined_at: string };
@@ -110,27 +111,27 @@ export default function TeamManager({ tenantId, initialMembers, initialInvitatio
 
   const activeOwners = members.filter(item => item.active && item.role === "owner").length;
 
-  return <div className="team-manager">
-    <section className="team-panel">
-      <div className="team-panel-heading"><div><h2>Invite a team member</h2><p>Invitations expire after seven days and can be used once.</p></div></div>
-      <form className="team-invite-form" onSubmit={invite}>
+  return <div className={styles.manager}>
+    <section className={styles.panel}>
+      <div className={styles.panelHeading}><div><h2>Invite a team member</h2><p>Invitations expire after seven days and can be used once.</p></div></div>
+      <form className={styles.inviteForm} onSubmit={invite}>
         <div className="field"><label htmlFor="invite-email">Email address</label><input id="invite-email" type="email" required maxLength={254} autoComplete="email" value={email} onChange={event => setEmail(event.target.value)} placeholder="staff@example.com" /></div>
         <div className="field"><label htmlFor="invite-role">Workspace role</label><select id="invite-role" value={role} onChange={event => setRole(event.target.value as Exclude<TeamRole, "owner">)}>{roles.filter(item => item.value !== "owner").map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</select></div>
         <button className="primary-button" type="submit" disabled={busy || !email.trim()}>{busy ? "Please wait…" : "Create invitation"}</button>
       </form>
-      {inviteUrl && <div className="team-invite-link"><label htmlFor="new-invite-link">Invitation link</label><input id="new-invite-link" readOnly value={inviteUrl} onFocus={event => event.currentTarget.select()} /><button className="secondary-button" type="button" onClick={copyInvite}>Copy link</button><p className="field-help">Send this link privately to the invited person. It is shown only once.</p></div>}
+      {inviteUrl && <div className={styles.inviteLink}><label htmlFor="new-invite-link">Invitation link</label><input id="new-invite-link" readOnly value={inviteUrl} onFocus={event => event.currentTarget.select()} /><button className="secondary-button" type="button" onClick={copyInvite}>Copy link</button><p className="field-help">Send this link privately to the invited person. It is shown only once.</p></div>}
     </section>
 
     {error && <p className="form-message error" role="alert">{error}</p>}
     {message && <p className="form-message" role="status">{message}</p>}
 
-    <section className="team-panel">
-      <div className="team-panel-heading"><div><h2>Active team</h2><p>Owners retain full control. At least one active owner is always required.</p></div><span className="team-count">{members.filter(item => item.active).length} active</span></div>
-      <div className="team-list">
-        {members.filter(item => item.active).map(member => <article className="team-member" key={member.membership_id}>
-          <div className="team-member-copy"><strong>{member.member_email || "Team member"}</strong><span>{roleName(member.role)}</span></div>
-          {member.role === "owner" && activeOwners <= 1 ? <span className="team-owner-label">Owner · required</span> : <div className="team-member-actions">
-            <label className="sr-only" htmlFor={`role-${member.membership_id}`}>Role for {member.member_email}</label>
+    <section className={styles.panel}>
+      <div className={styles.panelHeading}><div><h2>Active team</h2><p>Owners retain full control. At least one active owner is always required.</p></div><span className={styles.count}>{members.filter(item => item.active).length} active</span></div>
+      <div className={styles.list}>
+        {members.filter(item => item.active).map(member => <article className={styles.member} key={member.membership_id}>
+          <div className={styles.memberCopy}><strong>{member.member_email || "Team member"}</strong><span>{roleName(member.role)}</span></div>
+          {member.role === "owner" && activeOwners <= 1 ? <span className={styles.ownerLabel}>Owner · required</span> : <div className={styles.memberActions}>
+            <label className={styles.srOnly} htmlFor={`role-${member.membership_id}`}>Role for {member.member_email}</label>
             <select id={`role-${member.membership_id}`} value={member.role} disabled={busy} onChange={event => updateRole(member, event.target.value as TeamRole)}>{roles.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</select>
             <button className="secondary-button" type="button" disabled={busy} onClick={() => removeMember(member)}>Remove</button>
           </div>}
@@ -138,14 +139,14 @@ export default function TeamManager({ tenantId, initialMembers, initialInvitatio
       </div>
     </section>
 
-    <section className="team-panel">
-      <div className="team-panel-heading"><div><h2>Invitations</h2><p>Review recent invitations and revoke unused links.</p></div></div>
-      {invitations.length === 0 ? <p className="team-empty">No invitations yet.</p> : <div className="team-list">
+    <section className={styles.panel}>
+      <div className={styles.panelHeading}><div><h2>Invitations</h2><p>Review recent invitations and revoke unused links.</p></div></div>
+      {invitations.length === 0 ? <p className={styles.empty}>No invitations yet.</p> : <div className={styles.list}>
         {invitations.map(invitation => {
           const status = invitation.accepted_at ? "Accepted" : invitation.revoked_at ? "Revoked" : new Date(invitation.expires_at) <= new Date() ? "Expired" : "Pending";
-          return <article className="team-member" key={invitation.invitation_id}>
-            <div className="team-member-copy"><strong>{invitation.invite_email}</strong><span>{roleName(invitation.invite_role)} · Expires {new Date(invitation.expires_at).toLocaleDateString()}</span></div>
-            <div className="team-member-actions"><span className={`team-invite-status ${status.toLowerCase()}`}>{status}</span>{status === "Pending" && <button className="secondary-button" type="button" disabled={busy} onClick={() => revokeInvitation(invitation)}>Revoke</button>}</div>
+          return <article className={styles.member} key={invitation.invitation_id}>
+            <div className={styles.memberCopy}><strong>{invitation.invite_email}</strong><span>{roleName(invitation.invite_role)} · Expires {new Date(invitation.expires_at).toLocaleDateString()}</span></div>
+            <div className={styles.memberActions}><span className={`${styles.inviteStatus} ${styles[status.toLowerCase() as "accepted" | "revoked" | "expired" | "pending"]}`}>{status}</span>{status === "Pending" && <button className="secondary-button" type="button" disabled={busy} onClick={() => revokeInvitation(invitation)}>Revoke</button>}</div>
           </article>;
         })}
       </div>}
