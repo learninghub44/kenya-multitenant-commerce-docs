@@ -68,3 +68,23 @@
   .nav :global(.marketing-mobile-menu){display:block}
 }
 @media(prefers-reduced-motion:reduce){.nav *{scroll-behavior:auto!important;transition:none!important}}
+
+
+/* Shared marketing shell refinements */
+.nav :global(.marketing-desktop-nav) :global(.marketing-nav-cta){padding:10px 17px;border-radius:9px;background:#0f8a43;color:#fff}
+.nav :global(.marketing-desktop-nav) :global(.marketing-nav-cta):hover{background:#0a6e35;color:#fff}
+.nav :global(.marketing-mobile-menu) nav :global(.marketing-nav-cta){background:#0f8a43;color:#fff}
+.nav :global(.marketing-mobile-menu) nav :global(.marketing-nav-cta):hover{background:#0a6e35;color:#fff}
+.footer>footer :global(.marketing-footer-brand){display:grid;align-content:start;gap:12px;min-width:0}
+.footer>footer :global(.marketing-footer-brand) p{max-width:36ch;margin:0;color:#65776c;font-size:14px;line-height:1.75}
+.footer>footer :global(.marketing-footer-column){display:grid;align-content:start;justify-items:start;gap:10px;min-width:0}
+.footer>footer :global(.marketing-footer-column) h2{margin:0 0 5px;font-size:14px;font-weight:750}
+.footer>footer :global(.marketing-footer-column) a{color:#4f6257;font-size:13px;font-weight:600;line-height:1.6;text-decoration:none;overflow-wrap:anywhere}
+.footer>footer :global(.marketing-footer-column) a:hover{color:#0a6e35;text-decoration:underline;text-underline-offset:3px}
+.footer>footer :global(.marketing-footer-bottom){grid-column:1/-1;display:flex;justify-content:space-between;gap:14px;margin-top:16px;padding-top:18px;border-top:1px solid #e4ece6;color:#718078;font-size:12px;line-height:1.65}
+@media(max-width:1000px){.footer>footer :global(.marketing-footer-brand){grid-column:1/-1}}
+@media(max-width:680px){
+ .footer>footer :global(.marketing-footer-brand),.footer>footer :global(.marketing-footer-bottom){grid-column:1/-1}
+ .footer>footer :global(.marketing-footer-bottom){flex-direction:column;gap:8px}
+}
+@media(max-width:390px){.footer>footer :global(.marketing-footer-brand),.footer>footer :global(.marketing-footer-bottom){grid-column:auto}}
