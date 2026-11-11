@@ -193,7 +193,7 @@ export default function TenantShell({
         )}
 
         <a className={styles.skipLink} href="#tenant-main">Skip to main content</a>
-        <div id="tenant-main" className="tenant-content">{children}</div>
+        <div id="tenant-main" className={`tenant-content ${styles.content}`}>{children}</div>
 
         <nav className={styles.mobileNavigation} aria-label="Quick navigation">
           {mobileItems.map((item) => {
