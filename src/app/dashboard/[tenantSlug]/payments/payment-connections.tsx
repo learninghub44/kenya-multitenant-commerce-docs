@@ -82,7 +82,7 @@ export default function PaymentConnections({ tenantSlug }: { tenantSlug: string 
 
       <section className="dashboard-panel">
         <div className="dashboard-panel-header">
-          <div><h2>Add or update a provider account</h2><p>Use credentials issued to this merchant account, not another store's credentials.</p></div>
+          <div><h2>Add or update a provider account</h2><p>Use credentials issued to this merchant account, not another store&apos;s credentials.</p></div>
         </div>
         <form className="payment-connection-form" onSubmit={save}>
           <label>Payment provider
