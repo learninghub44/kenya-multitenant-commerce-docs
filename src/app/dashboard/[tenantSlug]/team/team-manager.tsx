@@ -4,11 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
-export type TeamRole = "manager" | "catalog_editor" | "stock_clerk" | "order_operator" | "finance_viewer";
+export type TeamRole = "owner" | "manager" | "catalog_editor" | "stock_clerk" | "order_operator" | "finance_viewer";
 export type TeamMember = { membership_id: string; user_id: string; member_email: string; role: string; active: boolean; joined_at: string };
 export type TeamInvitation = { invitation_id: string; invite_email: string; invite_role: string; expires_at: string; accepted_at: string | null; revoked_at: string | null; created_at: string };
 
 const roles: { value: TeamRole; label: string }[] = [
+  { value: "owner", label: "Owner" },
   { value: "manager", label: "Manager" },
   { value: "catalog_editor", label: "Catalog editor" },
   { value: "stock_clerk", label: "Stock clerk" },
@@ -27,7 +28,7 @@ export default function TeamManager({ tenantId, initialMembers, initialInvitatio
   const [members, setMembers] = useState(initialMembers);
   const [invitations, setInvitations] = useState(initialInvitations);
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<TeamRole>("order_operator");
+  const [role, setRole] = useState<Exclude<TeamRole, "owner">>("order_operator");
   const [inviteUrl, setInviteUrl] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -106,12 +107,14 @@ export default function TeamManager({ tenantId, initialMembers, initialInvitatio
     finally { setBusy(false); }
   }
 
+  const activeOwners = members.filter(item => item.active && item.role === "owner").length;
+
   return <div className="team-manager">
     <section className="team-panel">
       <div className="team-panel-heading"><div><h2>Invite a team member</h2><p>Invitations expire after seven days and can be used once.</p></div></div>
       <form className="team-invite-form" onSubmit={invite}>
         <div className="field"><label htmlFor="invite-email">Email address</label><input id="invite-email" type="email" required maxLength={254} autoComplete="email" value={email} onChange={event => setEmail(event.target.value)} placeholder="staff@example.com" /></div>
-        <div className="field"><label htmlFor="invite-role">Workspace role</label><select id="invite-role" value={role} onChange={event => setRole(event.target.value as TeamRole)}>{roles.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</select></div>
+        <div className="field"><label htmlFor="invite-role">Workspace role</label><select id="invite-role" value={role} onChange={event => setRole(event.target.value as TeamRole)}>{roles.filter(item => item.value !== "owner").map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</select></div>
         <button className="primary-button" type="submit" disabled={busy || !email.trim()}>{busy ? "Please wait…" : "Create invitation"}</button>
       </form>
       {inviteUrl && <div className="team-invite-link"><label htmlFor="new-invite-link">Invitation link</label><input id="new-invite-link" readOnly value={inviteUrl} onFocus={event => event.currentTarget.select()} /><button className="secondary-button" type="button" onClick={copyInvite}>Copy link</button><p className="field-help">Send this link privately to the invited person. It is shown only once.</p></div>}
@@ -125,7 +128,7 @@ export default function TeamManager({ tenantId, initialMembers, initialInvitatio
       <div className="team-list">
         {members.filter(item => item.active).map(member => <article className="team-member" key={member.membership_id}>
           <div className="team-member-copy"><strong>{member.member_email || "Team member"}</strong><span>{roleName(member.role)}</span></div>
-          {member.role === "owner" ? <span className="team-owner-label">Owner</span> : <div className="team-member-actions">
+          {member.role === "owner" && activeOwners <= 1 ? <span className="team-owner-label">Owner · required</span> : <div className="team-member-actions">
             <label className="sr-only" htmlFor={`role-${member.membership_id}`}>Role for {member.member_email}</label>
             <select id={`role-${member.membership_id}`} value={member.role} disabled={busy} onChange={event => updateRole(member, event.target.value as TeamRole)}>{roles.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</select>
             <button className="secondary-button" type="button" disabled={busy} onClick={() => removeMember(member)}>Remove</button>
