@@ -60,7 +60,7 @@ export default function ProductImageManager({ tenantId, productId, images }: {
         if (authError || !data.user) throw new Error("Your session has expired. Sign in again.");
         const { error: saveError } = await supabase.rpc("register_product_image", {
           p_tenant_id: tenantId, p_product_id: productId, p_public_id: uploaded.public_id,
-          p_secure_url: uploaded.secure_url, p_alt_text: altText.trim() || file.name.replace(/\\.[^.]+$/, ""),
+          p_secure_url: uploaded.secure_url, p_alt_text: altText.trim() || file.name.replace(/\.[^.]+$/, ""),
           p_position: images.length + completed
         });
         if (saveError) throw saveError;
