@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import TenantActions, { type PlatformTenant } from "./tenant-actions";
 import Link from "next/link";
@@ -25,7 +26,7 @@ export default async function PlatformHomePage() {
 
   return <main className="admin-shell stack">
     <header className="admin-topbar">
-      <a className="admin-brand" href="/" aria-label="Commerce Workspace platform admin">
+      <Link className="admin-brand" href="/" aria-label="Commerce Workspace platform admin">
         <span className="admin-brand-mark">C</span><span>Commerce Workspace<small>Platform operations</small></span>
       </a>
       <div className="admin-topbar-actions"><span className="admin-secure-label">MFA protected</span><form action="/auth/signout" method="post"><button className="button" type="submit">Sign out</button></form></div>
