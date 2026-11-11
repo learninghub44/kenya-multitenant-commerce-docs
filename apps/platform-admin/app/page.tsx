@@ -35,9 +35,9 @@ export default async function PlatformHomePage() {
       <span className="admin-date-label">Operations console</span>
     </header>
     <section className="admin-metrics" aria-label="Platform summary">
-      <article><span>Total businesses</span><strong>{tenants.length}</strong><small>Returned tenant records</small></article>
-      <article><span>Active</span><strong>{activeTenants}</strong><small>Currently enabled</small></article>
-      <article><span>Suspended</span><strong>{suspendedTenants}</strong><small>Access restricted</small></article>
+      <article><span>Businesses loaded</span><strong>{tenants.length}</strong><small>Maximum 100 per request</small></article>
+      <article><span>Active in list</span><strong>{activeTenants}</strong><small>Currently enabled</small></article>
+      <article><span>Suspended in list</span><strong>{suspendedTenants}</strong><small>Access restricted</small></article>
       <article><span>Recent audit events</span><strong>{events.length}</strong><small>Latest 20 records</small></article>
     </section>
     {tenantResult.error && <p className="admin-message error" role="alert">Could not load tenant summaries.</p>}
