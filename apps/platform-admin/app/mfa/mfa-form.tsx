@@ -33,6 +33,11 @@ export default function MfaForm() {
         if (!cancelled) { setFactorId(verified.id); setStage("verify"); }
         return;
       }
+      const pending = factors.totp.find(item => item.status === "unverified");
+      if (pending) {
+        const { error: cleanupError } = await supabase.auth.mfa.unenroll({ factorId: pending.id });
+        if (cleanupError) throw cleanupError;
+      }
       const { data: enrolled, error: enrollError } = await supabase.auth.mfa.enroll({ factorType: "totp", friendlyName: "Platform admin authenticator" });
       if (enrollError) throw enrollError;
       if (!cancelled) {
