@@ -3,7 +3,8 @@ import styles from "../../marketing.module.css";
 
 export const metadata: Metadata = {
   title: "Terms of use | Commerce Workspace",
-  description: "Draft terms for the Commerce Workspace service. Legal review is required before launch."
+  description: "Draft terms for the Commerce Workspace service. Legal review is required before launch.",
+  robots: { index: false, follow: false }
 };
 
 export default function TermsPage() {
