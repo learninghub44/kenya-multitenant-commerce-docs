@@ -18,6 +18,7 @@ export default function HomePage() {
           <Link href="/features">Features</Link>
           <Link href="/how-it-works">How it works</Link>
           <Link href="/pricing">Pricing</Link>
+          <Link href="/support">Support</Link>
           <Link className={styles.navSignIn} href="/login">Sign in</Link>
           <Link className={styles.navCta} href="/register">Get started</Link>
         </nav>
@@ -74,8 +75,11 @@ export default function HomePage() {
       </section>
 
       <footer className={styles.footer}>
-        <Logo href="/" size={40} />
-        <div><Link href="/features">Features</Link> · <Link href="/how-it-works">How it works</Link> · <Link href="/pricing">Pricing</Link> · <Link href="/privacy">Privacy</Link> · <Link href="/terms">Terms</Link> · <Link href="/login">Sign in</Link></div>
+        <div className={styles.footerBrand}><Logo href="/" size={40} /><p>Practical tools to manage your catalogue, stock, customer requests and business records.</p></div>
+        <div className={styles.footerColumn}><h2>Explore</h2><Link href="/features">Features</Link><Link href="/how-it-works">How it works</Link><Link href="/pricing">Pricing</Link><Link href="/register">Get started</Link></div>
+        <div className={styles.footerColumn}><h2>Help and information</h2><Link href="/support">Help centre</Link><Link href="/privacy">Privacy notice</Link><Link href="/terms">Terms of use</Link><Link href="/login">Sign in</Link></div>
+        <div className={styles.footerColumn}><h2>Contact support</h2><a href="tel:+254701059192">+254 701 059 192</a><a href="tel:+254101024580">+254 101 024 580</a><a href="mailto:support@christech.co.ke">support@christech.co.ke</a></div>
+        <div className={styles.footerBottom}><span>© {new Date().getFullYear()} Commerce Workspace. All rights reserved.</span><span>Orders are requests; payment is arranged directly with the merchant.</span></div>
       </footer>
     </main>
   );

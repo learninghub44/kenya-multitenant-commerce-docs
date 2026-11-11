@@ -27,6 +27,7 @@ const navItems = [
   { label: "Store profile", path: "/settings", roles: ["owner", "manager"] },
   { label: "Team", path: "/team", roles: ["owner"] },
   { label: "Activity", path: "/activity", roles: ["owner"] },
+  { label: "Support", path: "/support", roles: ["owner", "manager", "catalog_editor", "stock_clerk", "order_operator", "finance_viewer"] },
 ];
 
 function roleLabel(role: string) {
@@ -207,6 +208,12 @@ export default function TenantShell({
             </Link>;
           })}
         </nav>
+        <footer className={styles.supportFooter}>
+          <div><strong>Need a hand?</strong><span>Our support team can help.</span></div>
+          <Link href={`${basePath}/support`}>Visit help centre <span aria-hidden="true">→</span></Link>
+          <a href="tel:+254701059192">+254 701 059 192</a>
+          <a href="mailto:support@christech.co.ke">support@christech.co.ke</a>
+        </footer>
       </div>
     </div>
   );
