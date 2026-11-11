@@ -17,7 +17,7 @@ export default async function CategoriesPage({ params }: { params: Promise<{ ten
   if (access.reason === "membership_error") throw new Error("Could not verify your business access.");
   if (!access.tenant || !access.membership || !access.user) notFound();
   const { supabase, tenant, membership } = access;
-  if (!["owner", "manager", "catalog_editor"].includes(membership.role)) {
+  if (!hasTenantPermission(membership.role, "productsWrite")) {
     return <RoleAccessDenied tenantSlug={tenantSlug} role={membership.role} area="product categories" />;
   }
 
@@ -27,7 +27,7 @@ export default async function CategoriesPage({ params }: { params: Promise<{ ten
     return <main className="dashboard-page"><Link href={`/dashboard/${tenant.slug}/products`}>← Products</Link><p role="alert">Could not load categories. Confirm the category migration is applied.</p></main>;
   }
 
-  const canManage = ["owner", "manager", "catalog_editor"].includes(membership.role);
+  const canManage = hasTenantPermission(membership.role, "productsWrite");
   const categories = (data ?? []) as CategoryRow[];
   return <main className="dashboard-page">
     <header className="dashboard-header"><div><p className="eyebrow">Product catalogue</p><h1>Categories</h1><p className="auth-description">Organize products for {tenant.name}.</p></div><span className="workspace-status">{categories.length} categories</span></header>
