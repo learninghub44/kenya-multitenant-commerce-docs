@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 export type PlatformTenant = { tenant_id: string; tenant_name: string; tenant_slug: string; tenant_status: "active" | "suspended" | "closed"; created_at: string; active_members: number };
 
 export default function TenantActions({ initialTenants, canChangeStatus }: { initialTenants: PlatformTenant[]; canChangeStatus: boolean }) {
+  const router = useRouter();
   const [tenants,setTenants] = useState(initialTenants);
   const [search,setSearch] = useState("");
   const [reason,setReason] = useState("");
@@ -24,7 +26,7 @@ export default function TenantActions({ initialTenants, canChangeStatus }: { ini
       });
       if (rpcError) throw rpcError;
       setTenants(current => current.map(item => item.tenant_id === tenant.tenant_id ? { ...item, tenant_status: next } : item));
-      setReason(""); setMessage(`${tenant.tenant_name} is now ${next}.`);
+      setReason(""); setMessage(`${tenant.tenant_name} is now ${next}.`); router.refresh();
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Could not update tenant status."); }
     finally { setBusy(""); }
   }
