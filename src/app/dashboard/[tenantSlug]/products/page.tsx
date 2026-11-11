@@ -8,7 +8,7 @@ import ProductEditor from "./product-editor";
 import ProductCategoryAssignment from "./product-category-assignment";
 import VariantManager, { type ManagedVariant } from "./variant-manager";
 import ProductImageManager from "./product-image-manager";
-import { DashboardEmptyState, DashboardPageHeader } from "@/components/dashboard-primitives";
+import { DashboardEmptyState, DashboardNotice, DashboardPageHeader } from "@/components/dashboard-primitives";
 
 type ProductRow = {
   id: string;
@@ -45,14 +45,14 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
     .eq("tenant_id", tenant.id)
     .order("created_at", { ascending: false });
   if (productsError) {
-    return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><p role="alert">Could not load products. Confirm the Supabase migrations are applied.</p></main>;
+    return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><DashboardNotice tone="error">Could not load products. Confirm the Supabase migrations are applied.</DashboardNotice></main>;
   }
 
   const products = (productsData ?? []) as ProductRow[];
   const { data: categoriesData, error: categoriesError } = await supabase.from("categories")
     .select("id, name, status").eq("tenant_id", tenant.id).eq("status", "published").order("name");
   if (categoriesError) {
-    return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><p role="alert">Could not load categories. Confirm the category migration is applied.</p></main>;
+    return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><DashboardNotice tone="error">Could not load categories. Confirm the category migration is applied.</DashboardNotice></main>;
   }
   const categories = (categoriesData ?? []) as CategoryRow[];
   let variants: VariantRow[] = [];
@@ -62,7 +62,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
       .eq("tenant_id", tenant.id)
       .in("product_id", products.map(product => product.id));
     if (error) {
-      return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><p role="alert">Could not load product prices. Confirm the database migration.</p></main>;
+      return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><DashboardNotice tone="error">Could not load product prices. Confirm the database migration.</DashboardNotice></main>;
     }
     variants = (data ?? []) as VariantRow[];
   }
@@ -72,7 +72,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
         .eq("tenant_id", tenant.id).in("product_id", products.map(product => product.id)).order("position")
     : { data: [], error: null };
   if (imageError) {
-    return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><p role="alert">Could not load product images. Confirm the image migration is applied.</p></main>;
+    return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><DashboardNotice tone="error">Could not load product images. Confirm the image migration is applied.</DashboardNotice></main>;
   }
   const images = (imageData ?? []) as ProductImageRow[];
 
