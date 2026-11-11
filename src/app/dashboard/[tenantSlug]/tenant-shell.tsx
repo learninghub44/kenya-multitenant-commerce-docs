@@ -211,7 +211,7 @@ export default function TenantShell({
             const href = `${basePath}${item.path}`;
             const active = item.path ? pathname === href || pathname.startsWith(`${href}/`) : pathname === basePath;
             return <Link key={item.path || "overview"} className={`${styles.mobileNavLink} ${active ? styles.active : ""}`} href={href} aria-current={active ? "page" : undefined}>
-              <span className={styles.mobileNavMark} aria-hidden="true" />
+              <span className={styles.mobileNavIcon} aria-hidden="true">{item.label === "Overview" ? "⌂" : item.label === "Orders" ? "▤" : item.label === "Products" ? "□" : "▥"}</span>
               <span>{item.label}</span>
             </Link>;
           })}
