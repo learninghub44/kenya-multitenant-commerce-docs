@@ -167,7 +167,7 @@ export default function OnboardingPage() {
                     <label htmlFor="store-address">Store address</label>
                     <input id="store-address" required minLength={3} maxLength={50} autoCapitalize="none" autoCorrect="off" spellCheck={false} value={slug} onChange={e => { setSlugEdited(true); setSlug(slugify(e.target.value)); }} />
                     <p className="field-help">Your shop address: <strong>{storeDisplayAddress(cleanSlug || "your-store")}</strong></p>
-                    <p className={`field-help ${styles.slugStatus} ${slugState === "available" ? styles.success : slugState === "taken" || reserved ? styles.error : ""}`} role="status">{slugMessage}</p>
+                    <p className={`field-help ${styles.slugStatus} ${slugState === "available" ? styles.slugStatusSuccess : slugState === "taken" || reserved ? styles.slugStatusError : ""}`} role="status">{slugMessage}</p>
                   </div>
                   {error && <p className="form-message error" role="alert">{error}</p>}
                   <button className="primary-button" type="button" disabled={!name.trim() || !slugSyntaxValid || reserved || slugState !== "available"} onClick={() => { setError(""); setStep(2); }}>Continue</button>
