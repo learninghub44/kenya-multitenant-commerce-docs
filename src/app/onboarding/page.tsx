@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import AuthShell from "../auth/auth-shell";
+import styles from "./onboarding.module.css";
 import { storeDisplayAddress } from "@/lib/store-url";
 import { RESERVED_SLUGS } from "@/lib/reserved-slugs";
 import { normalizeKenyanPhone } from "@/lib/auth-helpers";
@@ -134,7 +135,7 @@ export default function OnboardingPage() {
             <p className="eyebrow">Workspace created</p>
             <h1 id="onboarding-title">Your store is ready to set up</h1>
             <p className="auth-description">Your workspace and owner access have been created. Continue with these recommended steps.</p>
-            <ol className="onboarding-checklist">
+            <ol className={styles.checklist}>
               <li><strong>1. Add your first product</strong><span>Publish an item with an accurate price and available stock.</span></li>
               <li><strong>2. Review store details</strong><span>Check your contact information and storefront profile.</span></li>
               <li><strong>3. Share your store link</strong><span>Customers can browse and send order requests. Online payment collection is not enabled.</span></li>
@@ -147,9 +148,9 @@ export default function OnboardingPage() {
             <p className="eyebrow">Step {step} of 2</p>
             <h1 id="onboarding-title">{step === 1 ? "Create your workspace" : "Add your public store details"}</h1>
             <p className="auth-description">{step === 1 ? "Choose a business name and a unique store address." : "These optional details can appear on your public storefront. Leave any field blank if you are not ready."}</p>
-            <div className="onboarding-progress" aria-label={`Step ${step} of 2`}><span style={{ width: step === 1 ? "50%" : "100%" }} /></div>
+            <div className={styles.progress} aria-label={`Step ${step} of 2`}><span style={{ width: step === 1 ? "50%" : "100%" }} /></div>
             {step === 1 ? (
-              <div className="onboarding-checklist compact" aria-label="Setup checklist">
+              <div className={`${styles.checklist} ${styles.compact}`} aria-label="Setup checklist">
                 <p><strong>Workspace basics</strong><span>Business name and a unique store address</span></p>
                 <p><strong>Public store profile</strong><span>Optional contact information and tagline</span></p>
                 <p><strong>First product</strong><span>Add this after your workspace is created</span></p>
@@ -166,7 +167,7 @@ export default function OnboardingPage() {
                     <label htmlFor="store-address">Store address</label>
                     <input id="store-address" required minLength={3} maxLength={50} autoCapitalize="none" autoCorrect="off" spellCheck={false} value={slug} onChange={e => { setSlugEdited(true); setSlug(slugify(e.target.value)); }} />
                     <p className="field-help">Your shop address: <strong>{storeDisplayAddress(cleanSlug || "your-store")}</strong></p>
-                    <p className={`field-help slug-status ${slugState === "available" ? "success" : slugState === "taken" || reserved ? "error" : ""}`} role="status">{slugMessage}</p>
+                    <p className={`field-help ${styles.slugStatus} ${slugState === "available" ? styles.success : slugState === "taken" || reserved ? styles.error : ""}`} role="status">{slugMessage}</p>
                   </div>
                   {error && <p className="form-message error" role="alert">{error}</p>}
                   <button className="primary-button" type="button" disabled={!name.trim() || !slugSyntaxValid || reserved || slugState !== "available"} onClick={() => { setError(""); setStep(2); }}>Continue</button>
