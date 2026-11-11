@@ -11,3 +11,6 @@ Confirm destructive actions and explain consequences. Preserve form inputs after
 
 ## Accessibility and performance
 Target WCAG 2.2 AA where practical. Use semantic headings, associated labels, keyboard navigation, visible focus, accessible status announcements, reduced-motion support, optimized responsive images, and pagination. Provide loading, empty, error, success, and permission-denied states.
+
+## Dashboard navigation
+Desktop workspaces use a persistent role-filtered sidebar and a context bar. On mobile, keep the sidebar available as an accessible drawer and expose a compact bottom navigation for the most-used destinations. Always show the current destination, preserve keyboard focus visibility, support Escape to close the drawer, and account for device safe areas.
