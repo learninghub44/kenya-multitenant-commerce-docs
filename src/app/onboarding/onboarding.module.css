@@ -4,5 +4,5 @@
 .checklist li,.checklist p{display:grid;gap:3px;margin:0}
 .checklist span{color:var(--muted);font-size:14px;line-height:1.5}
 .compact{gap:9px;padding:14px}
-.slugStatus.success{color:var(--accent-strong)}
-.slugStatus.error{color:var(--danger)}
+.slugStatusSuccess{color:var(--accent-strong)}
+.slugStatusError{color:var(--danger)}
