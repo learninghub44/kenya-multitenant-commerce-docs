@@ -4,6 +4,7 @@ import { getTenantAccess } from "@/lib/tenant-access";
 import { hasTenantPermission } from "@/lib/tenant-permissions";
 import OrderActions from "./order-actions";
 import RoleAccessDenied from "../role-access-denied";
+import { DashboardEmptyState, DashboardPageHeader } from "@/components/dashboard-primitives";
 
 type OrderRow = {
   id: string; order_number: string; status: string; payment_status: string;
@@ -50,9 +51,9 @@ export default async function OrdersPage({ params }: { params: Promise<{ tenantS
   const canManageOrders = hasTenantPermission(membership.role, "ordersWrite");
 
   return <main className="dashboard-page">
-    <header className="dashboard-header"><div><p className="eyebrow">Sales & fulfilment</p><h1>Orders</h1><p className="auth-description">Orders for {tenant.name}. Online payment integration is not enabled; staff can record a payment only after independently verifying receipt.</p></div><span className="workspace-status">{orders.length} recent orders</span></header>
+    <DashboardPageHeader eyebrow="Sales & fulfilment" title="Orders" description={`Orders for ${tenant.name}. Online payment integration is not enabled; staff can record a payment only after independently verifying receipt.`} aside={<span className="workspace-status">{orders.length} recent orders</span>} />
     <section className="workspace-list">
-      {orders.length===0 ? <div className="empty-state"><h2>No orders yet</h2><p>Customer order requests from the public storefront will appear here.</p></div> : orders.map(order => <article className="order-card" key={order.id}>
+      {orders.length===0 ? <DashboardEmptyState title="No orders yet" description="Customer order requests from the public storefront will appear here." /> : orders.map(order => <article className="order-card" key={order.id}>
         <div className="order-card-header"><div><p className="eyebrow">{order.order_number}</p><h2>{order.customer_name_snapshot}</h2><p>{order.customer_phone_snapshot}</p></div><div className="order-badges"><span className="workspace-status">{order.status.replaceAll("_"," ")}</span><span className="workspace-status">{order.payment_status.replaceAll("_"," ")}</span></div></div>
         <p className="order-address">{order.delivery_address_snapshot || "No delivery address provided"}</p>
         <ul className="order-line-list">{items.filter(item => item.order_id===order.id).map(item => <li key={item.id}><span>{item.product_title_snapshot} — {item.variant_title_snapshot}{item.sku_snapshot ? ` · ${item.sku_snapshot}` : ""}<small>Qty {item.quantity} × {new Intl.NumberFormat("en-KE",{style:"currency",currency:order.currency}).format(item.unit_price_minor/100)}</small></span><strong>{new Intl.NumberFormat("en-KE",{style:"currency",currency:order.currency}).format(item.line_total_minor/100)}</strong></li>)}</ul>
