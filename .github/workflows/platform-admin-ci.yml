@@ -1,0 +1,56 @@
+name: Platform admin CI
+
+on:
+  pull_request:
+    paths:
+      - "apps/platform-admin/**"
+      - "supabase/migrations/**"
+      - "supabase/tests/**"
+      - ".github/workflows/platform-admin-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "apps/platform-admin/**"
+      - "supabase/migrations/**"
+      - "supabase/tests/**"
+      - ".github/workflows/platform-admin-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: platform-admin-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/platform-admin
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - uses: actions/cache@v6
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-platform-admin-npm-${{ hashFiles('apps/platform-admin/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-platform-admin-npm-
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Type-check
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Next.js build
+        run: npm run build
+      - name: Cloudflare OpenNext build
+        run: npm run build:cloudflare
