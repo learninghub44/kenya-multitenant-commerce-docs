@@ -27,7 +27,7 @@ export default async function OrdersPage({ params }: { params: Promise<{ tenantS
   if (access.reason === "membership_error") throw new Error("Could not verify your business access.");
   if (!access.tenant || !access.membership || !access.user) notFound();
   const { supabase, tenant, membership } = access;
-  if (!["owner", "manager", "order_operator"].includes(membership.role)) {
+  if (!hasTenantPermission(membership.role, "ordersWrite")) {
     return <RoleAccessDenied tenantSlug={tenantSlug} role={membership.role} area="orders" />;
   }
 
@@ -46,8 +46,8 @@ export default async function OrdersPage({ params }: { params: Promise<{ tenantS
     return <main className="dashboard-page"><Link href={`/dashboard/${tenant.slug}/products`}>← Products</Link><p role="alert">Could not load order items.</p></main>;
   }
   const items = (itemData ?? []) as ItemRow[];
-  const canRecordPayment = ["owner","manager"].includes(membership.role);
-  const canManageOrders = ["owner","manager","order_operator"].includes(membership.role);
+  const canRecordPayment = hasTenantPermission(membership.role, "paymentsRecord");
+  const canManageOrders = hasTenantPermission(membership.role, "ordersWrite");
 
   return <main className="dashboard-page">
     <header className="dashboard-header"><div><p className="eyebrow">Sales & fulfilment</p><h1>Orders</h1><p className="auth-description">Orders for {tenant.name}. Online payment integration is not enabled; staff can record a payment only after independently verifying receipt.</p></div><span className="workspace-status">{orders.length} recent orders</span></header>
