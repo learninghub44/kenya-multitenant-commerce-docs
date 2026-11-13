@@ -667,3 +667,45 @@ ul { margin: 0; padding: 0; list-style: none; }
  .tenant-topbar-context>span{display:none}.tenant-topbar-context>strong{font-size:13px}
  .tenant-topbar-action{padding-inline:7px;font-size:10px}.overview-heading{flex-direction:column}
 }
+
+
+/* Desktop dashboard hierarchy and responsive workspace polish */
+@media(min-width:761px){
+ .tenant-app{min-height:100vh;background:#f4f7f4}
+ .tenant-sidebar{background:#fff;border-right:1px solid #e2eae3}
+ .tenant-stage{min-width:0}
+ .tenant-topbar{min-height:76px;padding-inline:clamp(24px,3.2vw,52px);border-bottom:1px solid #e8eee9}
+ .tenant-content{width:min(100%,1680px);padding:clamp(28px,3vw,48px) clamp(28px,3.6vw,58px)}
+ .tenant-content>.dashboard-page{width:100%;max-width:1480px;margin-inline:auto}
+ .overview-heading{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:28px}
+ .overview-heading h1{font-size:clamp(30px,2.5vw,42px);letter-spacing:-.045em}
+ .overview-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+ .overview-metric{min-height:146px;padding:22px;border-radius:16px;box-shadow:0 8px 24px rgba(25,55,35,.045)}
+ .overview-metric>strong{font-size:clamp(28px,2.5vw,38px);letter-spacing:-.04em}
+ .overview-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,.75fr);gap:18px;margin-top:18px}
+ .overview-panel{min-width:0;padding:22px;border-radius:16px;box-shadow:0 8px 24px rgba(25,55,35,.035)}
+ .overview-panel-heading{margin-bottom:16px}
+ .overview-order-row{padding:16px 0}
+ .overview-action-list>a{padding:15px 0}
+ .supportFooter{max-width:1480px;margin:22px auto 30px}
+}
+@media(min-width:761px) and (max-width:1100px){
+ .overview-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .overview-grid{grid-template-columns:minmax(0,1fr)}
+ .tenant-sidebar{width:232px}
+}
+@media(max-width:760px){
+ .tenant-stage{overflow-x:clip}
+ .tenant-content{overflow-x:clip}
+ .overview-heading{align-items:flex-start}
+ .overview-store-link{white-space:nowrap}
+ .overview-metric,.overview-panel{box-shadow:0 4px 14px rgba(25,55,35,.04)}
+ .mobileNavigation{padding-bottom:max(8px,env(safe-area-inset-bottom))}
+}
+@media(max-width:380px){
+ .overview-metrics{gap:7px}
+ .overview-metric{padding:10px}
+ .overview-metric>span{font-size:10px}
+ .overview-metric>strong{font-size:22px}
+ .tenant-account{max-width:112px}
+}
