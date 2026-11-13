@@ -1,9 +1,10 @@
 # Authentication
 
-Sign-in options on `/auth`: Google, email and password, and passwordless email link. New accounts collect full name and an optional Kenyan phone number (stored in Supabase user metadata, normalised to `+254…`).
+Sign-in options on `/login` (existing users) and `/register` (new accounts): Google, email and password, and passwordless email link. New accounts collect full name and an optional Kenyan phone number (stored in Supabase user metadata, normalised to `+254…`).
 
 ## Routes
-- `/auth` create account, sign in, email link.
+- `/login` sign in and `/register` create account (shared form in `src/app/auth/auth-form.tsx`). `/auth` is only a legacy redirect to these.
+- Unauthenticated dashboard requests redirect straight to `/login?next=<path>`; no code redirects to `/auth` any more. `next` is accepted only as a same-origin path (`getSafeNextPath`).
 - `/auth/forgot-password` and `/auth/reset-password` password reset. The forgot form answers the same way whether or not the email has an account.
 - `/auth/callback` completes Google sign-in, email confirmation, magic links and reset links (PKCE `code` or `token_hash`). The `next` parameter is accepted only as a same-origin path.
 

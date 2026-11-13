@@ -1,5 +1,4 @@
-import { notFound, redirect } from "next/navigation";
-import { getTenantAccess } from "@/lib/tenant-access";
+import { requireTenantAccess } from "@/lib/access";
 import TenantShell from "./tenant-shell";
 
 export default async function TenantDashboardLayout({
@@ -10,24 +9,16 @@ export default async function TenantDashboardLayout({
   params: Promise<{ tenantSlug: string }>;
 }>) {
   const { tenantSlug } = await params;
-  const access = await getTenantAccess(tenantSlug);
-
-  if (access.reason === "unauthenticated") {
-    redirect(`/login?next=${encodeURIComponent(`/dashboard/${tenantSlug}`)}`);
-  }
-  if (access.reason === "tenant_error") {
-    throw new Error("Could not verify this business workspace.");
-  }
-  if (access.reason === "membership_error") {
-    throw new Error("Could not verify your business access.");
-  }
-  if (!access.tenant || !access.membership || !access.user) notFound();
+  const access = await requireTenantAccess(tenantSlug);
+  // Suspended/closed workspaces render the "workspace unavailable" page with no
+  // dashboard chrome; pages under this layout use the same cached lookup.
+  if (access.denied) return access.denied;
 
   return (
     <TenantShell
       tenantSlug={access.tenant.slug}
       tenantName={access.tenant.name}
-      role={access.membership.role}
+      role={access.role}
       email={access.user.email ?? null}
     >
       {children}

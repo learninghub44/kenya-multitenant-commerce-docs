@@ -59,3 +59,4 @@ Apply every migration in timestamp order, `202610160001` through `202610160021`,
 - Private routes are explicitly `private, no-store`; do not put tenant/customer/order/payment data behind shared caches.
 - CI caches npm downloads, but a committed `package-lock.json` is still required before changing to `npm ci` and calling dependency installs reproducible.
 - See `docs/27-caching-idempotency-cicd-deployment.md` for separate client/admin deployment requirements and environment setup.
+- Phase 1: apply `202611130001_workspace_access_rpc.sql` before deploying the access-layer change; run `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, `npm run build:cloudflare` and `supabase test db`; manually confirm a suspended tenant shows the "workspace unavailable" page and cannot write.

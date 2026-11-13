@@ -1,14 +1,12 @@
-import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
-import { getTenantAccess } from "@/lib/tenant-access";
-import { hasTenantPermission } from "@/lib/tenant-permissions";
-import RoleAccessDenied from "../role-access-denied";
+import { requireTenantAccess } from "@/lib/access";
+import { failLoad } from "@/lib/access/load-failure";
+import { hasPermission } from "@/lib/permissions";
 import NewProductForm from "./new-product-form";
 import ProductEditor from "./product-editor";
 import ProductCategoryAssignment from "./product-category-assignment";
 import VariantManager, { type ManagedVariant } from "./variant-manager";
 import ProductImageManager from "./product-image-manager";
-import { DashboardEmptyState, DashboardNotice, DashboardPageHeader } from "@/components/dashboard-primitives";
+import { DashboardEmptyState, DashboardPageHeader } from "@/components/dashboard-primitives";
 
 type ProductRow = {
   id: string;
@@ -27,33 +25,21 @@ type ProductImageRow = { id: string; product_id: string; secure_url: string; alt
 
 export default async function ProductsPage({ params }: { params: Promise<{ tenantSlug: string }> }) {
   const { tenantSlug } = await params;
-  const access = await getTenantAccess(tenantSlug);
-  if (access.reason === "unauthenticated") {
-    redirect(`/login?next=${encodeURIComponent(`/dashboard/${tenantSlug}/products`)}`);
-  }
-  if (access.reason === "tenant_error") throw new Error("Could not verify this business workspace.");
-  if (access.reason === "membership_error") throw new Error("Could not verify your business access.");
-  if (!access.tenant || !access.membership || !access.user) notFound();
-  const { supabase, tenant, membership } = access;
-  if (!hasTenantPermission(membership.role, "productsWrite")) {
-    return <RoleAccessDenied tenantSlug={tenantSlug} role={membership.role} area="the product catalogue" />;
-  }
+  const access = await requireTenantAccess(tenantSlug, { permission: "products.update", area: "the product catalogue", path: "/products" });
+  if (access.denied) return access.denied;
+  const { supabase, tenant, role } = access;
 
   const { data: productsData, error: productsError } = await supabase
     .from("products")
     .select("id, title, slug, description, status, category_id, created_at")
     .eq("tenant_id", tenant.id)
     .order("created_at", { ascending: false });
-  if (productsError) {
-    return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><DashboardNotice tone="error">Could not load products. Confirm the Supabase migrations are applied.</DashboardNotice></main>;
-  }
+  if (productsError) failLoad("products #1", productsError);
 
   const products = (productsData ?? []) as ProductRow[];
   const { data: categoriesData, error: categoriesError } = await supabase.from("categories")
     .select("id, name, status").eq("tenant_id", tenant.id).eq("status", "published").order("name");
-  if (categoriesError) {
-    return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><DashboardNotice tone="error">Could not load categories. Confirm the category migration is applied.</DashboardNotice></main>;
-  }
+  if (categoriesError) failLoad("products #2", categoriesError);
   const categories = (categoriesData ?? []) as CategoryRow[];
   let variants: VariantRow[] = [];
   if (products.length) {
@@ -61,9 +47,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
       .select("id, product_id, title, sku, price_minor, currency, options, status")
       .eq("tenant_id", tenant.id)
       .in("product_id", products.map(product => product.id));
-    if (error) {
-      return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><DashboardNotice tone="error">Could not load product prices. Confirm the database migration.</DashboardNotice></main>;
-    }
+    if (error) failLoad("product prices", error);
     variants = (data ?? []) as VariantRow[];
   }
 
@@ -71,15 +55,13 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
     ? await supabase.from("product_images").select("id, product_id, secure_url, alt_text, position")
         .eq("tenant_id", tenant.id).in("product_id", products.map(product => product.id)).order("position")
     : { data: [], error: null };
-  if (imageError) {
-    return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><DashboardNotice tone="error">Could not load product images. Confirm the image migration is applied.</DashboardNotice></main>;
-  }
+  if (imageError) failLoad("products #3", imageError);
   const images = (imageData ?? []) as ProductImageRow[];
 
-  const canManage = hasTenantPermission(membership.role, "productsWrite");
+  const canManage = hasPermission(role, "products.update");
   return (
     <main className="dashboard-page">
-      <DashboardPageHeader eyebrow="Product catalogue" title={tenant.name} description="Manage your products and draft prices." aside={<span className="workspace-status">{membership.role.replaceAll("_", " ")}</span>} />
+      <DashboardPageHeader eyebrow="Product catalogue" title={tenant.name} description="Manage your products and draft prices." aside={<span className="workspace-status">{role.replaceAll("_", " ")}</span>} />
       <section className="workspace-list">
         {products.length === 0 ? <DashboardEmptyState title="No products yet" description="Add your first product. It will be saved as a draft and will not appear on a public storefront." /> : products.map(product => {
           const productVariants = variants.filter(item => item.product_id === product.id);

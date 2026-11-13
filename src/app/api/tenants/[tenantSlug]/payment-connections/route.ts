@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getTenantAccess } from "@/lib/tenant-access";
-import { hasTenantPermission } from "@/lib/tenant-permissions";
+import { getTenantAccess } from "@/lib/access/tenant-access";
+import { apiErrorForOutcome } from "@/lib/access/api";
 import { encryptPaymentCredentials } from "@/lib/payment-credentials";
 
 const PROVIDERS = ["daraja", "payhero"] as const;
@@ -8,23 +8,25 @@ const ENVIRONMENTS = ["sandbox", "production"] as const;
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ tenantSlug: string }> }) {
   const { tenantSlug } = await params;
-  const access = await getTenantAccess(tenantSlug);
-  if (!access.user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
-  if (!access.tenant || !access.membership) return NextResponse.json({ error: "Business not found." }, { status: 404 });
-  if (!hasTenantPermission(access.membership.role, "settingsManage")) return NextResponse.json({ error: "Not allowed." }, { status: 403 });
+  const access = await getTenantAccess(tenantSlug, "settings.payments.manage");
+  const failure = apiErrorForOutcome(access);
+  if (failure) return failure;
+  if (!access.workspace) return NextResponse.json({ error: "Business not found." }, { status: 404 });
+  const tenant = { id: access.workspace.tenant_id };
   const { data, error } = await access.supabase.from("tenant_payment_connections")
     .select("provider, environment, enabled, display_name, last_verified_at, updated_at")
-    .eq("tenant_id", access.tenant.id);
-  if (error) return NextResponse.json({ error: "Could not load payment connections. Apply the latest database migrations." }, { status: 500 });
+    .eq("tenant_id", tenant.id);
+  if (error) { console.error("[payments] load connections failed", { code: error.code, message: error.message }); return NextResponse.json({ error: "Could not load payment connections. Please try again." }, { status: 500 }); }
   return NextResponse.json({ connections: data ?? [] });
 }
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ tenantSlug: string }> }) {
   const { tenantSlug } = await params;
-  const access = await getTenantAccess(tenantSlug);
-  if (!access.user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
-  if (!access.tenant || !access.membership) return NextResponse.json({ error: "Business not found." }, { status: 404 });
-  if (!hasTenantPermission(access.membership.role, "settingsManage")) return NextResponse.json({ error: "Not allowed." }, { status: 403 });
+  const access = await getTenantAccess(tenantSlug, "settings.payments.manage");
+  const failure = apiErrorForOutcome(access);
+  if (failure) return failure;
+  if (!access.workspace) return NextResponse.json({ error: "Business not found." }, { status: 404 });
+  const tenant = { id: access.workspace.tenant_id };
 
   let body: unknown;
   try { body = await request.json(); } catch { return NextResponse.json({ error: "Invalid request body." }, { status: 400 }); }
@@ -48,7 +50,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const encrypted = await encryptPaymentCredentials(clean);
     const { error } = await access.supabase.from("tenant_payment_connections").upsert({
-      tenant_id: access.tenant.id,
+      tenant_id: tenant.id,
       provider,
       environment,
       enabled: false,
@@ -56,7 +58,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       ...encrypted,
       credential_version: 1,
     }, { onConflict: "tenant_id,provider" });
-    if (error) return NextResponse.json({ error: "Could not save provider credentials. Confirm the payment connection migration is applied." }, { status: 500 });
+    if (error) { console.error("[payments] save connection failed", { code: error.code, message: error.message }); return NextResponse.json({ error: "Could not save provider credentials. Please try again." }, { status: 500 }); }
     return NextResponse.json({ saved: true, enabled: false, message: "Credentials encrypted and saved. Payments remain disabled until a provider connection test and callback verification are implemented." });
   } catch {
     return NextResponse.json({ error: "Secure credential storage is unavailable. Configure PAYMENT_CREDENTIALS_ENCRYPTION_KEY before saving provider credentials." }, { status: 503 });

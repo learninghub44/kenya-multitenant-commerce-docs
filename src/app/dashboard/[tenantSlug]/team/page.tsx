@@ -1,22 +1,11 @@
-import { notFound, redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import RoleAccessDenied from "../role-access-denied";
+import { requireTenantAccess } from "@/lib/access";
 import TeamManager, { type TeamInvitation, type TeamMember } from "./team-manager";
 
 export default async function TeamPage({ params }: { params: Promise<{ tenantSlug: string }> }) {
   const { tenantSlug } = await params;
-  const supabase = await createSupabaseServerClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) redirect(`/login?next=${encodeURIComponent(`/dashboard/${tenantSlug}/team`)}`);
-
-  const { data: tenant, error: tenantError } = await supabase.from("tenants")
-    .select("id, name, slug, status").eq("slug", tenantSlug).maybeSingle();
-  if (tenantError || !tenant || tenant.status !== "active") notFound();
-
-  const { data: membership } = await supabase.from("tenant_memberships")
-    .select("role").eq("tenant_id", tenant.id).eq("user_id", user.id).eq("active", true).maybeSingle();
-  if (!membership) notFound();
-  if (membership.role !== "owner") return <RoleAccessDenied tenantSlug={tenantSlug} role={membership.role} area="team management" />;
+  const access = await requireTenantAccess(tenantSlug, { permission: "staff.manage", area: "team management", path: "/team" });
+  if (access.denied) return access.denied;
+  const { supabase, tenant } = access;
 
   const [membersResult, invitationsResult] = await Promise.all([
     supabase.rpc("list_tenant_team", { p_tenant_id: tenant.id }),

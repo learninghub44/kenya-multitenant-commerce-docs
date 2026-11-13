@@ -15,3 +15,9 @@ products.read/create/update/publish/archive; inventory.read/receive/adjust/trans
 
 ## Rules
 Users may belong to multiple tenants. Resolve active tenant context server-side and verify membership on every request. Tenant membership does not grant platform-admin access. Staff invitations must expire and be single-use. Do not allow removal of the last active owner. Payment credential changes require re-authentication or equivalent step-up checks. Refunds, stock adjustments, role changes, and payment-setting changes must be audited. Support access must never be a hidden RLS bypass.
+## Implemented application permission map (Phase 1)
+`src/lib/permissions.ts` is the single application-side map of role -> permission. The sidebar (`src/lib/navigation.ts`), dashboard pages, route handlers and client components all read from it; there are no inline role arrays. Current names: products.read/update, inventory.read/adjust, orders.read/update/read_totals, payments.record, reports.read, customers.manage, purchasing.manage, expenses.manage, erp.read, settings.store.manage, settings.payments.manage, staff.manage, audit.read.
+
+This map is presentation and early gating only. Postgres RLS and the SECURITY DEFINER RPCs remain the authority. `npm test` includes a parity check that every `has_tenant_role` role list in `supabase/migrations/` matches an application permission and vice versa, so drift fails CI. The parity check compares role sets, not which table or RPC uses them.
+
+Known difference from the suggested list above: `products.create/publish/archive` and `inventory.receive/transfer` are not split out yet; `products.update` and `inventory.adjust` cover them.

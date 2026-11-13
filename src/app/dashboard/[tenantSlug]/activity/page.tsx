@@ -1,20 +1,13 @@
-import { notFound, redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import RoleAccessDenied from "../role-access-denied";
+import { requireTenantAccess } from "@/lib/access";
 import styles from "../team/team.module.css";
 
 type AuditEvent = { event_id: number; actor_email: string | null; action: string; entity_type: string; entity_id: string | null; request_id: string | null; occurred_at: string };
 
 export default async function ActivityPage({ params }: { params: Promise<{ tenantSlug: string }> }) {
   const { tenantSlug } = await params;
-  const supabase = await createSupabaseServerClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) redirect(`/login?next=${encodeURIComponent(`/dashboard/${tenantSlug}/activity`)}`);
-  const { data: tenant, error: tenantError } = await supabase.from("tenants").select("id,name,status").eq("slug", tenantSlug).maybeSingle();
-  if (tenantError || !tenant || tenant.status !== "active") notFound();
-  const { data: membership } = await supabase.from("tenant_memberships").select("role").eq("tenant_id", tenant.id).eq("user_id", user.id).eq("active", true).maybeSingle();
-  if (!membership) notFound();
-  if (membership.role !== "owner") return <RoleAccessDenied tenantSlug={tenantSlug} role={membership.role} area="the activity log" />;
+  const access = await requireTenantAccess(tenantSlug, { permission: "audit.read", area: "the activity log", path: "/activity" });
+  if (access.denied) return access.denied;
+  const { supabase, tenant } = access;
   const { data, error } = await supabase.rpc("list_tenant_audit_events", { p_tenant_id: tenant.id, p_limit: 100 });
   const events = (data ?? []) as AuditEvent[];
   return <main className="dashboard-page">
