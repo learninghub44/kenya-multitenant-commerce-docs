@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { hasPermission } from "@/lib/permissions";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
@@ -43,9 +44,9 @@ export default function ErpManager({ tenantId, role, customers, suppliers, expen
   const [receiveQuantity, setReceiveQuantity] = useState("1");
   const [receiveReference, setReceiveReference] = useState("");
 
-  const canCustomers = ["owner","manager","order_operator"].includes(role);
-  const canSuppliers = ["owner","manager","stock_clerk"].includes(role);
-  const canRecordExpense = ["owner","manager"].includes(role);
+  const canCustomers = hasPermission(role, "customers.manage");
+  const canSuppliers = hasPermission(role, "purchasing.manage");
+  const canRecordExpense = hasPermission(role, "expenses.manage");
   const canPurchasing = canSuppliers;
   const variantLabel = (id: string) => {
     const variant = variants.find(v => v.id === id);

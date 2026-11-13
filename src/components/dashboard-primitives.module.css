@@ -1,8 +1,0 @@
-.headerAside{display:flex;align-items:center;gap:10px}
-.emptyState{display:flex;align-items:center;justify-content:space-between;gap:18px}
-.emptyAction{flex:0 0 auto}
-.notice{margin:16px 0;padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--muted);font-size:14px;line-height:1.6}
-.skeleton{display:block;width:100%;min-height:76px;border-radius:10px;background:var(--border);animation:pulse 1.35s ease-in-out infinite alternate}
-@keyframes pulse{from{opacity:.55}to{opacity:1}}
-@media(max-width:560px){.emptyState{align-items:stretch;flex-direction:column}.emptyAction{width:100%}}
-@media(prefers-reduced-motion:reduce){.skeleton{animation:none}}

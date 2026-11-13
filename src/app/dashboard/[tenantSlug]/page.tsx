@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
-import { getTenantAccess } from "@/lib/tenant-access";
-import { hasTenantPermission } from "@/lib/tenant-permissions";
+import { requireTenantAccess } from "@/lib/access";
+import { hasPermission } from "@/lib/permissions";
 import { storeUrl } from "@/lib/store-url";
 
 type RecentOrder = {
@@ -39,20 +38,13 @@ export default async function BusinessOverviewPage({
   params: Promise<{ tenantSlug: string }>;
 }) {
   const { tenantSlug } = await params;
-  const access = await getTenantAccess(tenantSlug);
-
-  if (access.reason === "unauthenticated") {
-    redirect(`/login?next=${encodeURIComponent(`/dashboard/${tenantSlug}`)}`);
-  }
-  if (access.reason === "tenant_error") throw new Error("Could not load this business workspace.");
-  if (access.reason === "membership_error") throw new Error("Could not verify your business access.");
-  if (!access.tenant || !access.membership || !access.user) notFound();
-
-  const { supabase, tenant, membership } = access;
-  const canViewOrders = hasTenantPermission(membership.role, "ordersRead");
-  const canViewInventory = hasTenantPermission(membership.role, "inventoryRead");
-  const canViewReports = hasTenantPermission(membership.role, "reportsRead");
-  const canAddProducts = hasTenantPermission(membership.role, "productsWrite");
+  const access = await requireTenantAccess(tenantSlug, { path: "" });
+  if (access.denied) return access.denied;
+  const { supabase, tenant, role } = access;
+  const canViewOrders = hasPermission(role, "orders.read");
+  const canViewInventory = hasPermission(role, "inventory.read");
+  const canViewReports = hasPermission(role, "reports.read");
+  const canAddProducts = hasPermission(role, "products.update");
   const [productsResult, publishedResult, openOrdersResult, fulfilledResult, recentOrdersResult] =
     await Promise.all([
       supabase.from("products")

@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { storeUrl } from "@/lib/store-url";
+import { navItemsForRole, type NavItem } from "@/lib/navigation";
+import { hasPermission } from "@/lib/permissions";
 import Logo from "@/components/logo";
 import styles from "./tenant-shell.module.css";
 
@@ -15,21 +17,6 @@ type TenantShellProps = {
   email: string | null;
   children: ReactNode;
 };
-
-const navItems = [
-  { label: "Overview", path: "", group: "Workspace", roles: ["owner", "manager", "catalog_editor", "stock_clerk", "order_operator", "finance_viewer"] },
-  { label: "Orders", path: "/orders", group: "Sales", roles: ["owner", "manager", "order_operator"] },
-  { label: "Products", path: "/products", group: "Sales", roles: ["owner", "manager", "catalog_editor"] },
-  { label: "Categories", path: "/categories", group: "Sales", roles: ["owner", "manager", "catalog_editor"] },
-  { label: "Inventory", path: "/inventory", group: "Operations", roles: ["owner", "manager", "stock_clerk"] },
-  { label: "Business records", path: "/erp", group: "Operations", roles: ["owner", "manager"] },
-  { label: "Reports", path: "/reports", group: "Operations", roles: ["owner", "manager", "finance_viewer"] },
-  { label: "Settings", path: "/settings", group: "Manage", roles: ["owner", "manager"] },
-  { label: "Payments & integrations", path: "/payments", group: "Manage", roles: ["owner", "manager"] },
-  { label: "Team", path: "/team", group: "Manage", roles: ["owner"] },
-  { label: "Activity", path: "/activity", group: "Manage", roles: ["owner"] },
-  { label: "Support", path: "/support", group: "Help", roles: ["owner", "manager", "catalog_editor", "stock_clerk", "order_operator", "finance_viewer"] },
-];
 
 function roleLabel(role: string) {
   return role.replaceAll("_", " ");
@@ -45,11 +32,11 @@ export default function TenantShell({
   const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const basePath = `/dashboard/${tenantSlug}`;
-  const visibleItems = navItems.filter((item) => item.roles.includes(role));
+  const visibleItems = navItemsForRole(role);
   const drawerIsOpen = mobileNavOpen;
   const activeItem = visibleItems.find((item) => item.path ? pathname === `${basePath}${item.path}` || pathname.startsWith(`${basePath}${item.path}/`) : pathname === basePath);
   const quickNavOrder = ["", "/orders", "/products", "/inventory", "/reports"];
-  const mobileItems = quickNavOrder.map((path) => visibleItems.find((item) => item.path === path)).filter((item): item is (typeof navItems)[number] => Boolean(item)).slice(0, 4);
+  const mobileItems = quickNavOrder.map((path) => visibleItems.find((item) => item.path === path)).filter((item): item is NavItem => Boolean(item)).slice(0, 4);
 
   useEffect(() => {
     setMobileNavOpen(false);
@@ -180,7 +167,7 @@ export default function TenantShell({
             <strong>{tenantName}</strong>
           </div>
           <div className="tenant-account">
-            {["owner", "manager", "catalog_editor"].includes(role) && (
+            {hasPermission(role, "products.update") && (
               <Link className="tenant-topbar-action" href={`${basePath}/products#add-product`}>+ Add product</Link>
             )}
             {email && <span className="tenant-account-email">{email}</span>}

@@ -1,13 +1,12 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/access";
 import { storeDisplayAddress } from "@/lib/store-url";
 import Logo from "@/components/logo";
 
 export default async function DashboardPage() {
+  const user = await requireUser("/dashboard");
   const supabase = await createSupabaseServerClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) redirect("/login?next=/dashboard");
 
   const { data: memberships, error } = await supabase
     .from("tenant_memberships")
@@ -20,7 +19,7 @@ export default async function DashboardPage() {
       <main className="dashboard-page workspaces-page">
         <p className="eyebrow">Your workspaces</p>
         <h1>Your businesses</h1>
-        <p className="dashboard-alert" role="alert">Could not load your workspaces. Refresh the page, and check Supabase access if the issue continues.</p>
+        <p className="dashboard-alert" role="alert">Could not load your workspaces. Refresh the page, and contact support if the issue continues.</p>
         <Link className="primary-button inline-button" href="/onboarding">Try workspace setup</Link>
       </main>
     );

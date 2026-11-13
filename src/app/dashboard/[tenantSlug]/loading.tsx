@@ -1,4 +1,4 @@
-import styles from "@/components/dashboard-primitives.module.css";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function TenantDashboardLoading() {
   return (
@@ -6,9 +6,9 @@ export default function TenantDashboardLoading() {
       <p className="eyebrow">Business workspace</p>
       <h1>Loading your workspace</h1>
       <p className="auth-description">Getting the latest information for this business.</p>
-      <div className="workspace-list" aria-hidden="true">
-        <div className="workspace-card"><span className={styles.skeleton} /></div>
-        <div className="workspace-card"><span className="loading-skeleton" /></div>
+      <div className="workspace-list">
+        <div className="workspace-card"><Skeleton /></div>
+        <div className="workspace-card"><Skeleton /></div>
       </div>
     </main>
   );

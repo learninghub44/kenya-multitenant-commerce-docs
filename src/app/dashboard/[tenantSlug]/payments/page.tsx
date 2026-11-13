@@ -1,21 +1,10 @@
-import { notFound, redirect } from "next/navigation";
-import { getTenantAccess } from "@/lib/tenant-access";
-import { hasTenantPermission } from "@/lib/tenant-permissions";
-import RoleAccessDenied from "../role-access-denied";
+import { requireTenantAccess } from "@/lib/access";
 import PaymentConnections from "./payment-connections";
 
 export default async function PaymentsPage({ params }: { params: Promise<{ tenantSlug: string }> }) {
   const { tenantSlug } = await params;
-  const access = await getTenantAccess(tenantSlug);
-  if (access.reason === "unauthenticated") {
-    redirect(`/login?next=${encodeURIComponent(`/dashboard/${tenantSlug}/payments`)}`);
-  }
-  if (access.reason === "tenant_error") throw new Error("Could not verify this business workspace.");
-  if (access.reason === "membership_error") throw new Error("Could not verify your business access.");
-  if (!access.tenant || !access.membership || !access.user) notFound();
-  if (!hasTenantPermission(access.membership.role, "settingsManage")) {
-    return <RoleAccessDenied tenantSlug={tenantSlug} role={access.membership.role} area="payment integrations" />;
-  }
+  const access = await requireTenantAccess(tenantSlug, { permission: "settings.payments.manage", area: "payment integrations", path: "/payments" });
+  if (access.denied) return access.denied;
 
   return (
     <main className="dashboard-page">

@@ -32,7 +32,7 @@ The project owner reports that the app is deployed and Supabase is connected. Th
 ## Not complete / blockers
 
 - Daraja and PayHero online payments, provider authentication and callbacks, duplicate callback handling, settlement reconciliation, and refunds are not implemented. The storefront does not collect online payment.
-- Full order notification/outbox delivery, automated scheduled reservation cleanup, tenant staff invitations/role administration, platform super-admin, custom-domain verification, branding, bulk imports/exports, and comprehensive reporting/accounting are not implemented.
+- Full order notification/outbox delivery, automated scheduled reservation cleanup, custom-domain verification, branding, bulk imports/exports, and comprehensive reporting/accounting are not implemented.
 - Purchasing UI currently supports one line per purchase order; customer/supplier editing, purchase returns, and supplier invoice reconciliation are not implemented.
 - No complete automated test suite for Postgres RLS, tenant isolation, stock concurrency, checkout idempotency, or payment replay is in place.
 - The live Supabase schema was not inspected during these frontend changes; review migration status before making any future production schema change.
@@ -51,3 +51,13 @@ The project owner reports that the app is deployed and Supabase is connected. Th
 - Migration `202610160021_order_idempotency_and_stock_consistency.sql` blocks repeated terminal order transitions and makes reservation-release operations fail closed when the reserved quantity does not reconcile.
 - Deployment split, environment secrets, cache policy, CI hardening and remaining blockers are documented in `docs/27-caching-idempotency-cicd-deployment.md`.
 - The project owner reports an existing deployment and connected Supabase, but the live target and settings were not verified in this checkout. No production data or migrations were changed here; the separate platform-admin app has not been implemented.
+
+## Phase 1 foundations (central access layer)
+
+- `src/lib/access/`: `requireUser()` and `requireTenantAccess(slug, { permission, area, path })` (server-only, `React.cache`d). Signed out -> `/login?next=`; unknown slug or non-member -> `notFound()`; suspended/closed tenant -> a dedicated "workspace unavailable" page; missing permission -> the shared access-denied page. Lookup failures are logged server-side and surface as a generic error with a request ID.
+- Migration `202611130001_workspace_access_rpc.sql` adds `get_workspace_access(p_slug)`. RLS only exposes active tenants to members, so without it a suspended workspace could not be told apart from a missing one. It derives `auth.uid()` in Postgres and returns only the caller's own active membership. **Apply it before deploying this code**, or dashboard pages will error.
+- Single permission map (`src/lib/permissions.ts`) and nav config (`src/lib/navigation.ts`); see docs/02.
+- UI primitives in `src/components/ui/`: Button, ButtonLink, Card, Badge, Alert, PageHeader (breadcrumbs), EmptyState, Skeleton, DataTable (client-side search and pagination over already-authorised rows), ErrorState. Existing `dashboard-primitives` wrap them. The new primitives are not yet adopted across every page.
+- Data-load failures use `failLoad()`; users no longer see "confirm migrations" text.
+- Tests: `npm test` (Node test runner, no new dependency) covers the permission map, nav/permission agreement, access outcomes and SQL role parity. SQL test `supabase/tests/workspace_access.test.sql` is structural only.
+- Known gaps: the activity log is owner-only in both app and RPC (the audit_events RLS policy also admits finance); the payments page still shows operator setup notes to merchants; no behavioural SQL test for `get_workspace_access` yet.

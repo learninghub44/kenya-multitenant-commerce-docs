@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
-import { getTenantAccess } from "@/lib/tenant-access";
-import { hasTenantPermission } from "@/lib/tenant-permissions";
+import { requireTenantAccess } from "@/lib/access";
+import { failLoad } from "@/lib/access/load-failure";
+import { hasPermission } from "@/lib/permissions";
 import StockMovementForm from "./stock-movement-form";
-import RoleAccessDenied from "../role-access-denied";
 
 type ProductRow = { id: string; title: string };
 type VariantRow = { id: string; product_id: string; sku: string | null; title: string; price_minor: number; currency: string };
@@ -11,17 +10,9 @@ type BalanceRow = { variant_id: string; location_id: string; on_hand: number; re
 
 export default async function InventoryPage({ params }: { params: Promise<{ tenantSlug: string }> }) {
   const { tenantSlug } = await params;
-  const access = await getTenantAccess(tenantSlug);
-  if (access.reason === "unauthenticated") {
-    redirect(`/login?next=${encodeURIComponent(`/dashboard/${tenantSlug}/inventory`)}`);
-  }
-  if (access.reason === "tenant_error") throw new Error("Could not verify this business workspace.");
-  if (access.reason === "membership_error") throw new Error("Could not verify your business access.");
-  if (!access.tenant || !access.membership || !access.user) notFound();
-  const { supabase, tenant, membership } = access;
-  if (!hasTenantPermission(membership.role, "inventoryWrite")) {
-    return <RoleAccessDenied tenantSlug={tenantSlug} role={membership.role} area="inventory" />;
-  }
+  const access = await requireTenantAccess(tenantSlug, { permission: "inventory.adjust", area: "inventory", path: "/inventory" });
+  if (access.denied) return access.denied;
+  const { supabase, tenant, role } = access;
 
   const [{ data: locations, error: locationsError }, { data: productData, error: productError }, { data: variantData, error: variantError }] = await Promise.all([
     supabase.from("inventory_locations").select("id, name, code, active").eq("tenant_id", tenant.id).eq("active", true).order("name"),
@@ -29,9 +20,7 @@ export default async function InventoryPage({ params }: { params: Promise<{ tena
     supabase.from("product_variants").select("id, product_id, sku, title, price_minor, currency").eq("tenant_id", tenant.id).order("created_at", { ascending: false })
   ]);
 
-  if (locationsError || productError || variantError) {
-    return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><p role="alert">Could not load inventory. Confirm that all Supabase migrations have been applied.</p></main>;
-  }
+  if (locationsError || productError || variantError) failLoad("inventory #1", locationsError ?? productError ?? variantError);
 
   const products = (productData ?? []) as ProductRow[];
   const variants = (variantData ?? []) as VariantRow[];
@@ -40,9 +29,7 @@ export default async function InventoryPage({ params }: { params: Promise<{ tena
     ? await supabase.from("inventory_balances").select("variant_id, location_id, on_hand, reserved")
         .eq("tenant_id", tenant.id).eq("location_id", activeLocation.id)
     : { data: [], error: null };
-  if (balanceError) {
-    return <main className="dashboard-page"><Link href="/dashboard">← Your businesses</Link><p role="alert">Could not load stock balances.</p></main>;
-  }
+  if (balanceError) failLoad("inventory #2", balanceError);
 
   const balances = (balanceData ?? []) as BalanceRow[];
   const productById = new Map(products.map(product => [product.id, product]));
@@ -55,14 +42,14 @@ export default async function InventoryPage({ params }: { params: Promise<{ tena
       onHand: balance?.on_hand ?? 0
     };
   });
-  const canManage = hasTenantPermission(membership.role, "inventoryWrite");
-  const canManageProducts = hasTenantPermission(membership.role, "productsWrite");
+  const canManage = hasPermission(role, "inventory.adjust");
+  const canManageProducts = hasPermission(role, "products.update");
 
   return (
     <main className="dashboard-page">
-      <header className="dashboard-header"><div><p className="eyebrow">Inventory</p><h1>{tenant.name}</h1><p className="auth-description">Stock balances and recorded movements for {activeLocation?.name ?? "your locations"}.</p></div><span className="workspace-status">{membership.role.replaceAll("_", " ")}</span></header>
+      <header className="dashboard-header"><div><p className="eyebrow">Inventory</p><h1>{tenant.name}</h1><p className="auth-description">Stock balances and recorded movements for {activeLocation?.name ?? "your locations"}.</p></div><span className="workspace-status">{role.replaceAll("_", " ")}</span></header>
       <section className="workspace-list">
-        {!activeLocation && <div className="empty-state"><h2>No active stock location</h2><p>Apply the latest migration to create the default Main store location.</p></div>}
+        {!activeLocation && <div className="empty-state"><h2>No active stock location</h2><p>Your Main store location has not been set up yet. Contact support if this does not resolve.</p></div>}
         {variants.length === 0 ? <div className="empty-state"><h2>No product variants yet</h2><p>Create a product first. Every product starts with a default variant.</p>{canManageProducts ? <Link className="workspace-action" href={`/dashboard/${tenant.slug}/products`}>Open products →</Link> : <p className="field-help">Ask a workspace owner, manager or catalog editor to add the first product.</p>}</div> : variants.map(variant => {
           const product = productById.get(variant.product_id);
           const balance = balances.find(item => item.variant_id === variant.id);

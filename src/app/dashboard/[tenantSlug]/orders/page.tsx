@@ -1,10 +1,8 @@
-import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
-import { getTenantAccess } from "@/lib/tenant-access";
-import { hasTenantPermission } from "@/lib/tenant-permissions";
+import { requireTenantAccess } from "@/lib/access";
+import { failLoad } from "@/lib/access/load-failure";
+import { hasPermission } from "@/lib/permissions";
 import OrderActions from "./order-actions";
-import RoleAccessDenied from "../role-access-denied";
-import { DashboardEmptyState, DashboardNotice, DashboardPageHeader } from "@/components/dashboard-primitives";
+import { DashboardEmptyState, DashboardPageHeader } from "@/components/dashboard-primitives";
 
 type OrderRow = {
   id: string; order_number: string; status: string; payment_status: string;
@@ -20,35 +18,23 @@ type ItemRow = {
 
 export default async function OrdersPage({ params }: { params: Promise<{ tenantSlug: string }> }) {
   const { tenantSlug } = await params;
-  const access = await getTenantAccess(tenantSlug);
-  if (access.reason === "unauthenticated") {
-    redirect(`/login?next=${encodeURIComponent(`/dashboard/${tenantSlug}/orders`)}`);
-  }
-  if (access.reason === "tenant_error") throw new Error("Could not verify this business workspace.");
-  if (access.reason === "membership_error") throw new Error("Could not verify your business access.");
-  if (!access.tenant || !access.membership || !access.user) notFound();
-  const { supabase, tenant, membership } = access;
-  if (!hasTenantPermission(membership.role, "ordersWrite")) {
-    return <RoleAccessDenied tenantSlug={tenantSlug} role={membership.role} area="orders" />;
-  }
+  const access = await requireTenantAccess(tenantSlug, { permission: "orders.update", area: "orders", path: "/orders" });
+  if (access.denied) return access.denied;
+  const { supabase, tenant, role } = access;
 
   const { data: orderData, error: orderError } = await supabase.from("orders")
     .select("id,order_number,status,payment_status,total_minor,currency,customer_name_snapshot,customer_phone_snapshot,delivery_address_snapshot,created_at,notes")
     .eq("tenant_id", tenant.id).order("created_at", { ascending: false }).limit(100);
-  if (orderError) {
-    return <main className="dashboard-page"><Link href={`/dashboard/${tenant.slug}/products`}>← Products</Link><DashboardNotice tone="error">Could not load orders. Confirm the order migrations are applied.</DashboardNotice></main>;
-  }
+  if (orderError) failLoad("orders #1", orderError);
   const orders = (orderData ?? []) as OrderRow[];
   const { data: itemData, error: itemError } = orders.length
     ? await supabase.from("order_items").select("id,order_id,product_title_snapshot,variant_title_snapshot,sku_snapshot,quantity,unit_price_minor,line_total_minor")
       .eq("tenant_id",tenant.id).in("order_id",orders.map(order => order.id))
     : { data: [], error: null };
-  if (itemError) {
-    return <main className="dashboard-page"><Link href={`/dashboard/${tenant.slug}/products`}>← Products</Link><DashboardNotice tone="error">Could not load order items.</DashboardNotice></main>;
-  }
+  if (itemError) failLoad("orders #2", itemError);
   const items = (itemData ?? []) as ItemRow[];
-  const canRecordPayment = hasTenantPermission(membership.role, "paymentsRecord");
-  const canManageOrders = hasTenantPermission(membership.role, "ordersWrite");
+  const canRecordPayment = hasPermission(role, "payments.record");
+  const canManageOrders = hasPermission(role, "orders.update");
 
   return <main className="dashboard-page">
     <DashboardPageHeader eyebrow="Sales & fulfilment" title="Orders" description={`Orders for ${tenant.name}. Online payment integration is not enabled; staff can record a payment only after independently verifying receipt.`} aside={<span className="workspace-status">{orders.length} recent orders</span>} />

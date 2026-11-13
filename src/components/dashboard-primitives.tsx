@@ -1,32 +1,19 @@
+// Backwards-compatible wrappers. New code should import from "@/components/ui".
 import type { ReactNode } from "react";
-import styles from "./dashboard-primitives.module.css";
+import { Alert } from "@/components/ui/alert";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
 
-export function DashboardPageHeader({ eyebrow, title, description, aside }: {
-  eyebrow: string;
-  title: string;
-  description: string;
-  aside?: ReactNode;
-}) {
-  return <header className="dashboard-header">
-    <div><p className="eyebrow">{eyebrow}</p><h1>{title}</h1><p className="auth-description">{description}</p></div>
-    {aside ? <div className={styles.headerAside}>{aside}</div> : null}
-  </header>;
+export function DashboardPageHeader(props: { eyebrow: string; title: string; description: string; aside?: ReactNode }) {
+  return <PageHeader {...props} />;
 }
 
-export function DashboardEmptyState({ title, description, children }: {
-  title: string;
-  description: string;
-  children?: ReactNode;
-}) {
-  return <div className={`empty-state ${styles.emptyState}`}>
-    <div><h2>{title}</h2><p>{description}</p></div>
-    {children ? <div className={styles.emptyAction}>{children}</div> : null}
-  </div>;
+export function DashboardEmptyState(props: { title: string; description: string; children?: ReactNode }) {
+  return <EmptyState {...props} />;
 }
 
-export function DashboardNotice({ children, tone = "info" }: {
-  children: ReactNode;
-  tone?: "info" | "error";
-}) {
-  return <p className={tone === "error" ? "dashboard-alert" : styles.notice} role={tone === "error" ? "alert" : "status"}>{children}</p>;
+export function DashboardNotice({ children, tone = "info" }: { children: ReactNode; tone?: "info" | "error" }) {
+  return tone === "error"
+    ? <p className="dashboard-alert" role="alert">{children}</p>
+    : <Alert>{children}</Alert>;
 }

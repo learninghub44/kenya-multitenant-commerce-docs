@@ -1,0 +1,48 @@
+/* Shared UI primitives. Uses the global design tokens from globals.css. */
+.button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font:inherit;font-size:14px;font-weight:700;line-height:1.2;text-decoration:none;cursor:pointer}
+.button:hover{border-color:var(--accent)}
+.button[disabled],.button[aria-disabled="true"]{opacity:.6;cursor:not-allowed}
+.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.primary:hover{background:var(--accent-strong);border-color:var(--accent-strong)}
+.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.ghost{background:transparent}
+.small{min-height:36px;padding:6px 12px;font-size:13px}
+
+.card{padding:22px;border:1px solid var(--border);border-radius:14px;background:var(--surface)}
+.card h2{margin:0 0 8px}
+.card p{color:var(--muted);font-size:14px;line-height:1.6}
+
+.badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:12px;font-weight:700;line-height:1.6;white-space:nowrap}
+.success{background:var(--accent-soft);border-color:#b9e3c7;color:var(--accent-strong)}
+.warning{background:#fff6dc;border-color:#f0d58a;color:#6b4e00}
+.error{background:#fdf1ef;border-color:#e8bcb5;color:#8c2921}
+
+.alert{margin:16px 0;padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--muted);font-size:14px;line-height:1.6;overflow-wrap:anywhere}
+.alert.success{color:var(--text)}
+.alert.error{color:#8c2921}
+.alert.warning{color:#6b4e00}
+
+.headerAside{display:flex;align-items:center;gap:10px}
+.breadcrumbs{margin:0 0 8px;font-size:13px;color:var(--muted)}
+.breadcrumbs ol{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+.breadcrumbs li+li::before{content:"/";margin-right:6px;color:var(--border)}
+.breadcrumbs a{color:inherit}
+
+.emptyState{display:flex;align-items:center;justify-content:space-between;gap:18px}
+.emptyAction{flex:0 0 auto}
+
+.skeleton{display:block;width:100%;min-height:76px;border-radius:10px;background:var(--border);animation:pulse 1.35s ease-in-out infinite alternate}
+@keyframes pulse{from{opacity:.55}to{opacity:1}}
+
+.tableTools{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.search{flex:1 1 220px;max-width:360px;min-height:44px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font:inherit;font-size:14px;background:var(--surface);color:var(--text)}
+.tableWrap{overflow-x:auto;border:1px solid var(--border);border-radius:14px;background:var(--surface)}
+.table{width:100%;border-collapse:collapse;font-size:14px}
+.table th,.table td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+.table th{color:var(--muted);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.table tr:last-child td{border-bottom:0}
+.pager{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;font-size:13px;color:var(--muted)}
+.pagerButtons{display:flex;gap:8px}
+
+@media(max-width:560px){.emptyState{align-items:stretch;flex-direction:column}.emptyAction{width:100%}}
+@media(prefers-reduced-motion:reduce){.skeleton{animation:none}}
