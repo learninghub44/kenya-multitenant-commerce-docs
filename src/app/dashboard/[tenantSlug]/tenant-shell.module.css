@@ -35,3 +35,7 @@
  .active .mobileNavIcon{background:#dcefe2}
  .mobileNavMark{display:none}
 }
+
+/* Menu tab in the bottom bar is a <button>: reset native chrome so it matches the links. */
+button.mobileNavMenu{border:0;background:transparent;font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button.mobileNavMenu.active{background:var(--accent-soft)}

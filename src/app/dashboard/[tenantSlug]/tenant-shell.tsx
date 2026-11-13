@@ -2,12 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { storeUrl } from "@/lib/store-url";
 import { navItemsForRole, type NavItem } from "@/lib/navigation";
 import { hasPermission } from "@/lib/permissions";
 import Logo from "@/components/logo";
+import NavIcon from "@/components/nav-icons";
+import AccountMenu from "./account-menu";
+import MobileMenu from "./mobile-menu";
+import chrome from "./mobile-chrome.module.css";
 import styles from "./tenant-shell.module.css";
 
 type TenantShellProps = {
@@ -30,87 +34,37 @@ export default function TenantShell({
   children,
 }: TenantShellProps) {
   const pathname = usePathname();
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const basePath = `/dashboard/${tenantSlug}`;
+  // Single source of truth for what this role may open: the desktop sidebar,
+  // the phone menu sheet and the bottom bar all derive from this list.
   const visibleItems = navItemsForRole(role);
-  const drawerIsOpen = mobileNavOpen;
   const activeItem = visibleItems.find((item) => item.path ? pathname === `${basePath}${item.path}` || pathname.startsWith(`${basePath}${item.path}/`) : pathname === basePath);
   const quickNavOrder = ["", "/orders", "/products", "/inventory", "/reports"];
   const mobileItems = quickNavOrder.map((path) => visibleItems.find((item) => item.path === path)).filter((item): item is NavItem => Boolean(item)).slice(0, 4);
+  const settingsItem = visibleItems.find((item) => item.path === "/settings");
+  const canAddProduct = hasPermission(role, "products.update");
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
 
   useEffect(() => {
-    setMobileNavOpen(false);
+    setMenuOpen(false);
   }, [pathname]);
 
+  // The sheet is a phone-only surface; close it if the viewport grows past the breakpoint.
   useEffect(() => {
-    if (!drawerIsOpen) return;
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") setMobileNavOpen(false);
+    const query = window.matchMedia("(min-width: 761px)");
+    function onChange(event: MediaQueryListEvent) {
+      if (event.matches) setMenuOpen(false);
     }
+    query.addEventListener("change", onChange);
+    return () => query.removeEventListener("change", onChange);
+  }, []);
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [drawerIsOpen]);
-
-  function closeMobileNavigation() {
-    setMobileNavOpen(false);
-  }
-
-  function renderNavigation(className: string, onNavigate?: () => void) {
-    return (
-      <nav className={`${className} ${styles.navigation}`} aria-label="Business workspace">
-        {Array.from(new Set(visibleItems.map((item) => item.group))).map((group) => (
-          <div className={styles.navigationGroup} key={group}>
-            <span className={styles.navigationLabel}>{group}</span>
-            {visibleItems.filter((item) => item.group === group).map((item) => {
-          const href = `${basePath}${item.path}`;
-          const active = item.path
-            ? pathname === href || pathname.startsWith(`${href}/`)
-            : pathname === basePath;
-
-          return (
-            <Link
-              className={`tenant-nav-link${active ? " is-active" : ""}`}
-              href={href}
-              aria-current={active ? "page" : undefined}
-              onClick={onNavigate}
-              key={item.path || "overview"}
-            >
-              <span className="tenant-nav-mark" aria-hidden="true" />
-              {item.label}
-            </Link>
-          );
-            })}
-          </div>
-        ))}
-      </nav>
-    );
-  }
-
-  function renderSidebar(onNavigate?: () => void, drawer = false) {
-    return (
-      <aside className={drawer ? `tenant-sidebar tenant-sidebar-drawer ${styles.sidebar}` : `tenant-sidebar ${styles.sidebar}`}>
+  return (
+    <div className="tenant-app">
+      <aside className={`tenant-sidebar ${styles.sidebar}`}>
         <div className="tenant-sidebar-heading">
-          <Logo href="/dashboard" size={drawer ? 34 : 40} className="tenant-logo" />
-          {drawer && (
-            <button
-              className="tenant-drawer-close"
-              type="button"
-              aria-label="Close navigation"
-              onClick={closeMobileNavigation}
-            >
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
-                <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-              </svg>
-            </button>
-          )}
+          <Logo href="/dashboard" size={40} className="tenant-logo" />
         </div>
 
         <div className="tenant-side-context">
@@ -119,55 +73,75 @@ export default function TenantShell({
           <span className="tenant-role">{roleLabel(role)}</span>
         </div>
 
-        {renderNavigation("tenant-navigation", onNavigate)}
+        <nav className={`tenant-navigation ${styles.navigation}`} aria-label="Business workspace">
+          {Array.from(new Set(visibleItems.map((item) => item.group))).map((group) => (
+            <div className={styles.navigationGroup} key={group}>
+              <span className={styles.navigationLabel}>{group}</span>
+              {visibleItems.filter((item) => item.group === group).map((item) => {
+                const href = `${basePath}${item.path}`;
+                const active = item.path
+                  ? pathname === href || pathname.startsWith(`${href}/`)
+                  : pathname === basePath;
+
+                return (
+                  <Link
+                    className={`tenant-nav-link${active ? " is-active" : ""}`}
+                    href={href}
+                    aria-current={active ? "page" : undefined}
+                    key={item.path || "overview"}
+                  >
+                    <span className="tenant-nav-mark" aria-hidden="true" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
+        </nav>
 
         <div className="tenant-sidebar-footer">
-          <a href={storeUrl(tenantSlug)} target="_blank" rel="noreferrer" onClick={onNavigate}>
+          <a href={storeUrl(tenantSlug)} target="_blank" rel="noreferrer">
             View storefront <span aria-hidden="true">↗</span>
           </a>
-          <Link href="/dashboard" onClick={onNavigate}>Switch business</Link>
+          <Link href="/dashboard">Switch business</Link>
         </div>
       </aside>
-    );
-  }
-
-  return (
-    <div className="tenant-app">
-      {renderSidebar()}
 
       <div className="tenant-stage">
         <header className="tenant-topbar">
-          <button
-            className="tenant-mobile-menu-button"
-            type="button"
-            aria-label={drawerIsOpen ? "Close navigation" : "Open navigation"}
-            aria-expanded={drawerIsOpen}
-            aria-controls="tenant-mobile-drawer"
-            onClick={() => {
-              if (drawerIsOpen) {
-                closeMobileNavigation();
-              } else {
-                setMobileNavOpen(true);
-              }
-            }}
-          >
-            {drawerIsOpen ? (
-              <svg viewBox="0 0 24 24" width="23" height="23" fill="none" aria-hidden="true">
-                <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-              </svg>
-            ) : (
-              <svg viewBox="0 0 24 24" width="23" height="23" fill="none" aria-hidden="true">
-                <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-              </svg>
+          {/* Phone: logo mark, workspace pill, quick add, account dropdown. */}
+          <span className={chrome.topbarMark}>
+            <Logo href="/dashboard" size={36} markOnly />
+          </span>
+          <div className={chrome.workspacePill}>
+            <span className={chrome.pillAvatar} aria-hidden="true">{(tenantName.trim().charAt(0) || "?").toUpperCase()}</span>
+            <div className={chrome.pillText}>
+              <small>{activeItem?.label ?? "Business workspace"}</small>
+              <strong>{tenantName}</strong>
+            </div>
+          </div>
+          <div className={chrome.mobileActions}>
+            {canAddProduct && (
+              <Link className={chrome.addButton} href={`${basePath}/products#add-product`} aria-label="Add product">
+                <NavIcon name="plus" size={20} />
+              </Link>
             )}
-          </button>
-          <Logo href="/dashboard" size={36} markOnly className="tenant-topbar-logo" />
-          <div className="tenant-topbar-context">
+            <AccountMenu
+              email={email}
+              tenantSlug={tenantSlug}
+              tenantName={tenantName}
+              role={role}
+              settingsHref={settingsItem ? `${basePath}${settingsItem.path}` : null}
+            />
+          </div>
+
+          {/* Desktop: page context and account actions. */}
+          <div className={`tenant-topbar-context ${chrome.desktopOnly}`}>
             <span>{activeItem?.label ?? "Business workspace"}</span>
             <strong>{tenantName}</strong>
           </div>
-          <div className="tenant-account">
-            {hasPermission(role, "products.update") && (
+          <div className={`tenant-account ${chrome.desktopOnly}`}>
+            {canAddProduct && (
               <Link className="tenant-topbar-action" href={`${basePath}/products#add-product`}>+ Add product</Link>
             )}
             {email && <span className="tenant-account-email">{email}</span>}
@@ -177,18 +151,14 @@ export default function TenantShell({
           </div>
         </header>
 
-        {drawerIsOpen && (
-          <div className="tenant-mobile-drawer-layer">
-            <button
-              className="tenant-mobile-backdrop"
-              type="button"
-              aria-label="Close navigation"
-              onClick={closeMobileNavigation}
-            />
-            <div id="tenant-mobile-drawer" className="tenant-mobile-drawer" role="dialog" aria-modal="true" aria-label="Business navigation">
-              {renderSidebar(closeMobileNavigation, true)}
-            </div>
-          </div>
+        {menuOpen && (
+          <MobileMenu
+            items={visibleItems}
+            basePath={basePath}
+            pathname={pathname}
+            tenantSlug={tenantSlug}
+            onClose={closeMenu}
+          />
         )}
 
         <a className={styles.skipLink} href="#tenant-main">Skip to main content</a>
@@ -198,11 +168,24 @@ export default function TenantShell({
           {mobileItems.map((item) => {
             const href = `${basePath}${item.path}`;
             const active = item.path ? pathname === href || pathname.startsWith(`${href}/`) : pathname === basePath;
-            return <Link key={item.path || "overview"} className={`${styles.mobileNavLink} ${active ? styles.active : ""}`} href={href} aria-current={active ? "page" : undefined}>
-              <span className={styles.mobileNavIcon} aria-hidden="true"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{item.label === "Overview" ? <><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9M9 20v-6h6v6"/></> : item.label === "Orders" ? <><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/></> : item.label === "Products" ? <><path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="m3 7 9 5 9-5M3 7v10l9 5 9-5V7M12 12v10"/></> : <><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/></>}</svg></span>
-              <span>{item.label}</span>
-            </Link>;
+            return (
+              <Link key={item.path || "overview"} className={`${styles.mobileNavLink} ${active ? styles.active : ""}`} href={href} aria-current={active ? "page" : undefined}>
+                <span className={styles.mobileNavIcon} aria-hidden="true"><NavIcon name={item.path} size={21} /></span>
+                <span>{item.label}</span>
+              </Link>
+            );
           })}
+          <button
+            className={`${styles.mobileNavLink} ${styles.mobileNavMenu} ${menuOpen ? styles.active : ""}`}
+            type="button"
+            aria-haspopup="dialog"
+            aria-expanded={menuOpen}
+            aria-controls="tenant-menu-sheet"
+            onClick={() => setMenuOpen(true)}
+          >
+            <span className={styles.mobileNavIcon} aria-hidden="true"><NavIcon name="menu" size={21} /></span>
+            <span>Menu</span>
+          </button>
         </nav>
         <footer className={styles.supportFooter}>
           <div><strong>Need a hand?</strong><span>Our support team can help.</span></div>

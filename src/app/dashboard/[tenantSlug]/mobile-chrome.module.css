@@ -1,0 +1,129 @@
+/*
+  Phone chrome for the business workspace: top bar pieces, the bottom-sheet
+  menu and the account dropdown. Desktop keeps the sidebar, so everything here
+  is hidden above 760px. Icon colour comes from --menu-icon (defaults to the
+  brand accent) so the whole set can be re-themed in one place.
+*/
+.layer,
+.account { --menu-icon: var(--accent); }
+
+/* ---------- Top bar (phone only) ---------- */
+.topbarMark, .workspacePill, .mobileActions { display: none; }
+
+@media (max-width: 760px) {
+  .desktopOnly { display: none !important; }
+  .topbarMark { display: inline-flex; flex: none; }
+  .mobileActions { display: flex; flex: none; align-items: center; gap: 8px; }
+  .workspacePill {
+    display: flex; flex: 1; align-items: center; gap: 10px; min-width: 0; min-height: 44px;
+    padding: 5px 12px 5px 8px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface);
+  }
+}
+
+.pillAvatar, .avatar {
+  display: grid; flex: none; place-items: center; width: 32px; height: 32px; border-radius: 50%;
+  background: var(--accent-soft); color: var(--accent-strong); font-size: 14px; font-weight: 800; line-height: 1;
+}
+.pillText { display: grid; min-width: 0; line-height: 1.2; }
+.pillText small {
+  overflow: hidden; color: var(--muted); font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 10px; letter-spacing: .14em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap;
+}
+.pillText strong { overflow: hidden; color: var(--text); font-size: 15px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+
+.addButton {
+  display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+  background: var(--accent); color: #fff; text-decoration: none;
+}
+.addButton:active { background: var(--accent-strong); }
+
+/* ---------- Account dropdown ---------- */
+.account { position: relative; }
+.accountButton {
+  display: flex; align-items: center; gap: 4px; height: 44px; padding: 0 8px 0 5px;
+  border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--text); cursor: pointer;
+}
+.accountButtonOpen { border-color: var(--accent); }
+.accountChevron { transition: transform .15s ease; }
+.accountButtonOpen .accountChevron { transform: rotate(180deg); }
+.accountPanel {
+  position: absolute; top: calc(100% + 10px); right: 0; z-index: 80; display: grid; gap: 12px;
+  width: min(320px, calc(100vw - 24px)); padding: 14px; border: 1px solid var(--border); border-radius: 20px;
+  background: var(--surface); box-shadow: 0 18px 45px rgb(18 38 31 / 16%);
+}
+.accountUser { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 2px 2px 0; }
+.accountUser > div { display: grid; min-width: 0; line-height: 1.3; }
+.accountUser strong { overflow: hidden; font-size: 16px; text-overflow: ellipsis; white-space: nowrap; }
+.accountUser span:not(.avatar) { color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+.accountBusiness {
+  display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--border);
+  border-radius: 14px; background: #f6faf7;
+}
+.accountBusiness > div { display: grid; justify-items: start; gap: 2px; min-width: 0; }
+.accountBusiness small { color: var(--muted); font-size: 12px; }
+.accountBusiness strong { font-size: 15px; overflow-wrap: anywhere; }
+.rolePill {
+  margin-top: 3px; padding: 2px 9px; border-radius: 999px; background: var(--accent-soft);
+  color: var(--accent-strong); font-size: 12px; font-weight: 700; text-transform: capitalize;
+}
+.accountActions { display: grid; gap: 2px; padding-top: 8px; border-top: 1px solid var(--border); }
+.accountActions form { margin: 0; }
+.accountActions a, .accountActions button {
+  display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 0 10px; border: 0;
+  border-radius: 12px; background: transparent; color: var(--text); font: inherit; font-size: 15px; font-weight: 600;
+  text-align: left; text-decoration: none; cursor: pointer;
+}
+.accountActions a:active, .accountActions button:active { background: var(--accent-soft); }
+
+/* ---------- Bottom-sheet menu ---------- */
+.layer { position: fixed; inset: 0; z-index: 1000; }
+@media (min-width: 761px) { .layer { display: none; } }
+
+.backdrop {
+  position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: rgb(12 25 18 / 45%);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); cursor: pointer; animation: fadeIn .18s ease-out;
+}
+.sheet {
+  position: absolute; inset: auto 0 0; display: flex; flex-direction: column; max-height: calc(100dvh - 40px);
+  border-radius: 28px 28px 0 0; background: var(--surface); box-shadow: 0 -14px 44px rgb(0 0 0 / 18%);
+  overscroll-behavior: contain; transition: transform .2s ease; animation: rise .24s cubic-bezier(.2, .8, .2, 1);
+}
+.grab { display: grid; flex: none; place-items: center; height: 30px; cursor: grab; touch-action: none; }
+.handle { width: 44px; height: 5px; border-radius: 999px; background: #d4ddd7; }
+.sheetHeader { display: flex; flex: none; align-items: center; justify-content: space-between; padding: 2px 20px 4px; }
+.sheetHeader h2 { margin: 0; font-size: 24px; letter-spacing: -.02em; }
+.closeButton {
+  display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid var(--border);
+  border-radius: 13px; background: var(--surface); color: var(--text); cursor: pointer;
+}
+.closeButton:active { background: var(--accent-soft); }
+.sheetBody {
+  flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  padding: 0 20px max(28px, env(safe-area-inset-bottom));
+}
+.section { margin: 0; }
+.sectionLabel {
+  margin: 20px 0 10px; color: var(--muted); font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 12px; font-weight: 500; letter-spacing: .2em; line-height: 1.2; text-transform: uppercase;
+}
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.card {
+  display: flex; align-items: center; gap: 12px; width: 100%; min-width: 0; min-height: 58px; padding: 8px 12px;
+  border: 1px solid var(--border); border-radius: 16px; background: var(--surface); color: var(--text);
+  font: inherit; font-size: 14.5px; font-weight: 600; line-height: 1.25; text-align: left; text-decoration: none;
+  cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background .15s ease, border-color .15s ease;
+}
+.card > span { min-width: 0; overflow-wrap: anywhere; }
+.card:active { background: var(--accent-soft); }
+.cardIcon { flex: none; color: var(--menu-icon); }
+.cardActive { border-color: var(--accent); background: var(--accent-soft); }
+.cardActive .cardIcon { color: var(--accent-strong); }
+.signOutForm { display: flex; margin: 0; }
+.signOutForm .card { flex: 1; }
+
+@keyframes rise { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet, .backdrop, .accountChevron, .card { animation: none; transition: none; }
+}
