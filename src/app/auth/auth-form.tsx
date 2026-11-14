@@ -30,6 +30,7 @@ export default function AuthForm({ variant }: { variant: Variant }) {
   const router = useRouter();
   const isRegister = variant === "register";
   const [useLink, setUseLink] = useState(false);
+  const [linkSent, setLinkSent] = useState(false);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -98,9 +99,25 @@ export default function AuthForm({ variant }: { variant: Variant }) {
     } finally { setBusy(false); }
   }
 
+  async function resendMagicLink() {
+    setBusy(true);
+    setError("");
+    try {
+      const { error: otpError } = await createSupabaseBrowserClient().auth.signInWithOtp({
+        email: email.trim().toLowerCase(),
+        options: { emailRedirectTo: callbackUrl(), shouldCreateUser: false },
+      });
+      if (otpError) throw otpError;
+    } catch (cause) {
+      setError(friendlyAuthError(cause instanceof Error ? cause.message : "").text);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setBusy(true); setError(""); setMessage(""); setNeedsConfirmation(false);
+    setBusy(true); setError(""); setMessage(""); setNeedsConfirmation(false); setLinkSent(false);
     try {
       const supabase = createSupabaseBrowserClient();
       const cleanEmail = email.trim().toLowerCase();
@@ -110,7 +127,7 @@ export default function AuthForm({ variant }: { variant: Variant }) {
           email: cleanEmail, options: { emailRedirectTo: callbackUrl(), shouldCreateUser: false },
         });
         if (otpError) throw otpError;
-        setMessage("Check your email. If you have an account, we sent a link that signs you in.");
+        setLinkSent(true);
         return;
       }
 
@@ -161,7 +178,18 @@ export default function AuthForm({ variant }: { variant: Variant }) {
     <section className={`auth-card auth-card-figma ${isRegister ? "is-register" : "is-login"}`} aria-labelledby="auth-title">
       <div className="auth-pattern" aria-hidden="true" />
       <div className="auth-form-content">
-        <h1 id="auth-title">{isRegister ? "Sign up" : "Sign in"}</h1>
+        <h1 id="auth-title">{linkSent ? "Check your inbox" : isRegister ? "Sign up" : "Sign in"}</h1>
+        {linkSent ? (
+          <div className="auth-email-sent" role="status" aria-live="polite">
+            <div className="auth-email-sent-icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><rect x="5" y="10" width="38" height="28" rx="6" stroke="currentColor" strokeWidth="2.5"/><path d="m8 14 16 13 16-13" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/><path d="m31 32 4 4 8-9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+            <p className="auth-email-sent-lead">We have sent a secure sign-in link to</p>
+            <strong className="auth-email-address">{email.trim().toLowerCase()}</strong>
+            <p className="auth-email-sent-help">Open the email on this device and follow the link to sign in. If it is not in your inbox, check spam or promotions.</p>
+            {error && <p className="form-message error" role="alert">{error}</p>}
+            <button className="primary-button figma-submit" type="button" onClick={resendMagicLink} disabled={busy}>{busy ? "Sending…" : "Send another link"}</button>
+            <button className="auth-email-edit" type="button" onClick={() => { setLinkSent(false); setError(""); setUseLink(true); }}>Use a different email</button>
+          </div>
+        ) : (
         <form onSubmit={submit}>
           {isRegister && <div className="figma-field"><label htmlFor="full-name">Full name</label><div className="figma-input-wrap"><span className="figma-field-icon" aria-hidden="true">♙</span><input id="full-name" autoComplete="name" required minLength={2} maxLength={120} placeholder="Your full name" value={fullName} onChange={e => setFullName(e.target.value)} /></div></div>}
           <div className="figma-field"><label htmlFor="email">Email</label><div className="figma-input-wrap"><span className="figma-field-icon" aria-hidden="true">✉</span><input id="email" type="email" inputMode="email" autoComplete="email" placeholder="you@example.com" required maxLength={254} value={email} onChange={e => setEmail(e.target.value)} /></div></div>
@@ -175,7 +203,9 @@ export default function AuthForm({ variant }: { variant: Variant }) {
           {message && <p className="form-message" role="status">{message}</p>}
           <button className="primary-button figma-submit" type="submit" disabled={busy}>{busy ? "Please wait…" : isRegister ? "Sign up" : useLink ? "Email me a sign-in link" : "Sign in"}</button>
         </form>
-        <div className="figma-footer"><p>{isRegister ? "Already have an Account!" : "Don’t have an Account ?"} <Link href={otherHref}>{isRegister ? "Sign in" : "Sign up"}</Link></p><button className="figma-google" type="button" onClick={continueWithGoogle} disabled={busy}><GoogleIcon /> Continue with Google</button>{!isRegister && <button className="figma-magic-link" type="button" onClick={() => { setUseLink(value => !value); setError(""); setMessage(""); }}>{useLink ? "Use my password instead" : "Use an email sign-in link"}</button>}</div>
+        )}
+        {!linkSent && <div className="figma-footer"><p>{isRegister ? "Already have an Account!" : "Don’t have an Account ?"} <Link href={otherHref}>{isRegister ? "Sign in" : "Sign up"}</Link></p><button className="figma-google" type="button" onClick={continueWithGoogle} disabled={busy}><GoogleIcon /> Continue with Google</button>{!isRegister && <button className="figma-magic-link" type="button" onClick={() => { setUseLink(value => !value); setError(""); setMessage(""); }}>{useLink ? "Use my password instead" : "Use an email sign-in link"}</button>}</div>}
+        {linkSent && <p className="auth-email-back"><Link href="/login">Back to sign in</Link></p>}
       </div>
     </section>
   );
