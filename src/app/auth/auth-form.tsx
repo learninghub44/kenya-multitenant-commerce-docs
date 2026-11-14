@@ -156,7 +156,6 @@ export default function AuthForm({ variant }: { variant: Variant }) {
   }
 
   const metCount = PASSWORD_RULES.filter(rule => rule.test(password)).length;
-  const submitLabel = isRegister ? "Create free account" : useLink ? "Email me a sign-in link" : "Sign in";
 
   return (
     <section className={`auth-card auth-card-figma ${isRegister ? "is-register" : "is-login"}`} aria-labelledby="auth-title">
