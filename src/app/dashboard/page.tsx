@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/access";
 import Logo from "@/components/logo";
 import { BusinessClock, BusinessIdChip } from "./[tenantSlug]/business-badge";
+import BusinessCardMotion from "./business-card-motion";
 
 export default async function DashboardPage() {
   const user = await requireUser("/dashboard");
@@ -52,7 +53,7 @@ export default async function DashboardPage() {
             <Link className="primary-button" href="/onboarding">Create business <span aria-hidden="true">→</span></Link>
           </div>
         ) : tenants.map(item => (
-          <article className="workspace-card business-card" key={item.tenant_id}>
+          <BusinessCardMotion key={item.tenant_id}>
             <span className="business-mark" aria-hidden="true">{item.tenant.name.slice(0, 1).toUpperCase()}</span>
             <div className="business-card-copy">
               <h2 title={item.tenant.name}>{item.tenant.name}</h2>
@@ -69,7 +70,7 @@ export default async function DashboardPage() {
             <Link className="workspace-action" href={`/dashboard/${item.tenant.slug}`}>
               Open workspace <span aria-hidden="true">→</span>
             </Link>
-          </article>
+          </BusinessCardMotion>
         ))}
         {tenants.length > 0 && (
           <Link className="workspace-create-link" href="/onboarding">
