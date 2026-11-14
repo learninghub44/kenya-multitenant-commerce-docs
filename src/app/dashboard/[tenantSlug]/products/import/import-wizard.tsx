@@ -117,26 +117,26 @@ export default function ImportWizard({ tenantId, tenantSlug, canStock }: { tenan
   const sampleHref = `data:text/csv;charset=utf-8,${encodeURIComponent(SAMPLE)}`;
 
   return (
-    <div>
-      <section className="product-form">
-        <h2>1. Choose where your products are</h2>
+    <div className="wizard-grid">
+      <section className="product-form wizard-source">
+        <h2>1. Source</h2>
         <div role="tablist" style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {([["file", "Upload a file"], ["link", "Link or store address"], ["paste", "Paste a table"]] as const).map(([key, label]) =>
+          {([["file", "File"], ["link", "Link / store"], ["paste", "Paste"]] as const).map(([key, label]) =>
             <button key={key} type="button" role="tab" aria-selected={mode === key} className={mode === key ? "primary-button" : "secondary-button"} onClick={() => setMode(key)}>{label}</button>)}
         </div>
         {mode === "file" && <>
-          <label htmlFor="import-file">CSV file (Shopify, WooCommerce, Excel “Save as CSV”, or your own)</label>
+          <label htmlFor="import-file">CSV file</label>
           <input id="import-file" type="file" accept=".csv,.tsv,.txt,text/csv" onChange={onFile} />
-          <p className="field-help">Up to {MAX_IMPORT_ROWS.toLocaleString()} rows and 5 MB. <a href={sampleHref} download="catalogue-sample.csv">Download a sample file</a></p>
+          <p className="field-help">Max {MAX_IMPORT_ROWS.toLocaleString()} rows · 5 MB · <a href={sampleHref} download="catalogue-sample.csv">Sample file</a></p>
         </>}
         {mode === "link" && <>
-          <label htmlFor="import-link">Google Sheets share link, CSV link, or a Shopify / WooCommerce store address</label>
+          <label htmlFor="import-link">Sheets, CSV, Shopify or WooCommerce link</label>
           <input id="import-link" type="url" inputMode="url" placeholder="https://yourstore.co.ke" value={link} onChange={e => setLink(e.target.value)} />
-          <p className="field-help">Sheets must be shared as “anyone with the link can view”. Store addresses use the store’s public product feed, so only products visible to shoppers are found.</p>
+          <p className="field-help">Sheets must be viewable by anyone with the link.</p>
           <button className="primary-button" type="button" disabled={busy || link.trim().length < 8} onClick={onLink}>{busy ? "Reading…" : "Read this link"}</button>
         </>}
         {mode === "paste" && <>
-          <label htmlFor="import-paste">Paste rows copied from Excel or Google Sheets (first row = column names)</label>
+          <label htmlFor="import-paste">Paste rows (first row = column names)</label>
           <textarea id="import-paste" rows={6} value={pasted} onChange={e => setPasted(e.target.value)} />
           <button className="primary-button" type="button" disabled={!pasted.trim()} onClick={() => { try { fromText(pasted, "csv"); } catch (cause) { setError(cause instanceof Error ? cause.message : "Could not read that."); } }}>Read pasted rows</button>
         </>}
@@ -145,34 +145,34 @@ export default function ImportWizard({ tenantId, tenantSlug, canStock }: { tenan
       </section>
 
       {table && built && <section className="product-form">
-        <h2>2. Check the columns</h2>
-        <p className="auth-description">{table.records.length.toLocaleString()} rows read{format !== "generic" ? ` · ${format === "shopify" ? "Shopify" : "WooCommerce"} export detected` : ""}. {table.note}</p>
-        {FIELDS.map(field => <div key={field}>
+        <h2>2. Columns</h2>
+        <p className="auth-description">{table.records.length.toLocaleString()} rows{format !== "generic" ? ` · ${format === "shopify" ? "Shopify" : "WooCommerce"}` : ""}{table.note ? ` · ${table.note}` : ""}</p>
+        <div className="map-grid">{FIELDS.map(field => <div key={field}>
           <label htmlFor={`map-${field}`}>{FIELD_LABELS[field]}{REQUIRED_FIELDS.includes(field) ? " (required)" : ""}</label>
           <select id={`map-${field}`} value={mapping[field] ?? ""} onChange={e => setMapping(prev => ({ ...prev, [field]: e.target.value || undefined }))}>
             <option value="">{REQUIRED_FIELDS.includes(field) ? "Choose a column" : "Don’t import"}</option>
             {table.headers.map(header => <option key={header} value={header}>{header}</option>)}
           </select>
-        </div>)}
-        <label htmlFor="dup-mode">If a product already exists (same SKU or URL slug)</label>
+        </div>)}</div>
+        <label htmlFor="dup-mode">Existing products (same SKU or slug)</label>
         <select id="dup-mode" value={duplicates} onChange={e => setDuplicates(e.target.value as "skip" | "update")}>
-          <option value="skip">Skip it and keep what I have</option>
-          <option value="update">Update its name, description, category and price</option>
+          <option value="skip">Skip</option>
+          <option value="update">Update name, description, category, price</option>
         </select>
-        <label><input type="checkbox" checked={publish} onChange={e => setPublish(e.target.checked)} style={{ width: "auto", marginRight: 8 }} />Publish imported products on my storefront right away (otherwise they are saved as drafts)</label>
+        <label><input type="checkbox" checked={publish} onChange={e => setPublish(e.target.checked)} style={{ width: "auto", marginRight: 8 }} />Publish immediately (otherwise drafts)</label>
         {canStock
-          ? <label><input type="checkbox" checked={includeStock} onChange={e => setIncludeStock(e.target.checked)} style={{ width: "auto", marginRight: 8 }} />Record opening stock for new products from the stock column</label>
-          : <p className="field-help">Your role can’t change stock, so opening stock will not be imported.</p>}
+          ? <label><input type="checkbox" checked={includeStock} onChange={e => setIncludeStock(e.target.checked)} style={{ width: "auto", marginRight: 8 }} />Import opening stock</label>
+          : <p className="field-help">Your role can’t import stock.</p>}
       </section>}
 
       {table && built && <section className="product-form">
-        <h2>3. Preview and import</h2>
+        <h2>3. Import</h2>
         {missing.length > 0 && <p className="form-message error" role="alert">Choose a column for: {missing.map(f => FIELD_LABELS[f]).join(", ")}.</p>}
-        {missing.length === 0 && <p className="form-message" role="status">{built.rows.length.toLocaleString()} ready to import{built.issues.length ? ` · ${built.issues.length} row(s) will be left out` : ""}{built.ignored ? ` · ${built.ignored} blank row(s) ignored` : ""}. Prices are read as Kenya shillings.</p>}
+        {missing.length === 0 && <p className="form-message" role="status">{built.rows.length.toLocaleString()} ready{built.issues.length ? ` · ${built.issues.length} skipped` : ""}{built.ignored ? ` · ${built.ignored} blank` : ""} · prices in KES</p>}
         {missing.length === 0 && built.rows.slice(0, 8).map((row, index) => <p key={index} className="field-help"><strong>{row.title}</strong> · KES {(row.price_minor / 100).toLocaleString("en-KE", { minimumFractionDigits: 2 })}{row.sku ? ` · ${row.sku}` : ""}{row.category ? ` · ${row.category}` : ""}{row.stock ? ` · ${row.stock} in stock` : ""}</p>)}
-        {missing.length === 0 && built.issues.length > 0 && <details><summary>Rows that will be left out</summary>{built.issues.slice(0, 50).map((issue, index) => <p key={index} className="field-help">Row {issue.row}: {issue.message}</p>)}{built.issues.length > 50 && <p className="field-help">…and {built.issues.length - 50} more.</p>}</details>}
+        {missing.length === 0 && built.issues.length > 0 && <details><summary>Skipped rows</summary>{built.issues.slice(0, 50).map((issue, index) => <p key={index} className="field-help">Row {issue.row}: {issue.message}</p>)}{built.issues.length > 50 && <p className="field-help">…and {built.issues.length - 50} more.</p>}</details>}
         {summary && <div className="form-message" role="status">
-          <p><strong>Import finished.</strong> {summary.created} created · {summary.updated} updated · {summary.skipped} skipped · {summary.failed} failed{summary.stock ? ` · opening stock recorded for ${summary.stock}` : ""}.</p>
+          <p><strong>Done.</strong> {summary.created} created · {summary.updated} updated · {summary.skipped} skipped · {summary.failed} failed{summary.stock ? ` · opening stock recorded for ${summary.stock}` : ""}.</p>
           {summary.errors.slice(0, 20).map((e, i) => <p key={i} className="field-help">Batch row {e.row}: {e.message}</p>)}
         </div>}
         {progress && table && <p className="form-message" role="status">{progress}</p>}

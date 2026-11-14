@@ -73,8 +73,7 @@ export default function StockMovementForm({
   return (
     <form className="product-form" onSubmit={submit}>
       <h2>Receive or adjust stock</h2>
-      <p className="auth-description">Every change is recorded in the stock ledger. The server prevents negative stock and safely handles retries.</p>
-      <label htmlFor="stock-variant">Product</label>
+            <label htmlFor="stock-variant">Product</label>
       <select id="stock-variant" required value={variantId} onChange={e => setVariantId(e.target.value)}>
         {variants.length === 0 && <option value="">No product variants available</option>}
         {variants.map(item => <option key={item.id} value={item.id}>{item.label} · on hand {item.onHand}</option>)}

@@ -715,3 +715,18 @@ ul { margin: 0; padding: 0; list-style: none; }
  .settings-provider-row{flex-direction:column;align-items:flex-start}
  .payment-connection-form .workspace-action{justify-self:stretch}
 }
+
+/* Desktop (>=1024px): compact, scannable workspace. Intro copy is hidden; warnings and field help stay. */
+@media (min-width: 1024px) {
+  .tenant-content .dashboard-header > div > .auth-description,
+  .tenant-content .product-form > .auth-description { display: none; }
+  .tenant-content .dashboard-header { align-items: center; margin-bottom: 20px; }
+  .tenant-content .dashboard-header h1 { font-size: 28px; line-height: 1.15; }
+  .tenant-content .workspace-list { grid-template-columns: repeat(auto-fill, minmax(440px, 1fr)); gap: 16px; margin-top: 20px; }
+  .tenant-content .product-form { margin-top: 20px; }
+  .wizard-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; }
+  .wizard-grid > .product-form { margin-top: 0; }
+  .wizard-grid > .wizard-source { grid-column: 1 / -1; }
+  .map-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; }
+}
+@media (max-width: 1023px) { .map-grid { display: grid; gap: 0; } }

@@ -70,8 +70,7 @@ export default function NewProductForm({ tenantId }: { tenantId: string }) {
   return (
     <form id="add-product" className="product-form" onSubmit={submit}>
       <h2>Add a product</h2>
-      <p className="auth-description">New products start as drafts. Price is stored in integer cents of KES (minor units).</p>
-      <label htmlFor="product-title">Product name</label>
+            <label htmlFor="product-title">Product name</label>
       <input id="product-title" required maxLength={180} value={title} onChange={e => { setTitle(e.target.value); if (!slugEdited) setSlug(slugify(e.target.value)); }} />
       <label htmlFor="product-slug">Product URL slug</label>
       <input id="product-slug" required maxLength={180} value={slug} onChange={e => { setSlugEdited(true); setSlug(slugify(e.target.value)); }} />

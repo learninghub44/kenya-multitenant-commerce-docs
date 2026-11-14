@@ -62,9 +62,9 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
   const canManage = hasPermission(role, "products.update");
   return (
     <main className="dashboard-page">
-      <DashboardPageHeader eyebrow="Product catalogue" title={tenant.name} description="Manage your products and draft prices." aside={<><span className="workspace-status">{role.replaceAll("_", " ")}</span>{hasPermission(role, "products.update") && <Link className="workspace-action" href={`/dashboard/${tenant.slug}/products/import`}>Import catalogue</Link>}</>} />
+      <DashboardPageHeader eyebrow="Product catalogue" title={tenant.name} aside={<><span className="workspace-status">{role.replaceAll("_", " ")}</span>{hasPermission(role, "products.update") && <Link className="workspace-action" href={`/dashboard/${tenant.slug}/products/import`}>Import catalogue</Link>}</>} />
       <section className="workspace-list">
-        {products.length === 0 ? <DashboardEmptyState title="No products yet" description="Add your first product, or import the catalogue you already have from a file, Google Sheets, Shopify or WooCommerce. Imports are saved as drafts unless you choose to publish." /> : products.map(product => {
+        {products.length === 0 ? <DashboardEmptyState title="No products yet" description="Add a product or import your catalogue." /> : products.map(product => {
           const productVariants = variants.filter(item => item.product_id === product.id);
           const variant = productVariants.find(item => item.status !== "archived");
           return <article className="workspace-card product-card" key={product.id}>

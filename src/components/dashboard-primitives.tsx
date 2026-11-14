@@ -4,7 +4,7 @@ import { Alert } from "@/components/ui/alert";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 
-export function DashboardPageHeader(props: { eyebrow: string; title: string; description: string; aside?: ReactNode }) {
+export function DashboardPageHeader(props: { eyebrow: string; title: string; description?: string; aside?: ReactNode }) {
   return <PageHeader {...props} />;
 }
 

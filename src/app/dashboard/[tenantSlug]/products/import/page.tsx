@@ -11,7 +11,7 @@ export default async function ImportCataloguePage({ params }: { params: Promise<
   const { tenant, role } = access;
   return (
     <main className="dashboard-page">
-      <DashboardPageHeader eyebrow="Product catalogue" title="Import your catalogue" description="Bring in products you already have from a file, Google Sheets, Shopify or WooCommerce. Nothing goes live until you publish it." aside={<Link className="workspace-action" href={`/dashboard/${tenant.slug}/products`}>← Back to products</Link>} />
+      <DashboardPageHeader eyebrow="Product catalogue" title="Import catalogue" aside={<Link className="workspace-action" href={`/dashboard/${tenant.slug}/products`}>← Back to products</Link>} />
       <ImportWizard tenantId={tenant.id} tenantSlug={tenant.slug} canStock={hasPermission(role, "inventory.adjust")} />
     </main>
   );
