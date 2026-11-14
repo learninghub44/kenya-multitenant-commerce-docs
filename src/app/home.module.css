@@ -168,3 +168,10 @@
 /* Motion wrapper layout support */
 .featureReveal{min-width:0}
 @media(prefers-reduced-motion:reduce){.featureReveal{transform:none!important}}
+
+
+/* Motion wrapper layout support */
+.featureReveal{min-width:0}
+.ctaMotion{display:flex;align-items:center;justify-content:space-between;gap:30px;width:100%}
+@media(max-width:760px){.ctaMotion{align-items:flex-start;flex-direction:column}}
+@media(prefers-reduced-motion:reduce){.featureReveal,.ctaMotion{transform:none!important}}
