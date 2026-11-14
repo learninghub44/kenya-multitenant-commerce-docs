@@ -12,6 +12,7 @@ export default function LoginPage() {
       summary="Your products, stock and orders are here."
       points={["Review orders", "Update your catalogue", "Manage your shop"]}
       shopLink
+      compact
     >
       <AuthForm variant="login" />
     </AuthShell>
