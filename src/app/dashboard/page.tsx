@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/access";
-import { storeDisplayAddress } from "@/lib/store-url";
 import Logo from "@/components/logo";
 import { BusinessClock, BusinessIdChip } from "./[tenantSlug]/business-badge";
 
