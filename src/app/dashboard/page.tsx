@@ -31,13 +31,11 @@ export default async function DashboardPage() {
     return tenant && tenant.status === "active" ? [{ ...item, tenant }] : [];
   });
   return (
-    <main className="dashboard-page">
-      <Logo href="/" size={42} className="page-logo" />
+    <main className="dashboard-page workspaces-page workspaces-compact">
+      <Logo href="/" size={36} className="page-logo" />
       <header className="workspaces-header">
         <div>
-          <p className="eyebrow">Your workspaces</p>
           <h1>Your businesses</h1>
-          <p className="auth-description">Choose a business to manage its catalogue, stock and orders.</p>
         </div>
         <form action="/auth/signout" method="post">
           <span className="workspace-account">{user.email ?? "Signed-in account"}</span>
@@ -49,11 +47,9 @@ export default async function DashboardPage() {
           <div className="empty-state workspace-empty">
             <span className="workspace-empty-mark" aria-hidden="true">+</span>
             <div>
-              <p className="eyebrow">A fresh start</p>
-              <h2>No business workspace yet</h2>
-              <p>Create a workspace to start organising your catalogue and day-to-day operations.</p>
+              <h2>No business yet</h2>
             </div>
-            <Link className="primary-button" href="/onboarding">Create your first workspace <span aria-hidden="true">→</span></Link>
+            <Link className="primary-button" href="/onboarding">Create business <span aria-hidden="true">→</span></Link>
           </div>
         ) : tenants.map(item => (
           <article className="workspace-card business-card" key={item.tenant_id}>
@@ -68,14 +64,14 @@ export default async function DashboardPage() {
               </div>
             </div>
             <Link className="workspace-action" href={`/dashboard/${item.tenant.slug}`}>
-              Open workspace <span aria-hidden="true">→</span>
+              Open <span aria-hidden="true">→</span>
             </Link>
           </article>
         ))}
         {tenants.length > 0 && (
           <Link className="workspace-create-link" href="/onboarding">
             <span className="workspace-create-plus" aria-hidden="true">+</span>
-            <span><strong>Add another business</strong><small>Create a separate workspace for another store</small></span>
+            <span><strong>Add business</strong></span>
             <span className="workspace-create-arrow" aria-hidden="true">→</span>
           </Link>
         )}

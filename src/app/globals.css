@@ -730,3 +730,15 @@ ul { margin: 0; padding: 0; list-style: none; }
   .map-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; }
 }
 @media (max-width: 1023px) { .map-grid { display: grid; gap: 0; } }
+
+/* Business picker: compact card grid on desktop. */
+.workspaces-compact .workspaces-header { align-items: center; margin: 20px 0 0; }
+.workspaces-compact .workspaces-header h1 { font-size: clamp(24px, 3vw, 30px); line-height: 1.15; margin: 0; }
+@media (min-width: 1024px) {
+  main.workspaces-compact { width: min(100% - 64px, 1120px); max-width: 1120px; margin-inline: auto; padding: 32px 0 56px; }
+  .workspaces-compact .workspace-list { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-top: 20px; }
+  .workspaces-compact .business-card { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 14px 16px; padding: 20px; }
+  .workspaces-compact .business-card h2 { margin: 0 0 2px; font-size: 18px; }
+  .workspaces-compact .business-card .workspace-action { grid-column: 1 / -1; justify-content: center; }
+  .workspaces-compact .workspace-create-link { min-height: 0; padding: 20px; align-self: stretch; }
+}
