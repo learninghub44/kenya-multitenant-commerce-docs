@@ -1,7 +1,7 @@
 import { requireTenantAccess } from "@/lib/access";
 import { failLoad } from "@/lib/access/load-failure";
 import { hasPermission } from "@/lib/permissions";
-import OrderActions from "./order-actions";
+import OrdersBoard, { type BoardOrder } from "./orders-board";
 import { DashboardEmptyState, DashboardPageHeader } from "@/components/dashboard-primitives";
 
 type OrderRow = {
@@ -36,17 +36,24 @@ export default async function OrdersPage({ params }: { params: Promise<{ tenantS
   const canRecordPayment = hasPermission(role, "payments.record");
   const canManageOrders = hasPermission(role, "orders.update");
 
+  const fmt = (currency: string, minor: number) => new Intl.NumberFormat("en-KE", { style: "currency", currency }).format(minor / 100);
+  const board: BoardOrder[] = orders.map(order => ({
+    id: order.id, order_number: order.order_number, status: order.status, payment_status: order.payment_status,
+    customer_name_snapshot: order.customer_name_snapshot, customer_phone_snapshot: order.customer_phone_snapshot,
+    delivery_address_snapshot: order.delivery_address_snapshot, notes: order.notes ?? "",
+    totalLabel: fmt(order.currency, order.total_minor),
+    placedLabel: new Date(order.created_at).toLocaleString("en-KE", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Nairobi" }),
+    items: items.filter(item => item.order_id === order.id).map(item => ({
+      id: item.id, product_title_snapshot: item.product_title_snapshot, variant_title_snapshot: item.variant_title_snapshot,
+      sku_snapshot: item.sku_snapshot, quantity: item.quantity,
+      unitLabel: fmt(order.currency, item.unit_price_minor), lineLabel: fmt(order.currency, item.line_total_minor)
+    }))
+  }));
+
   return <main className="dashboard-page">
     <DashboardPageHeader eyebrow="Sales & fulfilment" title="Orders" description={`Orders for ${tenant.name}. Online payment integration is not enabled; staff can record a payment only after independently verifying receipt.`} aside={<span className="workspace-status">{orders.length} recent orders</span>} />
-    <section className="workspace-list">
-      {orders.length===0 ? <DashboardEmptyState title="No orders yet" description="Customer order requests from the public storefront will appear here." /> : orders.map(order => <article className="order-card" key={order.id}>
-        <div className="order-card-header"><div><p className="eyebrow">{order.order_number}</p><h2>{order.customer_name_snapshot}</h2><p>{order.customer_phone_snapshot}</p></div><div className="order-badges"><span className="workspace-status">{order.status.replaceAll("_"," ")}</span><span className="workspace-status">{order.payment_status.replaceAll("_"," ")}</span></div></div>
-        <p className="order-address">{order.delivery_address_snapshot || "No delivery address provided"}</p>
-        <ul className="order-line-list">{items.filter(item => item.order_id===order.id).map(item => <li key={item.id}><span>{item.product_title_snapshot} — {item.variant_title_snapshot}{item.sku_snapshot ? ` · ${item.sku_snapshot}` : ""}<small>Qty {item.quantity} × {new Intl.NumberFormat("en-KE",{style:"currency",currency:order.currency}).format(item.unit_price_minor/100)}</small></span><strong>{new Intl.NumberFormat("en-KE",{style:"currency",currency:order.currency}).format(item.line_total_minor/100)}</strong></li>)}</ul>
-        <div className="order-total"><span>Order total</span><strong>{new Intl.NumberFormat("en-KE",{style:"currency",currency:order.currency}).format(order.total_minor/100)}</strong></div>
-        <p className="field-help">Placed {new Date(order.created_at).toLocaleString("en-KE",{dateStyle:"medium",timeStyle:"short",timeZone:"Africa/Nairobi"})}</p>
-        {(canRecordPayment || canManageOrders) && <OrderActions tenantId={tenant.id} orderId={order.id} status={order.status} paymentStatus={order.payment_status} canRecordPayment={canRecordPayment} canManageOrders={canManageOrders} />}
-      </article>)}
-    </section>
+    {orders.length === 0
+      ? <DashboardEmptyState title="No orders yet" description="Customer order requests from the public storefront will appear here." />
+      : <OrdersBoard tenantId={tenant.id} orders={board} canRecordPayment={canRecordPayment} canManageOrders={canManageOrders} />}
   </main>;
 }

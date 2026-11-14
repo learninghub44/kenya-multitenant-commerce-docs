@@ -1,0 +1,25 @@
+.toolbar { display: grid; gap: 12px; margin: 24px 0 18px; }
+.search {
+  width: 100%; min-width: 0; min-height: 48px; padding: 0 16px; border: 1px solid #c5d0c9; border-radius: 14px;
+  background: var(--surface); color: var(--text); font: inherit; font-size: 16px;
+}
+.search:focus { border-color: var(--accent); outline: 3px solid var(--accent-soft); outline-offset: 0; }
+.chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.chips::-webkit-scrollbar { display: none; }
+.chip {
+  display: inline-flex; flex: none; align-items: center; gap: 8px; min-height: 42px; padding: 0 14px; border: 1px solid var(--border);
+  border-radius: 999px; background: var(--surface); color: var(--text); font: inherit; font-size: 14px; font-weight: 650; cursor: pointer;
+}
+.chip span { padding: 1px 8px; border-radius: 999px; background: var(--background); color: var(--muted); font-size: 12px; font-weight: 700; }
+.chipActive { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-strong); }
+.chipActive span { background: var(--surface); color: var(--accent-strong); }
+.summary { margin: 0; color: var(--muted); font-size: 13px; }
+.contactRow { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 4px; }
+.contactLink {
+  display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border: 1px solid var(--border); border-radius: 999px;
+  background: var(--surface); color: var(--accent-strong); font-size: 14px; font-weight: 700; text-decoration: none;
+}
+.contactLink:active { background: var(--accent-soft); }
+.note { display: grid; gap: 2px; margin: 10px 0 0; padding: 10px 12px; border-radius: 10px; background: #fff8e6; color: #66481f; font-size: 14px; line-height: 1.5; }
+.note strong { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
+.more { justify-self: center; min-height: 46px; }

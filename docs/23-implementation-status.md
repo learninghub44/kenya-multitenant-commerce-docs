@@ -60,4 +60,13 @@ The project owner reports that the app is deployed and Supabase is connected. Th
 - UI primitives in `src/components/ui/`: Button, ButtonLink, Card, Badge, Alert, PageHeader (breadcrumbs), EmptyState, Skeleton, DataTable (client-side search and pagination over already-authorised rows), ErrorState. Existing `dashboard-primitives` wrap them. The new primitives are not yet adopted across every page.
 - Data-load failures use `failLoad()`; users no longer see "confirm migrations" text.
 - Tests: `npm test` (Node test runner, no new dependency) covers the permission map, nav/permission agreement, access outcomes and SQL role parity. SQL test `supabase/tests/workspace_access.test.sql` is structural only.
-- Known gaps: the activity log is owner-only in both app and RPC (the audit_events RLS policy also admits finance); the payments page still shows operator setup notes to merchants; no behavioural SQL test for `get_workspace_access` yet.
+- Known gaps: the activity log is owner-only in both app and RPC (the audit_events RLS policy also admits finance); no behavioural SQL test for `get_workspace_access` yet.
+
+## Dashboard page depth (mobile-first pass)
+
+- Orders: status filters with counts (All, Open, Unpaid, Fulfilled, Cancelled), search by order number, customer, phone (any format) or product, "Show more" paging, tap-to-call and WhatsApp links built from the customer phone, and the customer's order note is now shown. Logic lives in `src/lib/order-filters.ts` and `src/lib/phone.ts`.
+- Reports: 7 day / 30 day / 90 day / all-time selector (`?range=`), average order value, and a paid-sales trend (daily for 7/30 days, monthly otherwise). Days are Nairobi calendar days (`src/lib/report-periods.ts`). A notice appears when the 1,000-row load cap may hide older orders.
+- Activity: timestamps now use Africa/Nairobi time instead of the server's timezone.
+- Payments: merchant-facing wording replaces operator setup notes (no environment variable or migration names shown to merchants).
+- Not done: editing customers and suppliers (writes are revoked for `authenticated`; needs a reviewed migration and RPCs), multi-line purchase orders, online payment collection.
+

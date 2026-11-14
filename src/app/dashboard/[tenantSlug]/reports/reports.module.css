@@ -1,0 +1,14 @@
+.periods { display: flex; gap: 8px; margin-top: 22px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.periods::-webkit-scrollbar { display: none; }
+.period {
+  display: inline-flex; flex: none; align-items: center; min-height: 42px; padding: 0 16px; border: 1px solid var(--border);
+  border-radius: 999px; background: var(--surface); color: var(--text); font-size: 14px; font-weight: 650; text-decoration: none;
+}
+.periodActive { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-strong); }
+.notice { margin: 14px 0 0; padding: 10px 14px; border-radius: 10px; background: #fff8e6; color: #66481f; font-size: 14px; line-height: 1.5; }
+.chart { display: flex; align-items: flex-end; gap: 3px; height: 160px; margin-top: 16px; padding: 12px 10px 0; border-bottom: 1px solid var(--border); }
+.bar { display: flex; flex: 1; align-items: flex-end; height: 100%; min-width: 0; }
+.bar i { display: block; width: 100%; border-radius: 4px 4px 0 0; background: var(--accent); }
+.axis { display: flex; justify-content: space-between; gap: 8px; margin-top: 8px; color: var(--muted); font-size: 12px; }
+.axis span:nth-child(2) { text-align: center; }
+@media (max-width: 560px) { .axis span:nth-child(2) { display: none; } .chart { height: 130px; } }

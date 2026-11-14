@@ -108,12 +108,11 @@ export default function PaymentConnections({ tenantSlug }: { tenantSlug: string 
         </form>
       </section>
       <section className="dashboard-panel">
-        <h2>Before payments can go live</h2>
+        <h2>How payments work right now</h2>
         <ul>
-          <li>Set the server secret <code>PAYMENT_CREDENTIALS_ENCRYPTION_KEY</code> to a securely generated 32-byte base64 key.</li>
-          <li>Apply the latest Supabase migration for tenant payment connections.</li>
-          <li>Provider-specific initiation, callback authentication, transaction reconciliation and sandbox verification must be completed before enabling collection.</li>
-          <li>Saving credentials does not activate payment collection and does not verify that credentials are valid.</li>
+          <li>Customers cannot pay online yet. Storefront orders arrive as requests, and your staff confirm payment on the Orders page only after checking the money was received.</li>
+          <li>Saving credentials here does not turn on online payment collection, and it does not check that the credentials are valid.</li>
+          <li>Online collection can only be switched on after provider setup and testing are completed for your store.</li>
         </ul>
       </section>
     </div>
