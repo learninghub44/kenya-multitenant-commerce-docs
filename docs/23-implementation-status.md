@@ -16,6 +16,8 @@ The project owner reports that the app is deployed and Supabase is connected. Th
 
 ## Implemented
 
+- Catalogue import (CSV, Shopify/WooCommerce exports, Google Sheets, store URLs) with atomic idempotent `import_catalogue_rows` RPC, opening stock via the ledger, and audit history. See docs/32-catalogue-import.md.
+
 - Next.js/TypeScript app, Supabase SSR/browser/admin clients, email/password auth, tenant onboarding, and tenant-role checks.
 - Responsive business workspace picker, tenant overview, shared desktop/mobile navigation, role-aware page access, and sign-in redirects that return users to their requested page.
 - Tenant-scoped product catalogue, product editing/status controls, category create/edit/archive and product assignment, variant management, and signed Cloudinary product image uploads.
