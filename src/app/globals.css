@@ -742,3 +742,69 @@ ul { margin: 0; padding: 0; list-style: none; }
   .workspaces-compact .business-card .workspace-action { grid-column: 1 / -1; justify-content: center; }
   .workspaces-compact .workspace-create-link { min-height: 0; padding: 20px; align-self: stretch; }
 }
+
+/* ===== Desktop workspace scale (>=1024px): compact, FinoQ-style. Placed last so it wins. ===== */
+@media (min-width: 1024px) {
+  .tenant-app { grid-template-columns: 232px minmax(0, 1fr); }
+  .tenant-app .tenant-sidebar { padding: 16px 12px 12px; }
+  .tenant-app .tenant-logo { padding: 0 6px; }
+  .tenant-app .tenant-side-context { margin: 16px 0 10px; padding: 10px 12px; gap: 2px; }
+  .tenant-app .tenant-side-label { display: none; }
+  .tenant-app .tenant-side-context > strong { font-size: 14px; line-height: 1.3; }
+  .tenant-app .tenant-role { font-size: 12px; }
+  .tenant-app .tenant-navigation { gap: 2px; }
+  .tenant-app .tenant-nav-link { min-height: 36px; padding: 0 10px; gap: 10px; border-radius: 8px; font-size: 14px; }
+  .tenant-app .tenant-sidebar-footer a { padding: 8px 10px; font-size: 13px; }
+
+  .tenant-app .tenant-topbar { min-height: 56px; padding: 8px 28px; }
+  .tenant-app .tenant-topbar-context > span { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+  .tenant-app .tenant-topbar-context > strong { font-size: 14px; }
+  .tenant-app .tenant-account { gap: 12px; }
+  .tenant-app .tenant-account-email { font-size: 13px; }
+  .tenant-app .tenant-topbar-action, .tenant-app .tenant-signout { min-height: 36px; padding: 0 14px; font-size: 13px; border-radius: 8px; display: inline-flex; align-items: center; }
+
+  .tenant-app .tenant-content { padding: 24px 32px 32px; font-size: 14px; }
+  .tenant-app .tenant-content > .dashboard-page { max-width: 1280px; padding-bottom: 20px; }
+  .tenant-app .tenant-content h1 { font-size: 24px; line-height: 1.2; margin: 0; }
+  .tenant-app .tenant-content h2 { font-size: 16px; }
+  .tenant-app .tenant-content .eyebrow,
+  .tenant-app .tenant-content .overview-heading .auth-description,
+  .tenant-app .tenant-content .overview-panel-heading .eyebrow { display: none; }
+  .tenant-app .overview-heading { margin-bottom: 16px; align-items: center; }
+  .tenant-app .overview-store-link { min-height: 36px; padding: 0 14px; font-size: 13px; }
+  .tenant-app .overview-metrics { gap: 12px; }
+  .tenant-app .overview-metric { padding: 14px 16px; gap: 2px; border-radius: 12px; }
+  .tenant-app .overview-metric > span { font-size: 13px; }
+  .tenant-app .overview-metric > strong { font-size: 26px; }
+  .tenant-app .overview-metric > small { display: none; }
+  .tenant-app .overview-grid { gap: 12px; margin-top: 12px; }
+  .tenant-app .overview-panel { padding: 16px 18px; border-radius: 12px; }
+  .tenant-app .overview-panel-heading > a, .tenant-app .overview-empty > a { font-size: 13px; }
+  .tenant-app .overview-empty p, .tenant-app .overview-empty strong { font-size: 14px; }
+
+  .tenant-app .workspace-card, .tenant-app .empty-state, .tenant-app .product-form { padding: 16px 18px; border-radius: 12px; }
+  .tenant-app .workspace-card h2, .tenant-app .empty-state h2 { margin-bottom: 4px; font-size: 16px; }
+  .tenant-app .workspace-card p, .tenant-app .empty-state p { font-size: 13px; line-height: 1.5; }
+  .tenant-app .product-form label { font-size: 13px; margin-top: 4px; }
+  .tenant-app .product-form input, .tenant-app .product-form select, .tenant-app .product-form textarea { padding: 9px 11px; font-size: 14px; }
+  .tenant-app .primary-button, .tenant-app .secondary-button { min-height: 36px; padding: 0 14px; font-size: 14px; border-radius: 8px; }
+  .tenant-app .workspace-action { min-height: 0; padding: 7px 12px; font-size: 13px; }
+  .tenant-app .workspace-status { font-size: 12px; }
+  .tenant-app .dashboard-header { margin-bottom: 14px; }
+  .tenant-app .report-metrics { margin-top: 14px; gap: 12px; }
+  .tenant-app .report-metrics article { padding: 14px 16px; }
+  .tenant-app .report-metrics strong { font-size: 22px; }
+  .tenant-app .report-metrics small { display: none; }
+
+  .tenant-app .error-state h1 { font-size: 22px; }
+}
+
+/* Error pages and storefront notices (all sizes). */
+.error-state { max-width: 560px; }
+.error-state h1 { font-size: clamp(22px, 4vw, 28px); margin: 0 0 6px; }
+.error-state .auth-description { margin: 0 0 16px; font-size: 14px; }
+.error-state-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.error-state-actions a, .error-state-actions button { text-decoration: none; }
+.store-notice { display: grid; gap: 16px; width: min(100% - 32px, 560px); margin: 0 auto; padding: 32px 0; }
+.store-notice .empty-state h1 { margin: 0 0 6px; font-size: clamp(22px, 4vw, 28px); }
+.store-notice .empty-state p { margin: 0; font-size: 14px; }

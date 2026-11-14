@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import PublicCheckout from "./public-checkout";
@@ -30,18 +29,18 @@ export default async function StorefrontPage({ params }: { params: Promise<{ ten
   const supabase = await createSupabaseServerClient();
   const { error: refreshError } = await supabase.rpc("refresh_public_store_reservations", { p_store_slug: tenantSlug });
   if (refreshError) {
-    return <main className="storefront-page"><Link href="/">Commerce Workspace</Link><section className="empty-state"><h1>Store temporarily unavailable</h1><p>Stock availability could not be refreshed safely. Please try again shortly.</p></section></main>;
+    return <main className="storefront-page"><div className="store-notice"><Logo href="/" size={30} /><section className="empty-state"><h1>Store temporarily unavailable</h1><p>Please try again shortly.</p></section></div></main>;
   }
   const [{ data, error }, { data: profileData, error: profileError }] = await Promise.all([
     supabase.rpc("get_public_storefront", { p_store_slug: tenantSlug }),
     supabase.rpc("get_public_store_profile", { p_store_slug: tenantSlug }),
   ]);
   if (error || profileError) {
-    return <main className="storefront-page"><Link href="/">Commerce Workspace</Link><section className="empty-state"><h1>Store temporarily unavailable</h1><p>The public catalogue could not be loaded. The store owner may need to finish setup.</p></section></main>;
+    return <main className="storefront-page"><div className="store-notice"><Logo href="/" size={30} /><section className="empty-state"><h1>Store temporarily unavailable</h1><p>The catalogue could not be loaded. The owner may still be setting up.</p></section></div></main>;
   }
   const profile = ((profileData ?? []) as PublicStoreProfile[])[0];
   if (!profile) {
-    return <main className="storefront-page"><Link href="/">Commerce Workspace</Link><section className="empty-state"><h1>Store not found</h1><p>This store does not exist or is no longer active.</p></section></main>;
+    return <main className="storefront-page"><div className="store-notice"><Logo href="/" size={30} /><section className="empty-state"><h1>Store not found</h1><p>This store does not exist or is no longer active.</p></section></div></main>;
   }
   const rows = (data ?? []) as StorefrontRow[];
 

@@ -64,7 +64,7 @@ export default function TenantShell({
     <div className="tenant-app">
       <aside className={`tenant-sidebar ${styles.sidebar}`}>
         <div className="tenant-sidebar-heading">
-          <Logo href="/dashboard" size={40} className="tenant-logo" />
+          <Logo href="/dashboard" size={30} className="tenant-logo" />
         </div>
 
         <div className="tenant-side-context">
