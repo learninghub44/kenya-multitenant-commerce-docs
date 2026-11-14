@@ -9,6 +9,7 @@ import { navItemsForRole, type NavItem } from "@/lib/navigation";
 import { hasPermission } from "@/lib/permissions";
 import Logo from "@/components/logo";
 import NavIcon from "@/components/nav-icons";
+import { BusinessIdChip } from "./business-badge";
 import AccountMenu from "./account-menu";
 import MobileMenu from "./mobile-menu";
 import chrome from "./mobile-chrome.module.css";
@@ -19,6 +20,7 @@ type TenantShellProps = {
   tenantName: string;
   role: string;
   email: string | null;
+  businessCode?: string | null;
   children: ReactNode;
 };
 
@@ -31,6 +33,7 @@ export default function TenantShell({
   tenantName,
   role,
   email,
+  businessCode = null,
   children,
 }: TenantShellProps) {
   const pathname = usePathname();
@@ -70,7 +73,10 @@ export default function TenantShell({
         <div className="tenant-side-context">
           <span className="tenant-side-label">Business workspace</span>
           <strong>{tenantName}</strong>
-          <span className="tenant-role">{roleLabel(role)}</span>
+          <div className="tenant-side-meta">
+            <span className="tenant-role">{roleLabel(role)}</span>
+            {businessCode ? <BusinessIdChip code={businessCode} /> : null}
+          </div>
         </div>
 
         <nav className={`tenant-navigation ${styles.navigation}`} aria-label="Business workspace">
@@ -90,7 +96,7 @@ export default function TenantShell({
                     aria-current={active ? "page" : undefined}
                     key={item.path || "overview"}
                   >
-                    <span className="tenant-nav-mark" aria-hidden="true" />
+                    <NavIcon name={item.path} size={18} className="tenant-nav-icon" />
                     {item.label}
                   </Link>
                 );
@@ -101,9 +107,9 @@ export default function TenantShell({
 
         <div className="tenant-sidebar-footer">
           <a href={storeUrl(tenantSlug)} target="_blank" rel="noreferrer">
-            View storefront <span aria-hidden="true">↗</span>
+            <NavIcon name="storefront" size={16} /> Storefront <span aria-hidden="true">↗</span>
           </a>
-          <Link href="/dashboard">Switch business</Link>
+          <Link href="/dashboard"><NavIcon name="switch" size={16} /> Switch</Link>
         </div>
       </aside>
 

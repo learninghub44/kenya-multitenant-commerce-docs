@@ -879,5 +879,50 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .tenant-app .product-card-side .product-price { margin-right: 6px; font-size: 16px; }
   .tenant-app .overview-hero { padding: 20px 24px; }
   .tenant-app .overview-hero h1 { font-size: 26px; }
-  .tenant-app .overview-metric { background: var(--surface); }
+  .tenant-app .overview-metric { min-height: 92px; align-content: space-between; }
+}
+
+/* ===== Business ID chip and clock ===== */
+.biz-id { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border: 1px solid #f0d9ae; border-radius: 999px; background: #fff; color: var(--text); font: inherit; font-size: 12px; cursor: pointer; }
+.biz-id span { color: var(--muted); font-family: ui-monospace, Menlo, monospace; font-size: 10px; letter-spacing: .08em; }
+.biz-id strong { font-family: ui-monospace, Menlo, monospace; font-size: 13px; letter-spacing: .04em; }
+.biz-id em { color: var(--accent-strong); font-style: normal; font-size: 11px; font-weight: 700; }
+.biz-id:hover { background: var(--accent-soft); }
+.biz-id-hero { border-color: #ffffff30; background: #ffffff14; color: #fff; }
+.biz-id-hero span { color: #b9bdc7; }
+.biz-id-hero em { color: var(--amber); }
+.biz-id-hero:hover { background: #ffffff24; }
+.biz-clock { color: var(--muted); font-size: 13px; white-space: nowrap; }
+.biz-clock strong { color: inherit; font-weight: 700; font-variant-numeric: tabular-nums; }
+.biz-clock-hero { color: #d6d9e0; }
+.overview-hero-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-top: 8px; }
+.overview-hero .overview-hero-main .auth-description { display: none !important; }
+.hero-btn svg { flex: none; }
+
+/* ===== Sidebar polish (desktop) ===== */
+.tenant-side-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+@media (min-width: 761px) {
+  .tenant-app .tenant-sidebar { gap: 0; scrollbar-width: thin; }
+  .tenant-app .tenant-sidebar-heading { padding: 2px 4px 14px; border-bottom: 1px solid var(--border); }
+  .tenant-app .tenant-logo .logo-word { font-size: 15px !important; }
+  .tenant-app .tenant-navigation { flex: 1 1 auto; overflow-y: auto; scrollbar-width: thin; padding-right: 2px; gap: 10px; }
+  .tenant-app .tenant-navigation > div { gap: 1px; }
+  .tenant-app .tenant-nav-link { min-height: 34px; gap: 10px; font-size: 13.5px; color: #3b4150; }
+  .tenant-app .tenant-nav-icon { flex: none; color: #8b909b; }
+  .tenant-app .tenant-nav-link:hover .tenant-nav-icon, .tenant-app .tenant-nav-link.is-active .tenant-nav-icon { color: var(--accent); }
+  .tenant-app .tenant-nav-mark { display: none; }
+  .tenant-app .tenant-sidebar-footer { grid-template-columns: 1fr 1fr; gap: 6px; padding-top: 10px; }
+  .tenant-app .tenant-sidebar-footer a { justify-content: center; align-items: center; gap: 6px; padding: 7px 8px; border: 1px solid var(--border); font-size: 12.5px; }
+  .tenant-app .tenant-side-context { margin: 12px 0 12px; }
+}
+
+/* ===== Overview hero: compact on phones ===== */
+@media (max-width: 760px) {
+  .overview-hero { display: grid; gap: 12px; padding: 14px; border-radius: 14px; margin-bottom: 12px; }
+  .overview-hero .eyebrow { display: none; }
+  .overview-hero h1 { margin: 0; font-size: 19px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .overview-hero-meta { margin-top: 6px; gap: 8px 12px; }
+  .overview-hero-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .overview-hero .hero-btn { justify-content: center; min-height: 36px; padding: 0 6px; font-size: 12.5px; gap: 5px; border-radius: 10px; }
+  .overview-hero .overview-hero-main .auth-description { display: none !important; }
 }

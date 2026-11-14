@@ -16,6 +16,8 @@ The project owner reports that the app is deployed and Supabase is connected. Th
 
 ## Implemented
 
+- Every business has a short numeric `business_code` (e.g. 7166, unique, auto-assigned by trigger, backfilled) shown in the sidebar and overview. It is an identifier for support, never used for authorization. The UI hides it gracefully until migration `202611130003_business_code.sql` is applied.
+
 - Catalogue import (CSV, Shopify/WooCommerce exports, Google Sheets, store URLs) with atomic idempotent `import_catalogue_rows` RPC, opening stock via the ledger, and audit history. See docs/32-catalogue-import.md.
 
 - Next.js/TypeScript app, Supabase SSR/browser/admin clients, email/password auth, tenant onboarding, and tenant-role checks.

@@ -96,3 +96,13 @@ test("import RPC is not callable by anon and history is read-only for clients", 
   assert.match(sql, /revoke all on function public\.import_catalogue_rows\([^)]*\) from public, anon/);
   assert.match(sql, /revoke insert, update, delete on public\.catalogue_imports from anon, authenticated/);
 });
+
+const codeSql = readFileSync(new URL("../supabase/migrations/202611130003_business_code.sql", import.meta.url), "utf8");
+test("business code: serialized generation, backfill, format and uniqueness constraints", () => {
+  assert.match(codeSql, /pg_advisory_xact_lock/);
+  assert.match(codeSql, /before insert on public\.tenants/);
+  assert.match(codeSql, /business_code ~ '\^\[0-9\]\{4,6\}\$'/);
+  assert.match(codeSql, /unique \(business_code\)/);
+  assert.match(codeSql, /for r in select id from public\.tenants where business_code is null/);
+  assert.match(codeSql, /revoke all on function public\.generate_business_code\(\) from public, anon, authenticated/);
+});

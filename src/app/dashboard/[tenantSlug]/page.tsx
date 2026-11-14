@@ -1,3 +1,6 @@
+import NavIcon from "@/components/nav-icons";
+import { loadBusinessMeta } from "@/lib/access/business-meta";
+import { BusinessClock, BusinessIdChip } from "./business-badge";
 import Link from "next/link";
 import { requireTenantAccess } from "@/lib/access";
 import { hasPermission } from "@/lib/permissions";
@@ -41,6 +44,7 @@ export default async function BusinessOverviewPage({
   const access = await requireTenantAccess(tenantSlug, { path: "" });
   if (access.denied) return access.denied;
   const { supabase, tenant, role } = access;
+  const meta = await loadBusinessMeta(tenant.id);
   const canViewOrders = hasPermission(role, "orders.read");
   const canViewInventory = hasPermission(role, "inventory.read");
   const canViewReports = hasPermission(role, "reports.read");
@@ -86,15 +90,18 @@ export default async function BusinessOverviewPage({
   return (
     <main className="dashboard-page business-overview">
       <header className="overview-heading overview-hero">
-        <div>
+        <div className="overview-hero-main">
           <p className="eyebrow">Business overview</p>
           <h1>{tenant.name}</h1>
-          <p className="auth-description">Your business at a glance.</p>
+          <div className="overview-hero-meta">
+            {meta.businessCode ? <BusinessIdChip code={meta.businessCode} className="biz-id-hero" /> : null}
+            <BusinessClock timezone={meta.timezone} className="biz-clock-hero" />
+          </div>
         </div>
         <div className="overview-hero-actions">
-          {canAddProducts && <Link className="hero-btn hero-btn-amber" href={`/dashboard/${tenant.slug}/products#add-product`}>+ Add product</Link>}
-          {canAddProducts && <Link className="hero-btn hero-btn-amber" href={`/dashboard/${tenant.slug}/products/import`}>Import</Link>}
-          <a className="hero-btn hero-btn-ghost" href={storeUrl(tenant.slug)} target="_blank" rel="noreferrer">View storefront <span aria-hidden="true">↗</span></a>
+          {canAddProducts && <Link className="hero-btn hero-btn-amber" href={`/dashboard/${tenant.slug}/products#add-product`}><NavIcon name="plus" size={16} /><span>Add product</span></Link>}
+          {canAddProducts && <Link className="hero-btn hero-btn-amber" href={`/dashboard/${tenant.slug}/products/import`}><NavIcon name="/products" size={16} /><span>Import</span></Link>}
+          <a className="hero-btn hero-btn-ghost" href={storeUrl(tenant.slug)} target="_blank" rel="noreferrer"><NavIcon name="storefront" size={16} /><span>Storefront</span></a>
         </div>
       </header>
 

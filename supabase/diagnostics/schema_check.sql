@@ -12,6 +12,7 @@ select * from (values
   ('fn get_public_storefront',             to_regprocedure('public.get_public_storefront(text)') is not null, '202610160011 / 0017 / 0018'),
   ('fn get_public_store_profile',          to_regprocedure('public.get_public_store_profile(text)') is not null, '202610170001_store_profiles_and_reserved_slugs'),
   ('fn import_catalogue_rows',             to_regprocedure('public.import_catalogue_rows(uuid,jsonb,text,text,text,uuid)') is not null, '202611130002_catalogue_import'),
+  ('column tenants.business_code',        exists (select 1 from information_schema.columns where table_schema='public' and table_name='tenants' and column_name='business_code'), '202611130003_business_code'),
   ('fn record_inventory_movement',         to_regprocedure('public.record_inventory_movement(uuid,uuid,uuid,integer,text,text,text)') is not null, '202610160004_inventory_operations')
 ) as t(object_name, "exists", migration)
 order by "exists", object_name;
