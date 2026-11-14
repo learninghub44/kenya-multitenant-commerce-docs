@@ -75,11 +75,6 @@ export default async function DashboardPage() {
                 {item.tenant.business_code ? <BusinessIdChip code={item.tenant.business_code} /> : <span className="business-id-pending">ID pending</span>}
                 <BusinessClock timezone={item.tenant.timezone || "Africa/Nairobi"} />
               </div>
-              <div className="business-meta">
-                <span className="workspace-status">{item.tenant.currency}</span>
-                <span className="business-meta-dot" aria-hidden="true" />
-                <span className="business-role">{item.role.replaceAll("_", " ")}</span>
-              </div>
             </div>
             <Link className="workspace-action" href={`/dashboard/${item.tenant.slug}`}>
               Open workspace <span aria-hidden="true">→</span>
