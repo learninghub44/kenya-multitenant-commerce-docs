@@ -13,6 +13,7 @@ export default function RegisterPage() {
       points={["Publish your products", "Track stock and orders", "Work with your team"]}
       shopLink
       compact
+      activeAuth="register"
     >
       <AuthForm variant="register" />
     </AuthShell>
