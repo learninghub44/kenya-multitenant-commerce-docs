@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
 import { storeUrl } from "@/lib/store-url";
 import { navItemsForRole, type NavItem } from "@/lib/navigation";
@@ -37,6 +38,7 @@ export default function TenantShell({
   children,
 }: TenantShellProps) {
   const pathname = usePathname();
+  const reduceMotion = useReducedMotion();
   const [menuOpen, setMenuOpen] = useState(false);
   const basePath = `/dashboard/${tenantSlug}`;
   // Single source of truth for what this role may open: the desktop sidebar,
@@ -65,7 +67,7 @@ export default function TenantShell({
 
   return (
     <div className="tenant-app">
-      <aside className={`tenant-sidebar ${styles.sidebar}`}>
+      <motion.aside className={`tenant-sidebar ${styles.sidebar}`} initial={reduceMotion ? false : { opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}>
         <div className="tenant-sidebar-heading">
           <Logo href="/dashboard" size={30} className="tenant-logo" />
         </div>
@@ -111,7 +113,7 @@ export default function TenantShell({
           </a>
           <Link href="/dashboard"><NavIcon name="switch" size={16} /> Switch</Link>
         </div>
-      </aside>
+      </motion.aside>
 
       <div className="tenant-stage">
         <header className="tenant-topbar">

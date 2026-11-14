@@ -926,3 +926,90 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .overview-hero .hero-btn { justify-content: center; min-height: 36px; padding: 0 6px; font-size: 12.5px; gap: 5px; border-radius: 10px; }
   .overview-hero .overview-hero-main .auth-description { display: none !important; }
 }
+
+ 
+/* Business picker: compact identity-first rows, never oversized cards. */
+.workspaces-compact .workspace-list{display:grid;grid-template-columns:1fr;gap:9px;max-width:920px;margin-top:18px}
+.workspaces-compact .business-card{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:12px;padding:13px 16px;border:1px solid #e9e4da;border-radius:13px;background:#fff;box-shadow:0 2px 8px rgba(20,28,22,.025);transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease}
+.workspaces-compact .business-card:hover{border-color:#e2bd82;box-shadow:0 8px 22px rgba(20,28,22,.07);transform:translateY(-1px)}
+.workspaces-compact .business-mark{width:40px;height:40px;border-radius:11px;font-size:16px}
+.workspaces-compact .business-card-copy{display:grid;min-width:0;gap:5px}
+.workspaces-compact .business-card h2{min-width:0;margin:0;color:#171a20;font-size:15px;font-weight:750;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.business-card-identity{display:flex;align-items:center;flex-wrap:wrap;gap:7px 12px;min-width:0}
+.business-card-identity .biz-id{min-height:23px;padding:1px 7px;font-size:11px}
+.business-card-identity .biz-id em{display:none}
+.business-card-identity .biz-clock{font-size:11px;color:#737a83}
+.business-id-pending{color:#8a6a3b;font-size:11px;font-weight:700}
+.workspaces-compact .business-meta{gap:7px;margin-top:0}
+.workspaces-compact .business-meta .workspace-status,.workspaces-compact .business-meta .business-role{font-size:11px}
+.workspaces-compact .business-card .workspace-action{grid-column:auto;min-height:34px;padding:0 12px;border-radius:8px;font-size:12px;white-space:nowrap}
+.workspaces-compact .workspace-create-link{max-width:920px;margin-top:2px;padding:12px 15px;border-width:1px}
+@media(max-width:760px){
+ .workspaces-compact{padding:20px 14px 40px}
+ .workspaces-compact .workspaces-header{margin-top:18px;gap:12px}
+ .workspaces-compact .workspaces-header h1{font-size:24px}
+ .workspaces-compact .workspace-list{gap:8px;margin-top:14px}
+ .workspaces-compact .business-card{grid-template-columns:36px minmax(0,1fr) auto;gap:9px;padding:11px 10px;border-radius:11px}
+ .workspaces-compact .business-mark{width:34px;height:34px;border-radius:9px;font-size:14px}
+ .workspaces-compact .business-card h2{font-size:13px}
+ .business-card-identity{gap:5px 8px}
+ .business-card-identity .biz-id{min-height:21px;padding:0 6px}
+ .business-card-identity .biz-id strong{font-size:11px}
+ .business-card-identity .biz-clock{font-size:10px}
+ .workspaces-compact .business-meta{gap:5px}
+ .workspaces-compact .business-meta .workspace-status,.workspaces-compact .business-meta .business-role{font-size:10px}
+ .workspaces-compact .business-card .workspace-action{min-height:30px;padding:0 8px;font-size:11px}
+ .workspaces-compact .business-card .workspace-action span{display:none}
+}
+@media(max-width:380px){
+ .workspaces-compact .business-card{grid-template-columns:32px minmax(0,1fr);gap:8px}
+ .workspaces-compact .business-mark{width:30px;height:30px}
+ .workspaces-compact .business-card .workspace-action{grid-column:2;justify-self:start;min-height:28px}
+}
+
+/* Commerce workspace sidebar: stronger hierarchy and a real desktop navigation rail. */
+@media(min-width:1024px){
+ .tenant-app{grid-template-columns:264px minmax(0,1fr);min-height:100vh;background:#f7f7f3}
+ .tenant-app>.tenant-sidebar{position:sticky;top:0;display:flex;flex-direction:column;gap:0;width:264px;height:100vh;min-height:100vh;padding:22px 16px 16px;background:#fff;border-right:1px solid #e8e8e1;box-shadow:3px 0 18px rgba(20,28,22,.025)}
+ .tenant-app .tenant-sidebar-heading{padding:3px 8px 20px;border-bottom:1px solid #eff0eb}
+ .tenant-app .tenant-side-context{display:grid;gap:8px;margin:16px 0 18px;padding:13px;border:1px solid #ecece5;border-radius:13px;background:#fafaf7}
+ .tenant-app .tenant-side-label{display:block;color:#858b83;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+ .tenant-app .tenant-side-context>strong{font-size:14px;line-height:1.35;overflow-wrap:anywhere}
+ .tenant-app .tenant-side-meta{justify-content:space-between;gap:6px}
+ .tenant-app .tenant-role{color:#6d746d;font-size:11px;text-transform:capitalize}
+ .tenant-app .tenant-side-meta .biz-id{padding:2px 7px;font-size:10px}
+ .tenant-app .tenant-side-meta .biz-id em{display:none}
+ .tenant-app .tenant-navigation{display:grid;align-content:start;gap:18px;flex:1;min-height:0;overflow-y:auto;padding:0 2px 14px;scrollbar-width:thin}
+ .tenant-app .tenant-navigation>div{display:grid;gap:4px}
+ .tenant-app .tenant-navigation>div>span{padding:0 11px 5px;color:#93988f;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+ .tenant-app .tenant-nav-link{display:flex;align-items:center;min-height:42px;padding:0 11px;gap:12px;border:1px solid transparent;border-radius:10px;color:#515951;font-size:13px;font-weight:600;transition:background .16s ease,color .16s ease,border-color .16s ease}
+ .tenant-app .tenant-nav-icon{width:19px;color:#818980;transition:color .16s ease,transform .16s ease}
+ .tenant-app .tenant-nav-link:hover{background:#f7f6f0;color:#242b24}
+ .tenant-app .tenant-nav-link:hover .tenant-nav-icon{color:#a85d0c;transform:translateX(1px)}
+ .tenant-app .tenant-nav-link.is-active{border-color:#f0dfc3;background:#fff5e6;color:#8f4c08;box-shadow:none;font-weight:750}
+ .tenant-app .tenant-nav-link.is-active .tenant-nav-icon{color:#b96a0e}
+ .tenant-app .tenant-sidebar-footer{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-top:14px;border-top:1px solid #eff0eb}
+ .tenant-app .tenant-sidebar-footer a{display:flex;justify-content:center;align-items:center;gap:7px;min-height:38px;padding:0 8px;border:1px solid #e9eae4;border-radius:9px;background:#fff;color:#50584f;font-size:11px;font-weight:650;text-decoration:none}
+ .tenant-app .tenant-sidebar-footer a:hover{border-color:#e8c894;background:#fff9ef;color:#8f4c08}
+ .tenant-app .tenant-stage{min-width:0}
+ .tenant-app .tenant-topbar{min-height:64px;padding:9px clamp(24px,3vw,44px);border-bottom:1px solid #e9ebe5;background:rgba(255,255,255,.96)}
+ .tenant-app .tenant-content{padding:28px clamp(24px,3vw,44px) 34px}
+}
+@media(min-width:761px) and (max-width:1023px){
+ .tenant-app{grid-template-columns:220px minmax(0,1fr)}
+ .tenant-app>.tenant-sidebar{padding:14px 10px}
+ .tenant-app .tenant-nav-link{min-height:38px;padding:0 8px;font-size:12px}
+ .tenant-app .tenant-side-context{padding:9px}
+ .tenant-app .tenant-content{padding:22px 20px 30px}
+}
+@media(max-width:760px){
+ .tenant-app .tenant-topbar{position:sticky;top:0;z-index:700;border-bottom:1px solid #ecece5;background:rgba(255,255,255,.97);backdrop-filter:blur(14px)}
+ .tenant-app .tenant-content{padding-top:16px}
+ .tenant-app .tenant-stage{min-height:100svh}
+}
+@media(prefers-reduced-motion:reduce){
+ .workspaces-compact .business-card,.tenant-app .tenant-nav-link,.tenant-app .tenant-nav-icon{transition:none}
+ .workspaces-compact .business-card:hover{transform:none}
+}
+
+.business-id-note{max-width:920px;margin:14px 0 0;padding:10px 13px;border:1px solid #ead9b8;border-radius:9px;background:#fff9ee;color:#77501e;font-size:12px;line-height:1.5}

@@ -1,18 +1,31 @@
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/access";
-import { storeDisplayAddress } from "@/lib/store-url";
 import Logo from "@/components/logo";
+import { BusinessClock, BusinessIdChip } from "./[tenantSlug]/business-badge";
+import BusinessCardMotion from "./business-card-motion";
 
 export default async function DashboardPage() {
   const user = await requireUser("/dashboard");
   const supabase = await createSupabaseServerClient();
 
-  const { data: memberships, error } = await supabase
+  let { data: memberships, error } = await supabase
     .from("tenant_memberships")
-    .select("tenant_id, role, active, tenants(id, name, slug, status, currency)")
+    .select("tenant_id, role, active, tenants(id, name, slug, status, currency, business_code, timezone)")
     .eq("user_id", user.id)
     .eq("active", true);
+
+  // Keep the business switcher usable while the production migration is pending.
+  // The ID remains database-generated; never fabricate a client-side replacement.
+  if (error && (error.code === "42703" || error.code === "PGRST204")) {
+    const fallback = await supabase
+      .from("tenant_memberships")
+      .select("tenant_id, role, active, tenants(id, name, slug, status, currency, timezone)")
+      .eq("user_id", user.id)
+      .eq("active", true);
+    memberships = fallback.data as typeof memberships;
+    error = fallback.error;
+  }
 
   if (error) {
     return (
@@ -26,10 +39,11 @@ export default async function DashboardPage() {
   }
 
   const tenants = (memberships ?? []).flatMap(item => {
-    const related = item.tenants as unknown as { id: string; name: string; slug: string; status: string; currency: string } | Array<{ id: string; name: string; slug: string; status: string; currency: string }> | null;
+    const related = item.tenants as unknown as { id: string; name: string; slug: string; status: string; currency: string; business_code: string | null; timezone: string | null } | Array<{ id: string; name: string; slug: string; status: string; currency: string; business_code: string | null; timezone: string | null }> | null;
     const tenant = Array.isArray(related) ? related[0] : related;
     return tenant && tenant.status === "active" ? [{ ...item, tenant }] : [];
   });
+  const hasPendingBusinessIds = tenants.some(item => !item.tenant.business_code);
   return (
     <main className="dashboard-page workspaces-page workspaces-compact">
       <Logo href="/" size={36} className="page-logo" />
@@ -42,6 +56,7 @@ export default async function DashboardPage() {
           <button className="secondary-button" type="submit">Sign out</button>
         </form>
       </header>
+      {hasPendingBusinessIds && <p className="business-id-note">Business IDs will appear after the production database migrations run. IDs are generated and stored by the database.</p>}
       <section className="workspace-list" aria-label="Businesses you can access">
         {tenants.length === 0 ? (
           <div className="empty-state workspace-empty">
@@ -52,21 +67,19 @@ export default async function DashboardPage() {
             <Link className="primary-button" href="/onboarding">Create business <span aria-hidden="true">→</span></Link>
           </div>
         ) : tenants.map(item => (
-          <article className="workspace-card business-card" key={item.tenant_id}>
+          <BusinessCardMotion key={item.tenant_id}>
             <span className="business-mark" aria-hidden="true">{item.tenant.name.slice(0, 1).toUpperCase()}</span>
             <div className="business-card-copy">
-              <h2>{item.tenant.name}</h2>
-              <p className="business-slug">{storeDisplayAddress(item.tenant.slug)}</p>
-              <div className="business-meta">
-                <span className="workspace-status">{item.tenant.currency}</span>
-                <span className="business-meta-dot" aria-hidden="true" />
-                <span className="business-role">{item.role.replaceAll("_", " ")}</span>
+              <h2 title={item.tenant.name}>{item.tenant.name}</h2>
+              <div className="business-card-identity">
+                {item.tenant.business_code ? <BusinessIdChip code={item.tenant.business_code} /> : <span className="business-id-pending">ID pending</span>}
+                <BusinessClock timezone={item.tenant.timezone || "Africa/Nairobi"} />
               </div>
             </div>
             <Link className="workspace-action" href={`/dashboard/${item.tenant.slug}`}>
-              Open <span aria-hidden="true">→</span>
+              Open workspace <span aria-hidden="true">→</span>
             </Link>
-          </article>
+          </BusinessCardMotion>
         ))}
         {tenants.length > 0 && (
           <Link className="workspace-create-link" href="/onboarding">
