@@ -1025,7 +1025,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .auth-card-figma.is-register .auth-pattern::after { clip-path:ellipse(112% 77% at 50% 113%); }
 .auth-form-content { position:relative; z-index:1; display:flex; flex:1; flex-direction:column; min-height:852px; padding:370px 20px 28px; }
 .auth-card-figma.is-register .auth-form-content { padding-top:230px; }
-.auth-card-figma h1 { width:100%; margin:0 0 30px; color:#404040; font-family:Rubik,Arial,sans-serif; font-size:36px; font-weight:700; line-height:44px; letter-spacing:-1.1px; text-decoration:underline; text-decoration-color:#ff8383; text-decoration-thickness:2px; text-underline-offset:5px; }
+.auth-card-figma h1 { width:100%; margin:0 0 30px; color:#404040; font-family:var(--font-body),Arial,sans-serif; font-size:36px; font-weight:700; line-height:44px; letter-spacing:-1.1px; text-decoration:underline; text-decoration-color:#ff8383; text-decoration-thickness:2px; text-underline-offset:5px; }
 .auth-card-figma form { display:flex; flex:1; flex-direction:column; gap:20px; }
 .auth-card-figma .figma-field { display:grid; gap:10px; min-width:0; }
 .auth-card-figma .figma-field label { color:#404040; font-family:Rubik,Arial,sans-serif; font-size:16px; font-weight:500; line-height:24px; }
