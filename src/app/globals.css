@@ -1054,3 +1054,28 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .auth-card-figma .form-message { font-size:13px; }
 @media (max-width:430px) { .auth-shell-figma { display:block; background:#fff; } .auth-main-figma,.auth-card-figma { width:100%; min-height:100svh; } .auth-form-content { min-height:100svh; padding-bottom:max(28px,env(safe-area-inset-bottom)); } }
 @media (min-width:431px) { .auth-main-figma { border-radius:24px; min-height:852px; } .auth-card-figma { border-radius:24px; } }
+
+
+/* Clear, responsive email-link and recovery states */
+.auth-email-sent{display:grid;justify-items:center;gap:14px;width:100%;margin:26px 0 0;padding:28px 22px;border:1px solid #e7e8e2;border-radius:18px;background:linear-gradient(180deg,#fff 0%,#fbfaf7 100%);text-align:center;animation:auth-state-in .42s cubic-bezier(.2,.8,.2,1) both}
+.auth-email-sent-icon{display:grid;place-items:center;width:64px;height:64px;border-radius:20px;background:#f0f5ed;color:#34784a}
+.auth-email-sent-icon svg{width:34px;height:34px}
+.auth-email-sent h2{margin:2px 0 0;font-size:23px;letter-spacing:-.035em}
+.auth-email-sent p{max-width:38ch;margin:0;color:#68736b;font-size:14px;line-height:1.7;overflow-wrap:anywhere}
+.auth-email-sent .auth-email-sent-lead{margin-top:4px;color:#536158}
+.auth-email-address{max-width:100%;color:#202a23;font-size:15px;overflow-wrap:anywhere}
+.auth-email-sent .primary-button{width:100%;margin-top:4px}
+.auth-email-edit{min-height:40px;padding:6px 12px;border:0;border-radius:8px;background:transparent;color:#287346;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.auth-email-edit:hover{background:#edf5ee}
+.auth-email-back{margin:20px 0 0;text-align:center;font-size:13px}
+.auth-email-back a{color:#287346;font-weight:700;text-decoration:none}
+.auth-email-back a:hover{text-decoration:underline;text-underline-offset:3px}
+@keyframes auth-state-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.auth-card-figma .auth-email-sent{position:relative;margin:0;padding:24px 18px;border-color:#f1d8d4;border-radius:16px;background:#fffafa}
+.auth-card-figma .auth-email-sent-icon{background:#fff0ed;color:#e47773}
+.auth-card-figma .auth-email-sent h2{font-size:21px}
+.auth-card-figma .auth-email-sent .primary-button{background:#ff8383;border-color:#ff8383}
+.auth-card-figma .auth-email-sent .primary-button:hover{background:#fa7477}
+.auth-card-figma .auth-email-address{font-size:14px}
+@media(max-width:430px){.auth-email-sent{padding:24px 17px;border-radius:15px}.auth-email-sent-icon{width:58px;height:58px}}
+@media(prefers-reduced-motion:reduce){.auth-email-sent{animation:none}}
