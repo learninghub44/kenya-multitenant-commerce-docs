@@ -100,8 +100,8 @@ export default async function BusinessOverviewPage({
         </div>
         <div className="overview-hero-actions">
           {canAddProducts && <Link className="hero-btn hero-btn-amber" href={`/dashboard/${tenant.slug}/products#add-product`}><NavIcon name="plus" size={16} /><span>Add product</span></Link>}
-          {canAddProducts && <Link className="hero-btn hero-btn-amber" href={`/dashboard/${tenant.slug}/products/import`}><NavIcon name="/products" size={16} /><span>Import</span></Link>}
-          <a className="hero-btn hero-btn-ghost" href={storeUrl(tenant.slug)} target="_blank" rel="noreferrer"><NavIcon name="storefront" size={16} /><span>Storefront</span></a>
+          {canAddProducts && <Link className="hero-btn hero-btn-amber" href={`/dashboard/${tenant.slug}/products/import`}><NavIcon name="/products" size={16} /><span>Import products</span></Link>}
+          <a className="hero-btn hero-btn-ghost" href={storeUrl(tenant.slug)} target="_blank" rel="noreferrer"><NavIcon name="storefront" size={16} /><span>View storefront</span></a>
         </div>
       </header>
 
