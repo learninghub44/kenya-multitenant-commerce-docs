@@ -1011,3 +1011,5 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
  .workspaces-compact .business-card,.tenant-app .tenant-nav-link,.tenant-app .tenant-nav-icon{transition:none}
  .workspaces-compact .business-card:hover{transform:none}
 }
+
+.business-id-note{max-width:920px;margin:14px 0 0;padding:10px 13px;border:1px solid #ead9b8;border-radius:9px;background:#fff9ee;color:#77501e;font-size:12px;line-height:1.5}
