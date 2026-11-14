@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useModalClose } from "@/components/ui/modal";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 function slugify(value: string) {
@@ -11,6 +12,7 @@ function slugify(value: string) {
 
 export default function NewProductForm({ tenantId }: { tenantId: string }) {
   const router = useRouter();
+  const closeModal = useModalClose();
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [slugEdited, setSlugEdited] = useState(false);
@@ -60,6 +62,7 @@ export default function NewProductForm({ tenantId }: { tenantId: string }) {
       setPrice("");
       setSku("");
       router.refresh();
+      closeModal();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Could not create this product.");
     } finally {
@@ -69,8 +72,7 @@ export default function NewProductForm({ tenantId }: { tenantId: string }) {
 
   return (
     <form id="add-product" className="product-form" onSubmit={submit}>
-      <h2>Add a product</h2>
-            <label htmlFor="product-title">Product name</label>
+                  <label htmlFor="product-title">Product name</label>
       <input id="product-title" required maxLength={180} value={title} onChange={e => { setTitle(e.target.value); if (!slugEdited) setSlug(slugify(e.target.value)); }} />
       <label htmlFor="product-slug">Product URL slug</label>
       <input id="product-slug" required maxLength={180} value={slug} onChange={e => { setSlugEdited(true); setSlug(slugify(e.target.value)); }} />

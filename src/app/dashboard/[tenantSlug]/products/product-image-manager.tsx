@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { ChangeEvent, DragEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ModalButton } from "@/components/ui/modal";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 type ProductImage = { id: string; secure_url: string; alt_text: string; position: number };
@@ -87,8 +88,7 @@ export default function ProductImageManager({ tenantId, productId, images }: {
     void uploadFiles(Array.from(event.dataTransfer.files));
   }
 
-  return <details className="variant-manager">
-    <summary>Product images ({images.length})</summary>
+  return <ModalButton label={`Images (${images.length})`} title="Product images" size="lg">
     {images.length > 0 && <div className="product-image-list">
       {images.map(item => <figure key={item.id}>
         <Image src={item.secure_url} alt={item.alt_text || "Product image"} width={120} height={100} unoptimized />
@@ -108,5 +108,5 @@ export default function ProductImageManager({ tenantId, productId, images }: {
     {error && <p role="alert" className="form-message error">{error}</p>}
     {message && <p role="status" className="form-message">{message}</p>}
     <p className="field-help">Uploads use a short-lived server-generated signature. If the metadata save fails after upload, the Cloudinary file may need cleanup.</p>
-  </details>;
+  </ModalButton>;
 }

@@ -57,7 +57,7 @@
 .accountUser span:not(.avatar) { color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
 .accountBusiness {
   display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--border);
-  border-radius: 14px; background: #f6faf7;
+  border-radius: 14px; background: #fcf9f4;
 }
 .accountBusiness > div { display: grid; justify-items: start; gap: 2px; min-width: 0; }
 .accountBusiness small { color: var(--muted); font-size: 12px; }
@@ -89,7 +89,7 @@
   overscroll-behavior: contain; transition: transform .2s ease; animation: rise .24s cubic-bezier(.2, .8, .2, 1);
 }
 .grab { display: grid; flex: none; place-items: center; height: 30px; cursor: grab; touch-action: none; }
-.handle { width: 44px; height: 5px; border-radius: 999px; background: #d4ddd7; }
+.handle { width: 44px; height: 5px; border-radius: 999px; background: #f5debc; }
 .sheetHeader { display: flex; flex: none; align-items: center; justify-content: space-between; padding: 2px 20px 4px; }
 .sheetHeader h2 { margin: 0; font-size: 24px; letter-spacing: -.02em; }
 .closeButton {

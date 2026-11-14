@@ -85,15 +85,17 @@ export default async function BusinessOverviewPage({
 
   return (
     <main className="dashboard-page business-overview">
-      <header className="overview-heading">
+      <header className="overview-heading overview-hero">
         <div>
-          <p className="eyebrow">Overview</p>
+          <p className="eyebrow">Business overview</p>
           <h1>{tenant.name}</h1>
           <p className="auth-description">Your business at a glance.</p>
         </div>
-        <a className="overview-store-link" href={storeUrl(tenant.slug)} target="_blank" rel="noreferrer">
-          View storefront <span aria-hidden="true">↗</span>
-        </a>
+        <div className="overview-hero-actions">
+          {canAddProducts && <Link className="hero-btn hero-btn-amber" href={`/dashboard/${tenant.slug}/products#add-product`}>+ Add product</Link>}
+          {canAddProducts && <Link className="hero-btn hero-btn-amber" href={`/dashboard/${tenant.slug}/products/import`}>Import</Link>}
+          <a className="hero-btn hero-btn-ghost" href={storeUrl(tenant.slug)} target="_blank" rel="noreferrer">View storefront <span aria-hidden="true">↗</span></a>
+        </div>
       </header>
 
       {queryErrors.length > 0 && (

@@ -6,3 +6,4 @@ export { PageHeader, type Crumb } from "./page-header";
 export { EmptyState } from "./empty-state";
 export { Skeleton } from "./skeleton";
 export { DataTable, type Column } from "./data-table";
+export { ModalButton, useModalClose } from "./modal";

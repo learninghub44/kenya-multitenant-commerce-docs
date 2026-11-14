@@ -32,7 +32,7 @@
  .mobileNavLink{min-height:60px;gap:3px;padding:5px 2px;border-radius:10px;font-size:10px;line-height:1.2}
  .mobileNavIcon{display:grid;place-items:center;width:28px;height:27px;border-radius:8px;color:currentColor}
  .mobileNavIcon svg{display:block}
- .active .mobileNavIcon{background:#dcefe2}
+ .active .mobileNavIcon{background:#f4e9d7}
  .mobileNavMark{display:none}
 }
 

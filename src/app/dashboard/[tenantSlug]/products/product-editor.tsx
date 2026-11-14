@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ModalButton } from "@/components/ui/modal";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 export default function ProductEditor({
@@ -70,8 +71,7 @@ export default function ProductEditor({
   }
 
   return (
-    <details className="product-editor">
-      <summary>Edit product</summary>
+    <ModalButton label="Edit" title="Edit product" size="md">
       <form className="product-form product-form-compact" onSubmit={submit}>
         <label htmlFor={`edit-title-${productId}`}>Product name</label>
         <input id={`edit-title-${productId}`} required maxLength={180} value={title} onChange={e => setTitle(e.target.value)} />
@@ -92,6 +92,6 @@ export default function ProductEditor({
         {success && <p className="form-message" role="status">{success}</p>}
         <button className="primary-button" type="submit" disabled={busy}>{busy ? "Saving…" : "Save changes"}</button>
       </form>
-    </details>
+    </ModalButton>
   );
 }

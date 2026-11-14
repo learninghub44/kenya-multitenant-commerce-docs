@@ -2,6 +2,7 @@ import { requireTenantAccess } from "@/lib/access";
 import { failLoad } from "@/lib/access/load-failure";
 import { hasPermission } from "@/lib/permissions";
 import Link from "next/link";
+import { ModalButton } from "@/components/ui/modal";
 import NewProductForm from "./new-product-form";
 import ProductEditor from "./product-editor";
 import ProductCategoryAssignment from "./product-category-assignment";
@@ -62,7 +63,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
   const canManage = hasPermission(role, "products.update");
   return (
     <main className="dashboard-page">
-      <DashboardPageHeader eyebrow="Product catalogue" title={tenant.name} aside={<><span className="workspace-status">{role.replaceAll("_", " ")}</span>{hasPermission(role, "products.update") && <Link className="workspace-action" href={`/dashboard/${tenant.slug}/products/import`}>Import catalogue</Link>}</>} />
+      <DashboardPageHeader eyebrow={tenant.name} title="Products" aside={<><span className="workspace-status">{role.replaceAll("_", " ")}</span>{canManage && <Link className="workspace-action" href={`/dashboard/${tenant.slug}/products/import`}>Import</Link>}{canManage && <ModalButton label="Add product" icon="+" variant="primary" title="Add product" openOnHash="add-product"><NewProductForm tenantId={tenant.id} /></ModalButton>}</>} />
       <section className="workspace-list">
         {products.length === 0 ? <DashboardEmptyState title="No products yet" description="Add a product or import your catalogue." /> : products.map(product => {
           const productVariants = variants.filter(item => item.product_id === product.id);
@@ -75,7 +76,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ tenan
           </article>;
         })}
       </section>
-      {canManage ? <NewProductForm tenantId={tenant.id} /> : <p className="field-help">Your role can view the catalogue but cannot create products.</p>}
+      {!canManage && <p className="field-help">Your role can view the catalogue but cannot create products.</p>}
     </main>
   );
 }

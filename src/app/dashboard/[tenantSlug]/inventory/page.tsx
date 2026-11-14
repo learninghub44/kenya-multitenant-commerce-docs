@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireTenantAccess } from "@/lib/access";
 import { failLoad } from "@/lib/access/load-failure";
 import { hasPermission } from "@/lib/permissions";
+import { ModalButton } from "@/components/ui/modal";
 import StockMovementForm from "./stock-movement-form";
 
 type ProductRow = { id: string; title: string };
@@ -47,7 +48,7 @@ export default async function InventoryPage({ params }: { params: Promise<{ tena
 
   return (
     <main className="dashboard-page">
-      <header className="dashboard-header"><div><p className="eyebrow">Inventory</p><h1>{tenant.name}</h1><p className="auth-description">Stock balances and recorded movements for {activeLocation?.name ?? "your locations"}.</p></div><span className="workspace-status">{role.replaceAll("_", " ")}</span></header>
+      <header className="dashboard-header"><div><p className="eyebrow">{tenant.name}</p><h1>Inventory</h1><p className="auth-description">Stock balances and recorded movements for {activeLocation?.name ?? "your locations"}.</p></div><div className="header-actions"><span className="workspace-status">{role.replaceAll("_", " ")}</span>{canManage && activeLocation && <ModalButton label="Receive / adjust stock" icon="+" variant="primary" title="Receive or adjust stock"><StockMovementForm tenantId={tenant.id} locationId={activeLocation.id} variants={variantOptions} /></ModalButton>}</div></header>
       <section className="workspace-list">
         {!activeLocation && <div className="empty-state"><h2>No active stock location</h2><p>Your Main store location has not been set up yet. Contact support if this does not resolve.</p></div>}
         {variants.length === 0 ? <div className="empty-state"><h2>No product variants yet</h2><p>Create a product first. Every product starts with a default variant.</p>{canManageProducts ? <><Link className="workspace-action" href={`/dashboard/${tenant.slug}/products`}>Open products →</Link> <Link className="workspace-action" href={`/dashboard/${tenant.slug}/products/import`}>Import a catalogue →</Link></> : <p className="field-help">Ask a workspace owner, manager or catalog editor to add the first product.</p>}</div> : variants.map(variant => {
@@ -61,7 +62,7 @@ export default async function InventoryPage({ params }: { params: Promise<{ tena
           </article>;
         })}
       </section>
-      {canManage && activeLocation ? <StockMovementForm tenantId={tenant.id} locationId={activeLocation.id} variants={variantOptions} /> : !canManage ? <p className="field-help">Your role can view stock but cannot receive or adjust it.</p> : null}
+      {!canManage && <p className="field-help">Your role can view stock but cannot receive or adjust it.</p>}
     </main>
   );
 }

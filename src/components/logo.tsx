@@ -1,14 +1,14 @@
 import Link from "next/link";
 
 export function LogoMark({ size = 40, inverted = false }: { size?: number; inverted?: boolean }) {
-  const tile = inverted ? "#ffffff" : "#0f8a43";
-  const bag = inverted ? "#0f8a43" : "#ffffff";
-  const tick = inverted ? "#ffffff" : "#0f8a43";
+  const tile = inverted ? "#ffffff" : "#12141b";
+  const bag = inverted ? "#12141b" : "#f5a524";
+  const tick = inverted ? "#ffffff" : "#12141b";
   return (
     <svg className="logo-mark" width={size} height={size} viewBox="0 0 48 48" aria-hidden="true" focusable="false">
       <rect width="48" height="48" rx="12" fill={tile} />
       <path d="M13 19h22l-1.6 18a3 3 0 0 1-3 2.7H17.6a3 3 0 0 1-3-2.7L13 19z" fill={bag} />
-      <path d="M18.5 19v-3.5a5.5 5.5 0 0 1 11 0V19" fill="none" stroke="#ffc42e" strokeWidth="3.2" strokeLinecap="round" />
+      <path d="M18.5 19v-3.5a5.5 5.5 0 0 1 11 0V19" fill="none" stroke={inverted ? "#f5a524" : "#ffffff"} strokeWidth="3.2" strokeLinecap="round" />
       <path d="M19.5 29.5l3.2 3.2 6-6.4" fill="none" stroke={tick} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );

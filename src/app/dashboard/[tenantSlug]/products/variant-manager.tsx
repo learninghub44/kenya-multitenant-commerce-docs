@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ModalButton } from "@/components/ui/modal";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 export type ManagedVariant = {
@@ -96,8 +97,7 @@ export default function VariantManager({ tenantId, productId, variants }: {
     } finally { setBusy(false); }
   }
 
-  return <details className="variant-manager">
-    <summary>Variants ({variants.length})</summary>
+  return <ModalButton label={`Variants (${variants.length})`} title="Variants" size="lg">
     <div className="variant-list">
       {variants.map(variant => <article className="variant-row" key={variant.id}>
         <div><strong>{variant.title}</strong><p>{variant.sku ? `SKU ${variant.sku} · ` : ""}{new Intl.NumberFormat("en-KE", { style: "currency", currency: variant.currency }).format(variant.price_minor / 100)}</p><span className="workspace-status">{variant.status}</span><p className="field-help">{JSON.stringify(variant.options ?? {})}</p></div>
@@ -121,5 +121,5 @@ export default function VariantManager({ tenantId, productId, variants }: {
       {message && <p className="form-message" role="status">{message}</p>}
       <button className="primary-button" type="submit" disabled={busy}>{busy ? "Saving…" : "Create draft variant"}</button>
     </form>
-  </details>;
+  </ModalButton>;
 }

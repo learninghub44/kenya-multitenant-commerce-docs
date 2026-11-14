@@ -2,6 +2,7 @@
 
 import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useModalClose } from "@/components/ui/modal";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 type VariantOption = { id: string; label: string; onHand: number };
@@ -16,6 +17,7 @@ export default function StockMovementForm({
   variants: VariantOption[];
 }) {
   const router = useRouter();
+  const closeModal = useModalClose();
   const keyRef = useRef<string | null>(null);
   const [variantId, setVariantId] = useState(variants[0]?.id ?? "");
   const [operation, setOperation] = useState<"receipt" | "adjustment">("receipt");
@@ -63,6 +65,7 @@ export default function StockMovementForm({
       setQuantity("1");
       setReason("");
       router.refresh();
+      closeModal();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Could not save the stock movement.");
     } finally {
@@ -72,8 +75,7 @@ export default function StockMovementForm({
 
   return (
     <form className="product-form" onSubmit={submit}>
-      <h2>Receive or adjust stock</h2>
-            <label htmlFor="stock-variant">Product</label>
+                  <label htmlFor="stock-variant">Product</label>
       <select id="stock-variant" required value={variantId} onChange={e => setVariantId(e.target.value)}>
         {variants.length === 0 && <option value="">No product variants available</option>}
         {variants.map(item => <option key={item.id} value={item.id}>{item.label} · on hand {item.onHand}</option>)}
