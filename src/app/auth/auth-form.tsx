@@ -48,13 +48,11 @@ export default function AuthForm({ variant }: { variant: Variant }) {
     const next = new URLSearchParams(window.location.search).get("next");
     return next ? `?next=${encodeURIComponent(next)}` : "";
   };
-  const [otherHref, setOtherHref] = useState(isRegister ? "/login" : "/register");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const callbackError = params.get("error");
     if (callbackError) setError(CALLBACK_ERRORS[callbackError] ?? "Sign-in failed. Please try again.");
-    setOtherHref(`${isRegister ? "/login" : "/register"}${nextQuery()}`);
 
     // A signed-in visitor has nothing to do here.
     (async () => {
@@ -207,7 +205,7 @@ export default function AuthForm({ variant }: { variant: Variant }) {
           <button className="primary-button figma-submit" type="submit" disabled={busy}>{busy ? "Please wait…" : isRegister ? "Sign up" : useLink ? "Email me a sign-in link" : "Sign in"}</button>
         </form>
         )}
-        {!linkSent && <div className="figma-footer"><p>{isRegister ? "Already have an Account!" : "Don’t have an Account ?"} <Link href={otherHref}>{isRegister ? "Sign in" : "Sign up"}</Link></p><button className="figma-google" type="button" onClick={continueWithGoogle} disabled={busy}><GoogleIcon /> Continue with Google</button>{!isRegister && <button className="figma-magic-link" type="button" onClick={() => { setUseLink(value => !value); setError(""); setMessage(""); }}>{useLink ? "Use my password instead" : "Use an email sign-in link"}</button>}</div>}
+        {!linkSent && <div className="figma-footer"><button className="figma-google" type="button" onClick={continueWithGoogle} disabled={busy}><GoogleIcon /> Continue with Google</button>{!isRegister && <button className="figma-magic-link" type="button" onClick={() => { setUseLink(value => !value); setError(""); setMessage(""); }}>{useLink ? "Use my password instead" : "Use an email sign-in link"}</button>}</div>}
         {linkSent && <p className="auth-email-back"><Link href={`/login${nextQuery()}`}>Back to sign in</Link></p>}
       </div>
     </section>
