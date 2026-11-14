@@ -31,6 +31,7 @@ export default function AuthForm({ variant }: { variant: Variant }) {
   const isRegister = variant === "register";
   const [useLink, setUseLink] = useState(false);
   const [linkSent, setLinkSent] = useState(false);
+  const [linkResent, setLinkResent] = useState(false);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -101,6 +102,7 @@ export default function AuthForm({ variant }: { variant: Variant }) {
 
   async function resendMagicLink() {
     setBusy(true);
+    setLinkResent(false);
     setError("");
     try {
       const { error: otpError } = await createSupabaseBrowserClient().auth.signInWithOtp({
@@ -108,6 +110,7 @@ export default function AuthForm({ variant }: { variant: Variant }) {
         options: { emailRedirectTo: callbackUrl(), shouldCreateUser: false },
       });
       if (otpError) throw otpError;
+      setLinkResent(true);
     } catch (cause) {
       setError(friendlyAuthError(cause instanceof Error ? cause.message : "").text);
     } finally {
@@ -184,7 +187,7 @@ export default function AuthForm({ variant }: { variant: Variant }) {
             <div className="auth-email-sent-icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><rect x="5" y="10" width="38" height="28" rx="6" stroke="currentColor" strokeWidth="2.5"/><path d="m8 14 16 13 16-13" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/><path d="m31 32 4 4 8-9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
             <p className="auth-email-sent-lead">We have sent a secure sign-in link to</p>
             <strong className="auth-email-address">{email.trim().toLowerCase()}</strong>
-            <p className="auth-email-sent-help">Open the email on this device and follow the link to sign in. If it is not in your inbox, check spam or promotions.</p>
+            <p className="auth-email-sent-help" role="status">{linkResent ? "If an account exists for this address, a fresh sign-in link has been sent. Check your inbox." : "Open the email on this device and follow the link to sign in. If it is not in your inbox, check spam or promotions."}</p>
             {error && <p className="form-message error" role="alert">{error}</p>}
             <button className="primary-button figma-submit" type="button" onClick={resendMagicLink} disabled={busy}>{busy ? "Sending…" : "Send another link"}</button>
             <button className="auth-email-edit" type="button" onClick={() => { setLinkSent(false); setError(""); setUseLink(true); }}>Use a different email</button>
@@ -205,7 +208,7 @@ export default function AuthForm({ variant }: { variant: Variant }) {
         </form>
         )}
         {!linkSent && <div className="figma-footer"><p>{isRegister ? "Already have an Account!" : "Don’t have an Account ?"} <Link href={otherHref}>{isRegister ? "Sign in" : "Sign up"}</Link></p><button className="figma-google" type="button" onClick={continueWithGoogle} disabled={busy}><GoogleIcon /> Continue with Google</button>{!isRegister && <button className="figma-magic-link" type="button" onClick={() => { setUseLink(value => !value); setError(""); setMessage(""); }}>{useLink ? "Use my password instead" : "Use an email sign-in link"}</button>}</div>}
-        {linkSent && <p className="auth-email-back"><Link href="/login">Back to sign in</Link></p>}
+        {linkSent && <p className="auth-email-back"><Link href={`/login${nextQuery()}`}>Back to sign in</Link></p>}
       </div>
     </section>
   );
