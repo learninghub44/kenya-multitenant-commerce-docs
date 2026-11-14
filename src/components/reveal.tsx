@@ -3,13 +3,14 @@
 import type { ReactNode } from "react";
 import { motion, useReducedMotion } from "motion/react";
 
-type RevealProps = { children: ReactNode; className?: string; delay?: number };
+type RevealProps = { children: ReactNode; className?: string; delay?: number; ariaLabel?: string };
 
-export function Reveal({ children, className, delay = 0 }: RevealProps) {
+export function Reveal({ children, className, delay = 0, ariaLabel }: RevealProps) {
   const reduceMotion = useReducedMotion();
   return (
     <motion.div
       className={className}
+      aria-label={ariaLabel}
       initial={reduceMotion ? false : { opacity: 0, y: 20 }}
       whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.16 }}
