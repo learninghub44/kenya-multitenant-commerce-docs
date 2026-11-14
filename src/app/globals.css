@@ -1079,3 +1079,49 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .auth-card-figma .auth-email-address{font-size:14px}
 @media(max-width:430px){.auth-email-sent{padding:24px 17px;border-radius:15px}.auth-email-sent-icon{width:58px;height:58px}}
 @media(prefers-reduced-motion:reduce){.auth-email-sent{animation:none}}
+
+
+/* Branded authentication header and navigation */
+.auth-shell-figma { display: flex; flex-direction: column; min-height: 100svh; background: #fbf9f5; }
+.auth-topbar { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 20px; width: min(100%, 1440px); min-height: 88px; margin: 0 auto; padding: 16px clamp(20px, 5vw, 72px); }
+.auth-brand { display: inline-flex; align-items: center; gap: 12px; min-width: 0; color: #17191f; text-decoration: none; }
+.auth-brand-mark { display: grid; flex: 0 0 auto; width: 48px; height: 48px; filter: drop-shadow(0 5px 9px rgb(23 25 31 / 12%)); transition: transform .2s ease, filter .2s ease; }
+.auth-brand:hover .auth-brand-mark { transform: translateY(-2px) rotate(-3deg); filter: drop-shadow(0 8px 12px rgb(23 25 31 / 18%)); }
+.auth-brand-mark svg { display: block; width: 100%; height: 100%; }
+.auth-brand-copy { display: grid; gap: 3px; line-height: 1.05; }
+.auth-brand-copy strong { font-family: var(--font-display); font-size: clamp(17px, 2vw, 20px); font-weight: 850; letter-spacing: -.055em; white-space: nowrap; }
+.auth-brand-copy em { color: #c2650a; font-style: normal; }
+.auth-brand-copy small { color: #77736e; font-size: 9px; font-weight: 800; letter-spacing: .16em; }
+.auth-topnav { display: inline-flex; align-items: center; gap: 8px; padding: 5px; border: 1px solid #e9e2d8; border-radius: 999px; background: #fff; box-shadow: 0 5px 18px rgb(30 24 16 / 4%); }
+.auth-topnav a { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 0 19px; border-radius: 999px; color: #55545a; font-size: 14px; font-weight: 750; text-decoration: none; transition: background .18s ease, color .18s ease, transform .18s ease; }
+.auth-topnav a:hover { color: #17191f; background: #f8f3eb; }
+.auth-topnav a.is-active { color: #fff; background: #17191f; box-shadow: 0 3px 8px rgb(23 25 31 / 18%); }
+.auth-topnav a.auth-topnav-cta:not(.is-active) { color: #fff; background: #c2650a; }
+.auth-topnav a.auth-topnav-cta:not(.is-active):hover { background: #9c4f05; }
+.auth-main-figma { position: relative; display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: flex-start; gap: 16px; width: 100%; padding: 20px 22px 64px; background: transparent; }
+.auth-home-link { display: inline-flex; align-items: center; align-self: flex-start; gap: 9px; width: min(100%, 480px); margin: 0 auto; color: #6c6870; font-size: 14px; font-weight: 700; text-decoration: none; transition: color .18s ease, transform .18s ease; }
+.auth-home-link span { display: grid; width: 30px; height: 30px; place-items: center; border: 1px solid #e8e1d8; border-radius: 50%; background: #fff; color: #26232a; font-size: 17px; }
+.auth-home-link:hover { color: #c2650a; transform: translateX(-2px); }
+.auth-main-figma .auth-card-figma { margin: 0 auto; }
+.auth-card-figma { animation: authCardEnter .48s cubic-bezier(.2,.75,.25,1) both; }
+@keyframes authCardEnter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 600px) {
+  .auth-topbar { min-height: 74px; padding: 12px 16px; gap: 10px; }
+  .auth-brand { gap: 8px; }
+  .auth-brand-mark { width: 40px; height: 40px; }
+  .auth-brand-copy strong { font-size: 16px; }
+  .auth-brand-copy small { font-size: 7px; letter-spacing: .12em; }
+  .auth-topnav { gap: 3px; padding: 3px; }
+  .auth-topnav a { min-height: 36px; padding: 0 11px; font-size: 12px; }
+  .auth-main-figma { padding: 12px 16px 40px; gap: 12px; }
+  .auth-home-link { font-size: 13px; }
+}
+@media (max-width: 360px) {
+  .auth-brand-copy small { display: none; }
+  .auth-brand-copy strong { font-size: 14px; }
+  .auth-topnav a { padding: 0 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-card-figma { animation: none; }
+  .auth-brand-mark, .auth-home-link, .auth-topnav a { transition: none; }
+}
