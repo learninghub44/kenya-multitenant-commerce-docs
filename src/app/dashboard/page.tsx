@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/access";
 import { storeDisplayAddress } from "@/lib/store-url";
 import Logo from "@/components/logo";
+import { BusinessClock, BusinessIdChip } from "./[tenantSlug]/business-badge";
 
 export default async function DashboardPage() {
   const user = await requireUser("/dashboard");
@@ -10,7 +11,7 @@ export default async function DashboardPage() {
 
   const { data: memberships, error } = await supabase
     .from("tenant_memberships")
-    .select("tenant_id, role, active, tenants(id, name, slug, status, currency)")
+    .select("tenant_id, role, active, tenants(id, name, slug, status, currency, business_code, timezone)")
     .eq("user_id", user.id)
     .eq("active", true);
 
@@ -26,7 +27,7 @@ export default async function DashboardPage() {
   }
 
   const tenants = (memberships ?? []).flatMap(item => {
-    const related = item.tenants as unknown as { id: string; name: string; slug: string; status: string; currency: string } | Array<{ id: string; name: string; slug: string; status: string; currency: string }> | null;
+    const related = item.tenants as unknown as { id: string; name: string; slug: string; status: string; currency: string; business_code: string | null; timezone: string | null } | Array<{ id: string; name: string; slug: string; status: string; currency: string; business_code: string | null; timezone: string | null }> | null;
     const tenant = Array.isArray(related) ? related[0] : related;
     return tenant && tenant.status === "active" ? [{ ...item, tenant }] : [];
   });
@@ -55,8 +56,11 @@ export default async function DashboardPage() {
           <article className="workspace-card business-card" key={item.tenant_id}>
             <span className="business-mark" aria-hidden="true">{item.tenant.name.slice(0, 1).toUpperCase()}</span>
             <div className="business-card-copy">
-              <h2>{item.tenant.name}</h2>
-              <p className="business-slug">{storeDisplayAddress(item.tenant.slug)}</p>
+              <h2 title={item.tenant.name}>{item.tenant.name}</h2>
+              <div className="business-card-identity">
+                {item.tenant.business_code ? <BusinessIdChip code={item.tenant.business_code} /> : <span className="business-id-pending">ID pending</span>}
+                <BusinessClock timezone={item.tenant.timezone || "Africa/Nairobi"} />
+              </div>
               <div className="business-meta">
                 <span className="workspace-status">{item.tenant.currency}</span>
                 <span className="business-meta-dot" aria-hidden="true" />
@@ -64,7 +68,7 @@ export default async function DashboardPage() {
               </div>
             </div>
             <Link className="workspace-action" href={`/dashboard/${item.tenant.slug}`}>
-              Open <span aria-hidden="true">→</span>
+              Open workspace <span aria-hidden="true">→</span>
             </Link>
           </article>
         ))}
