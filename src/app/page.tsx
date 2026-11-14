@@ -44,7 +44,7 @@ export default function HomePage() {
         <div className={styles.actions}><Link className={styles.primary} href="/register">Create your workspace <span>→</span></Link><Link className={styles.secondary} href="/how-it-works">See how it works</Link></div>
         <p className={styles.supporting}>Practical tools for the everyday running of your business.</p>
       </Reveal>
-      <Reveal className={styles.visual} aria-label="Illustration of a business management workspace">
+      <Reveal className={styles.visual} ariaLabel="Illustration of a business management workspace">
         <div className={styles.visualTop}><span className={styles.dot}></span><span className={styles.dot}></span><span className={styles.dot}></span><b>BUSINESS OVERVIEW</b><small>Workspace</small></div>
         <div className={styles.visualBody}>
           <div className={styles.visualWelcome}><span>YOUR BUSINESS</span><strong>A little more organised.</strong><small>Your daily work, together.</small></div>
@@ -62,7 +62,7 @@ export default function HomePage() {
       <Reveal className={styles.howIntro}><p className={styles.sectionLabel}>GETTING STARTED</p><h2>Simple to set up.<br /><em>Easy to keep moving.</em></h2><p>Get your workspace ready, then use it to bring your daily operations together.</p><Link href="/how-it-works">See how it works <span>→</span></Link></Reveal>
       <Reveal className={styles.steps}>{steps.map(([title,description],index)=><article key={title}><span>0{index+1}</span><div><h3>{title}</h3><p>{description}</p></div></article>)}</Reveal>
     </section>
-    <section className={styles.cta}><Reveal><div><p className={styles.sectionLabel}>A BETTER WAY TO STAY ORGANISED</p><h2>Bring your business<br />into one workspace.</h2><p>Start with your catalogue. Build from there.</p></div><Link href="/register">Create your workspace <span>→</span></Link></Reveal></section>
+    <section className={styles.cta}><Reveal className={styles.ctaMotion}><div><p className={styles.sectionLabel}>A BETTER WAY TO STAY ORGANISED</p><h2>Bring your business<br />into one workspace.</h2><p>Start with your catalogue. Build from there.</p></div><Link href="/register">Create your workspace <span>→</span></Link></Reveal></section>
     <footer className={styles.footer}>
       <div className={styles.footerBrand}><Logo href="/" size={42}/><p>One clear workspace for your shop, stock and daily business operations.</p></div>
       <div className={styles.footerColumn}><h2>Explore</h2><Link href="/features">Features</Link><Link href="/how-it-works">How it works</Link><Link href="/pricing">Pricing</Link><Link href="/register">Get started</Link></div>
