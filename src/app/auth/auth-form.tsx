@@ -34,6 +34,8 @@ export default function AuthForm({ variant }: { variant: Variant }) {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [remember, setRemember] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -115,6 +117,7 @@ export default function AuthForm({ variant }: { variant: Variant }) {
       if (isRegister) {
         const cleanName = fullName.trim();
         if (cleanName.length < 2 || cleanName.length > 120) throw new Error("__validation:Enter your full name.");
+        if (password !== confirmPassword) throw new Error("__validation:Your passwords do not match.");
         const problem = passwordProblem(password);
         if (problem) throw new Error(`__validation:${problem}`);
         let normalizedPhone: string | undefined;
@@ -156,74 +159,25 @@ export default function AuthForm({ variant }: { variant: Variant }) {
   const submitLabel = isRegister ? "Create free account" : useLink ? "Email me a sign-in link" : "Sign in";
 
   return (
-    <section className="auth-card" aria-labelledby="auth-title">
-      <h1 id="auth-title">{isRegister ? "Create your free account" : "Welcome back"}</h1>
-      <p className="auth-description">
-        {isRegister ? "Join free and get your shop link. No card needed." : useLink ? "We will email you a one-time sign-in link." : "Sign in to manage your products, stock and orders."}
-      </p>
-
-      <button className="provider-button" type="button" onClick={continueWithGoogle} disabled={busy}>
-        <GoogleIcon /> Continue with Google
-      </button>
-      <div className="auth-divider"><span>or with email</span></div>
-
-      <form onSubmit={submit}>
-        {isRegister && (
-          <div className="field">
-            <label htmlFor="full-name">Full name</label>
-            <input id="full-name" autoComplete="name" required minLength={2} maxLength={120} placeholder="e.g. Grace Wanjiku" value={fullName} onChange={e => setFullName(e.target.value)} />
-          </div>
-        )}
-        <div className="field">
-          <label htmlFor="email">Email address</label>
-          <input id="email" type="email" inputMode="email" autoComplete="email" placeholder="you@business.co.ke" required maxLength={254} value={email} onChange={e => setEmail(e.target.value)} />
-        </div>
-        {isRegister && (
-          <div className="field">
-            <label htmlFor="phone">Phone <span className="optional">(optional, for customer contact)</span></label>
-            <div className="phone-field">
-              <span aria-hidden="true">+254</span>
-              <input id="phone" type="tel" inputMode="tel" autoComplete="tel-national" placeholder="712 345 678" maxLength={20} value={phone} onChange={e => setPhone(e.target.value)} />
-            </div>
-          </div>
-        )}
-        {(isRegister || !useLink) && (
-          <div className="field">
-            <div className="label-row">
-              <label htmlFor="password">Password</label>
-              {!isRegister && <Link className="inline-link" href="/auth/forgot-password">Forgot password?</Link>}
-            </div>
-            <div className="password-field">
-              <input id="password" type={showPassword ? "text" : "password"} autoComplete={isRegister ? "new-password" : "current-password"} required minLength={isRegister ? 8 : 1} maxLength={128} value={password} onChange={e => setPassword(e.target.value)} />
-              <button className="password-toggle" type="button" onClick={() => setShowPassword(value => !value)} aria-pressed={showPassword}>{showPassword ? "Hide" : "Show"}</button>
-            </div>
-            {isRegister && (
-              <>
-                <div className={`strength strength-${metCount}`} aria-hidden="true"><i /><i /><i /></div>
-                <ul className="password-rules" aria-label="Password requirements">
-                  {PASSWORD_RULES.map(rule => <li key={rule.id} className={rule.test(password) ? "is-met" : ""}>{rule.label}</li>)}
-                </ul>
-              </>
-            )}
-          </div>
-        )}
-
-        {error && <p className="form-message error" role="alert">{error}</p>}
-        {needsConfirmation && <button className="inline-link-button" type="button" onClick={resendConfirmation} disabled={busy}>Resend confirmation email</button>}
-        {message && <p className="form-message" role="status">{message}</p>}
-        <button className="primary-button" type="submit" disabled={busy}>{busy ? "Please wait…" : submitLabel}</button>
-      </form>
-
-      {!isRegister && (
-        <button className="inline-link-button center" type="button" onClick={() => { setUseLink(value => !value); setError(""); setMessage(""); }}>
-          {useLink ? "Use my password instead" : "Email me a sign-in link instead"}
-        </button>
-      )}
-
-      <p className="auth-switch">
-        {isRegister ? "Already have an account? " : "New here? "}
-        <Link href={otherHref}>{isRegister ? "Sign in" : "Create a free account"}</Link>
-      </p>
+    <section className={`auth-card auth-card-figma ${isRegister ? "is-register" : "is-login"}`} aria-labelledby="auth-title">
+      <div className="auth-pattern" aria-hidden="true" />
+      <div className="auth-form-content">
+        <h1 id="auth-title">{isRegister ? "Sign up" : "Sign in"}</h1>
+        <form onSubmit={submit}>
+          {isRegister && <div className="figma-field"><label htmlFor="full-name">Full name</label><div className="figma-input-wrap"><span className="figma-field-icon" aria-hidden="true">♙</span><input id="full-name" autoComplete="name" required minLength={2} maxLength={120} placeholder="Your full name" value={fullName} onChange={e => setFullName(e.target.value)} /></div></div>}
+          <div className="figma-field"><label htmlFor="email">Email</label><div className="figma-input-wrap"><span className="figma-field-icon" aria-hidden="true">✉</span><input id="email" type="email" inputMode="email" autoComplete="email" placeholder="you@example.com" required maxLength={254} value={email} onChange={e => setEmail(e.target.value)} /></div></div>
+          {isRegister && <div className="figma-field"><label htmlFor="phone">Phone</label><div className="figma-input-wrap"><span className="figma-field-icon" aria-hidden="true">⌕</span><span className="figma-phone-prefix">+254</span><input id="phone" type="tel" inputMode="tel" autoComplete="tel-national" placeholder="712 345 678" maxLength={20} value={phone} onChange={e => setPhone(e.target.value)} /></div></div>}
+          {(isRegister || !useLink) && <div className="figma-field"><label htmlFor="password">Password</label><div className="figma-input-wrap"><span className="figma-field-icon" aria-hidden="true">♙</span><input id="password" type={showPassword ? "text" : "password"} autoComplete={isRegister ? "new-password" : "current-password"} required minLength={isRegister ? 8 : 1} maxLength={128} placeholder="Enter your password" value={password} onChange={e => setPassword(e.target.value)} /><button className="figma-eye" type="button" onClick={() => setShowPassword(value => !value)} aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? "Hide" : "◉"}</button></div>
+          {isRegister && <><div className={`strength strength-${metCount}`} aria-hidden="true"><i /><i /><i /></div><ul className="password-rules" aria-label="Password requirements">{PASSWORD_RULES.map(rule => <li key={rule.id} className={rule.test(password) ? "is-met" : ""}>{rule.label}</li>)}</ul></>}</div>}
+          {isRegister && <div className="figma-field"><label htmlFor="confirm-password">Confirm Password</label><div className="figma-input-wrap"><span className="figma-field-icon" aria-hidden="true">♙</span><input id="confirm-password" type={showPassword ? "text" : "password"} autoComplete="new-password" required minLength={8} maxLength={128} placeholder="Confirm your password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} /></div></div>}
+          {!isRegister && !useLink && <div className="figma-login-options"><label className="figma-remember"><input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)} /><span>Remember Me</span></label><Link href="/auth/forgot-password">Forgot Password?</Link></div>}
+          {error && <p className="form-message error" role="alert">{error}</p>}
+          {needsConfirmation && <button className="inline-link-button" type="button" onClick={resendConfirmation} disabled={busy}>Resend confirmation email</button>}
+          {message && <p className="form-message" role="status">{message}</p>}
+          <button className="primary-button figma-submit" type="submit" disabled={busy}>{busy ? "Please wait…" : isRegister ? "Sign up" : useLink ? "Email me a sign-in link" : "Sign in"}</button>
+        </form>
+        <div className="figma-footer"><p>{isRegister ? "Already have an Account!" : "Don’t have an Account ?"} <Link href={otherHref}>{isRegister ? "Sign in" : "Sign up"}</Link></p><button className="figma-google" type="button" onClick={continueWithGoogle} disabled={busy}><GoogleIcon /> Continue with Google</button>{!isRegister && <button className="figma-magic-link" type="button" onClick={() => { setUseLink(value => !value); setError(""); setMessage(""); }}>{useLink ? "Use my password instead" : "Use an email sign-in link"}</button>}</div>
+      </div>
     </section>
   );
 }
