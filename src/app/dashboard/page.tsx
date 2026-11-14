@@ -9,11 +9,23 @@ export default async function DashboardPage() {
   const user = await requireUser("/dashboard");
   const supabase = await createSupabaseServerClient();
 
-  const { data: memberships, error } = await supabase
+  let { data: memberships, error } = await supabase
     .from("tenant_memberships")
     .select("tenant_id, role, active, tenants(id, name, slug, status, currency, business_code, timezone)")
     .eq("user_id", user.id)
     .eq("active", true);
+
+  // Keep the business switcher usable while the production migration is pending.
+  // The ID remains database-generated; never fabricate a client-side replacement.
+  if (error && (error.code === "42703" || error.code === "PGRST204")) {
+    const fallback = await supabase
+      .from("tenant_memberships")
+      .select("tenant_id, role, active, tenants(id, name, slug, status, currency, timezone)")
+      .eq("user_id", user.id)
+      .eq("active", true);
+    memberships = fallback.data as typeof memberships;
+    error = fallback.error;
+  }
 
   if (error) {
     return (
