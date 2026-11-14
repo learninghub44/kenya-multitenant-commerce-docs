@@ -43,6 +43,7 @@ export default async function DashboardPage() {
     const tenant = Array.isArray(related) ? related[0] : related;
     return tenant && tenant.status === "active" ? [{ ...item, tenant }] : [];
   });
+  const hasPendingBusinessIds = tenants.some(item => !item.tenant.business_code);
   return (
     <main className="dashboard-page workspaces-page workspaces-compact">
       <Logo href="/" size={36} className="page-logo" />
@@ -55,6 +56,7 @@ export default async function DashboardPage() {
           <button className="secondary-button" type="submit">Sign out</button>
         </form>
       </header>
+      {hasPendingBusinessIds && <p className="business-id-note">Business IDs will appear after the production database migrations run. IDs are generated and stored by the database.</p>}
       <section className="workspace-list" aria-label="Businesses you can access">
         {tenants.length === 0 ? (
           <div className="empty-state workspace-empty">
